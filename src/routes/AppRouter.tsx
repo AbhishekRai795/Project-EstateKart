@@ -13,6 +13,8 @@ import { ListerProperties } from '../pages/lister/Properties';
 import { AddProperty } from '../pages/lister/AddProperty';
 import { ListerAnalytics } from '../pages/lister/Analytics';
 import { ListerQueries } from '../pages/lister/Queries';
+import { UserDashboard } from '../pages/user/Dashboard';
+import { ClientManagement } from '../pages/lister/ClientManagement';
 
 const AppRouter: React.FC = () => {
   const { user, loading } = useAuth();
@@ -43,6 +45,9 @@ const AppRouter: React.FC = () => {
           <Route path="/favorites" element={
             user ? <UserFavorites /> : <Navigate to="/auth/login" />
           } />
+          <Route path="/user-dashboard" element={
+            user ? <UserDashboard /> : <Navigate to="/auth/login" />
+          } />
           <Route path="/dashboard" element={
             user ? <ListerDashboard /> : <Navigate to="/auth/login" />
           } />
@@ -57,6 +62,9 @@ const AppRouter: React.FC = () => {
           } />
           <Route path="/queries" element={
             user ? <ListerQueries /> : <Navigate to="/auth/login" />
+          } />
+          <Route path="/clients" element={
+            user ? <ClientManagement /> : <Navigate to="/auth/login" />
           } />
           
           {/* Fallback */}

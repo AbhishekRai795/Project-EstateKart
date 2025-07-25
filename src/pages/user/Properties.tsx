@@ -12,6 +12,13 @@ export const UserProperties: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filteredProperties, setFilteredProperties] = useState(properties);
   const [sortBy, setSortBy] = useState('recent');
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
+  const [scheduleForm, setScheduleForm] = useState({
+    date: '',
+    time: '',
+    message: ''
+  });
 
   const handleSearch = (query: string, filters: any) => {
     let filtered = properties;
@@ -77,6 +84,20 @@ export const UserProperties: React.FC = () => {
     }
 
     setFilteredProperties(sorted);
+  };
+
+  const handleScheduleViewing = (propertyId: string) => {
+    setSelectedPropertyId(propertyId);
+    setShowScheduleModal(true);
+  };
+
+  const handleScheduleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically send the schedule request to your backend
+    console.log('Schedule viewing:', { propertyId: selectedPropertyId, ...scheduleForm });
+    alert('Viewing scheduled successfully! The lister will contact you soon.');
+    setShowScheduleModal(false);
+    setScheduleForm({ date: '', time: '', message: '' });
   };
 
   const containerVariants = {
@@ -172,8 +193,10 @@ export const UserProperties: React.FC = () => {
               <PropertyCard
                 key={property.id}
                 property={property}
+                viewMode={viewMode}
                 onFavoriteToggle={user ? toggleFavorite : undefined}
                 isFavorite={user ? favoriteProperties.includes(property.id) : false}
+                onScheduleViewing={handleScheduleViewing}
               />
             ))}
           </div>
@@ -222,6 +245,93 @@ export const UserProperties: React.FC = () => {
             Load More Properties
           </motion.button>
         </motion.div>
+      )}
+
+      {/* Schedule Viewing Modal */}
+      {showScheduleModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">Schedule Property Viewing</h3>
+              <button
+                onClick={() => setShowScheduleModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleScheduleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Preferred Date
+                </label>
+                <input
+                  type="date"
+                  value={scheduleForm.date}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, date: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  required
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Preferred Time
+                </label>
+                <select
+                  value={scheduleForm.time}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, time: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  required
+                >
+                  <option value="">Select time</option>
+                  <option value="09:00">9:00 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="11:00">11:00 AM</option>
+                  <option value="14:00">2:00 PM</option>
+                  <option value="15:00">3:00 PM</option>
+                  <option value="16:00">4:00 PM</option>
+                  <option value="17:00">5:00 PM</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Message (Optional)
+                </label>
+                <textarea
+                  value={scheduleForm.message}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, message: e.target.value }))}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
+                  placeholder="Any specific requirements or questions..."
+                />
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowScheduleModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                >
+                  Schedule Viewing
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
       )}
     </motion.div>
   );
