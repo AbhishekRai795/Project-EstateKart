@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Filter, Grid, List, MapPin } from 'lucide-react';
+import { Filter, Grid, List, MapPin, X } from 'lucide-react';
 import { useProperty } from '../../contexts/PropertyContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { PropertyCard } from '../../components/common/PropertyCard';

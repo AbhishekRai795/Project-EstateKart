@@ -7,7 +7,7 @@ import {
   Bed, 
   Bath, 
   Square, 
-  Heart, 
+  ShoppingCart, 
   Share2, 
   Phone, 
   Mail, 
@@ -30,9 +30,18 @@ export const PropertyDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { properties, favoriteProperties, toggleFavorite } = useProperty();
+  const { properties, catalogueProperties, toggleCatalogue } = useProperty();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleForm, setScheduleForm] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: '',
+    date: '',
+    time: '',
+    message: ''
+  });
   const [contactForm, setContactForm] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -58,7 +67,7 @@ export const PropertyDetail: React.FC = () => {
     );
   }
 
-  const isFavorite = favoriteProperties.includes(property.id);
+  const isInCatalogue = catalogueProperties.includes(property.id);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => 
@@ -80,6 +89,20 @@ export const PropertyDetail: React.FC = () => {
     setShowContactForm(false);
   };
 
+  const handleScheduleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Schedule viewing:', scheduleForm);
+    alert('Viewing scheduled successfully! The lister will contact you soon.');
+    setShowScheduleModal(false);
+    setScheduleForm({ 
+      name: user?.name || '', 
+      email: user?.email || '', 
+      phone: '', 
+      date: '', 
+      time: '', 
+      message: '' 
+    });
+  };
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -138,9 +161,9 @@ export const PropertyDetail: React.FC = () => {
             
             <div className="flex items-center space-x-3">
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                <ShoppingCart
                 whileTap={{ scale: 0.95 }}
-                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                    isInCatalogue ? 'text-blue-500 fill-current' : 'text-gray-600'
               >
                 <Share2 className="h-5 w-5 text-gray-600" />
               </motion.button>
@@ -355,9 +378,11 @@ export const PropertyDetail: React.FC = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full border-2 border-primary-500 text-primary-600 py-3 px-4 rounded-lg hover:bg-primary-50 transition-colors font-medium"
+                  onClick={() => setShowScheduleModal(true)}
+                  className="w-full border-2 border-primary-500 text-primary-600 py-3 px-4 rounded-lg hover:bg-primary-50 transition-colors font-medium flex items-center justify-center space-x-2"
                 >
-                  Schedule Viewing
+                  <Calendar className="h-4 w-4" />
+                  <span>Schedule Viewing</span>
                 </motion.button>
 
                 <div className="flex space-x-3">
@@ -493,5 +518,129 @@ export const PropertyDetail: React.FC = () => {
         </div>
       )}
     </div>
+      {/* Schedule Viewing Modal */}
+      {showScheduleModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg border border-gray-200"
+          >
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-2xl font-bold text-gray-900">Schedule Property Viewing</h3>
+              <button
+                onClick={() => setShowScheduleModal(false)}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <ArrowLeft className="h-6 w-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleScheduleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  value={scheduleForm.name}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={scheduleForm.email}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number (Optional)
+                </label>
+                <input
+                  type="tel"
+                  value={scheduleForm.phone}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, phone: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Preferred Date
+                </label>
+                <input
+                  type="date"
+                  value={scheduleForm.date}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, date: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  required
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Preferred Time
+                </label>
+                <select
+                  value={scheduleForm.time}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, time: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  required
+                >
+                  <option value="">Select time</option>
+                  <option value="09:00">9:00 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="11:00">11:00 AM</option>
+                  <option value="14:00">2:00 PM</option>
+                  <option value="15:00">3:00 PM</option>
+                  <option value="16:00">4:00 PM</option>
+                  <option value="17:00">5:00 PM</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Message (Optional)
+                </label>
+                <textarea
+                  value={scheduleForm.message}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, message: e.target.value }))}
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all"
+                  placeholder="Any specific requirements or questions..."
+                />
+              </div>
+
+              <div className="flex space-x-4 pt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowScheduleModal(false)}
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl transition-all duration-300 font-bold shadow-lg hover:shadow-primary-500/25"
+                >
+                  Schedule Viewing
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
   );
 };
