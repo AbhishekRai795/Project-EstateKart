@@ -22,11 +22,11 @@ export interface Property {
 
 interface PropertyContextType {
   properties: Property[];
-  favoriteProperties: string[];
+  catalogueProperties: string[];
   addProperty: (property: Omit<Property, 'id' | 'createdAt' | 'views' | 'offers'>) => void;
   updateProperty: (id: string, updates: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
-  toggleFavorite: (propertyId: string) => void;
+  toggleCatalogue: (propertyId: string) => void;
   getPropertiesByLister: (listerId: string) => Property[];
   getPropertyAnalytics: (listerId: string) => any;
 }
@@ -107,7 +107,7 @@ export const PropertyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   ]);
 
-  const [favoriteProperties, setFavoriteProperties] = useState<string[]>([]);
+  const [catalogueProperties, setCatalogueProperties] = useState<string[]>([]);
 
   const addProperty = (propertyData: Omit<Property, 'id' | 'createdAt' | 'views' | 'offers'>) => {
     const newProperty: Property = {
@@ -130,8 +130,8 @@ export const PropertyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setProperties(prev => prev.filter(property => property.id !== id));
   };
 
-  const toggleFavorite = (propertyId: string) => {
-    setFavoriteProperties(prev => 
+  const toggleCatalogue = (propertyId: string) => {
+    setCatalogueProperties(prev => 
       prev.includes(propertyId) 
         ? prev.filter(id => id !== propertyId)
         : [...prev, propertyId]
@@ -167,11 +167,11 @@ export const PropertyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   return (
     <PropertyContext.Provider value={{
       properties,
-      favoriteProperties,
+      catalogueProperties,
       addProperty,
       updateProperty,
       deleteProperty,
-      toggleFavorite,
+      toggleCatalogue,
       getPropertiesByLister,
       getPropertyAnalytics
     }}>

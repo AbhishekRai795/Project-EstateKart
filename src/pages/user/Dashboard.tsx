@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, Heart, TrendingUp, MapPin, Home as HomeIcon, Star } from 'lucide-react';
+import { Search, ShoppingCart, TrendingUp, MapPin, Home as HomeIcon, Star, Sparkles } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProperty } from '../../contexts/PropertyContext';
 import { PropertyCard } from '../../components/common/PropertyCard';
@@ -9,12 +9,12 @@ import { StatsCard } from '../../components/analytics/StatsCard';
 
 export const UserDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { properties, favoriteProperties, toggleFavorite } = useProperty();
+  const { properties, catalogueProperties, toggleCatalogue } = useProperty();
 
   // Get recent and featured properties
   const recentProperties = properties.slice(0, 6);
-  const featuredProperties = properties.filter(p => p.views > 200).slice(0, 3);
-  const favoriteCount = favoriteProperties.length;
+  const recommendedProperties = properties.filter(p => p.views > 200).slice(0, 3);
+  const catalogueCount = catalogueProperties.length;
   const viewedCount = 12; // Mock data
 
   const handleSearch = (query: string, filters: any) => {
@@ -51,11 +51,13 @@ export const UserDashboard: React.FC = () => {
     >
       {/* Welcome Section */}
       <motion.div variants={itemVariants} className="mb-8">
-        <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-8 text-white">
+        <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-8 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
           <h1 className="text-3xl font-bold mb-2">
             Welcome back, {user?.name}! 👋
           </h1>
-          <p className="text-primary-100 text-lg">
+          <p className="text-primary-100 text-lg relative z-10">
             Discover your perfect property from thousands of listings
           </p>
         </div>
@@ -75,9 +77,9 @@ export const UserDashboard: React.FC = () => {
           color="primary"
         />
         <StatsCard
-          title="Saved Favorites"
-          value={favoriteCount}
-          icon={Heart}
+          title="My Catalogue"
+          value={catalogueCount}
+          icon={ShoppingCart}
           color="error"
         />
         <StatsCard
@@ -89,22 +91,25 @@ export const UserDashboard: React.FC = () => {
         />
       </motion.div>
 
-      {/* Featured Properties */}
+      {/* Recommended Properties */}
       <motion.section variants={itemVariants} className="mb-12">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Featured Properties</h2>
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Sparkles className="h-6 w-6 text-primary-500" />
+            Recommended Properties
+          </h2>
           <button className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
             View all →
           </button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredProperties.map((property) => (
+          {recommendedProperties.map((property) => (
             <PropertyCard
               key={property.id}
               property={property}
-              onFavoriteToggle={toggleFavorite}
-              isFavorite={favoriteProperties.includes(property.id)}
+              onCatalogueToggle={toggleCatalogue}
+              isInCatalogue={catalogueProperties.includes(property.id)}
             />
           ))}
         </div>
@@ -124,8 +129,8 @@ export const UserDashboard: React.FC = () => {
             <PropertyCard
               key={property.id}
               property={property}
-              onFavoriteToggle={toggleFavorite}
-              isFavorite={favoriteProperties.includes(property.id)}
+              onCatalogueToggle={toggleCatalogue}
+              isInCatalogue={catalogueProperties.includes(property.id)}
             />
           ))}
         </div>
@@ -134,53 +139,41 @@ export const UserDashboard: React.FC = () => {
       {/* Quick Actions */}
       <motion.section variants={itemVariants}>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
+            onClick={() => navigate('/properties')}
+            className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer group border border-gray-100 hover:border-primary-200"
           >
-            <div className="bg-primary-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-primary-200 transition-colors">
-              <Search className="h-6 w-6 text-primary-600" />
+            <div className="bg-gradient-to-br from-primary-100 to-primary-200 p-4 rounded-xl w-fit mb-6 group-hover:scale-110 transition-transform duration-300">
+              <Search className="h-7 w-7 text-primary-600" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Advanced Search</h3>
-            <p className="text-sm text-gray-600">Use filters to find exactly what you're looking for</p>
+            <h3 className="font-bold text-gray-900 mb-3 text-lg">Browse Properties</h3>
+            <p className="text-gray-600 leading-relaxed">Explore thousands of properties with advanced filters</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
+            onClick={() => navigate('/catalogue')}
+            className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer group border border-gray-100 hover:border-primary-200"
           >
-            <div className="bg-red-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-red-200 transition-colors">
-              <Heart className="h-6 w-6 text-red-600" />
+            <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-4 rounded-xl w-fit mb-6 group-hover:scale-110 transition-transform duration-300">
+              <ShoppingCart className="h-7 w-7 text-blue-600" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">My Favorites</h3>
-            <p className="text-sm text-gray-600">View all your saved properties in one place</p>
+            <h3 className="font-bold text-gray-900 mb-3 text-lg">My Catalogue</h3>
+            <p className="text-gray-600 leading-relaxed">View and manage your saved properties</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
+            onClick={() => navigate('/recommendations')}
+            className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer group border border-gray-100 hover:border-primary-200"
           >
-            <div className="bg-green-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-green-200 transition-colors">
-              <MapPin className="h-6 w-6 text-green-600" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Map View</h3>
-            <p className="text-sm text-gray-600">Explore properties on an interactive map</p>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
-          >
-            <div className="bg-blue-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-blue-200 transition-colors">
-              <Star className="h-6 w-6 text-blue-600" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Recommendations</h3>
-            <p className="text-sm text-gray-600">Get personalized property suggestions</p>
+            <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-4 rounded-xl w-fit mb-6 group-hover:scale-110 transition-transform duration-300">
+              <Sparkles className="h-7 w-7 text-purple-600" />
+            <h3 className="font-bold text-gray-900 mb-3 text-lg">Recommendations</h3>
+            <p className="text-gray-600 leading-relaxed">Get AI-powered personalized property suggestions</p>
           </motion.div>
         </div>
       </motion.section>

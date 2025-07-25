@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Eye, DollarSign, TrendingUp, Home as HomeIcon, Users, BarChart3 } from 'lucide-react';
+import { Plus, Eye, DollarSign, TrendingUp, Home as HomeIcon, Users, BarChart3, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProperty } from '../../contexts/PropertyContext';
 import { StatsCard } from '../../components/analytics/StatsCard';
@@ -63,27 +63,27 @@ export const ListerDashboard: React.FC = () => {
     >
       {/* Welcome Section */}
       <motion.div variants={itemVariants} className="mb-8">
-        <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-8 text-white relative overflow-hidden">
+        <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-10 text-white relative overflow-hidden">
           <div className="relative z-10">
-            <h1 className="text-3xl font-bold mb-2">
+            <h1 className="text-4xl font-bold mb-4">
               Welcome back, {user?.name}! 🏠
             </h1>
-            <p className="text-primary-100 text-lg mb-6">
+            <p className="text-primary-100 text-xl mb-8">
               Manage your properties and track your sales performance
             </p>
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/lister/add-property')}
-              className="bg-white text-primary-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center space-x-2"
+              onClick={() => navigate('/add-property')}
+              className="bg-white text-primary-600 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-50 transition-all duration-300 flex items-center space-x-3 shadow-lg hover:shadow-xl"
             >
-              <Plus className="h-5 w-5" />
+              <Plus className="h-6 w-6" />
               <span>Add New Property</span>
             </motion.button>
           </div>
           {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
-          <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 translate-x-16"></div>
+          <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 translate-x-40"></div>
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/5 rounded-full translate-y-20 translate-x-20"></div>
         </div>
       </motion.div>
 
@@ -111,17 +111,17 @@ export const ListerDashboard: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-md p-8 text-center">
-            <HomeIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No properties listed yet</h3>
-            <p className="text-gray-600 mb-4">Start by adding your first property listing</p>
+          <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-gray-100">
+            <HomeIcon className="h-20 w-20 text-gray-300 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">No properties listed yet</h3>
+            <p className="text-gray-600 mb-8 text-lg">Start by adding your first property listing</p>
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/add-property')}
-              className="bg-primary-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-600 transition-colors inline-flex items-center space-x-2"
+              className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-primary-500/25 inline-flex items-center space-x-3"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-6 w-6" />
               <span>Add Property</span>
             </motion.button>
           </div>
@@ -173,56 +173,57 @@ export const ListerDashboard: React.FC = () => {
       {/* Quick Actions */}
       <motion.section variants={itemVariants}>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <motion.div
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -3 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/add-property')}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
+            className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer group border border-gray-100 hover:border-primary-200"
           >
-            <div className="bg-primary-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-primary-200 transition-colors">
-              <Plus className="h-6 w-6 text-primary-600" />
+            <div className="bg-gradient-to-br from-primary-100 to-primary-200 p-4 rounded-xl w-fit mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+              <Plus className="h-7 w-7 text-primary-600" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Add Property</h3>
-            <p className="text-sm text-gray-600">List a new property for sale or rent</p>
+            <h3 className="font-bold text-gray-900 mb-3 text-lg">Add Property</h3>
+            <p className="text-gray-600 leading-relaxed">List a new property for sale or rent</p>
           </motion.div>
 
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
-          >
-            <div className="bg-green-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-green-200 transition-colors">
-              <DollarSign className="h-6 w-6 text-green-600" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">View Offers</h3>
-            <p className="text-sm text-gray-600">Check offers from potential buyers</p>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/analytics')}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
-          >
-            <div className="bg-blue-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-blue-200 transition-colors">
-              <BarChart3 className="h-6 w-6 text-blue-600" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Analytics</h3>
-            <p className="text-sm text-gray-600">Detailed insights and performance metrics</p>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -3 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/clients')}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
+            className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer group border border-gray-100 hover:border-primary-200"
           >
-            <div className="bg-blue-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-blue-200 transition-colors">
-              <Users className="h-6 w-6 text-blue-600" />
+            <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-4 rounded-xl w-fit mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+              <MessageSquare className="h-7 w-7 text-blue-600" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Client Management</h3>
-            <p className="text-sm text-gray-600">Manage queries and scheduled viewings</p>
+            <h3 className="font-bold text-gray-900 mb-3 text-lg">Client Management</h3>
+            <p className="text-gray-600 leading-relaxed">Manage queries and scheduled viewings</p>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1.05, y: -3 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/analytics')}
+            className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer group border border-gray-100 hover:border-primary-200"
+          >
+            <div className="bg-gradient-to-br from-green-100 to-green-200 p-4 rounded-xl w-fit mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+              <BarChart3 className="h-7 w-7 text-green-600" />
+            </div>
+            <h3 className="font-bold text-gray-900 mb-3 text-lg">Analytics</h3>
+            <p className="text-gray-600 leading-relaxed">Detailed insights and performance metrics</p>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1.05, y: -3 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/my-properties')}
+            className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer group border border-gray-100 hover:border-primary-200"
+          >
+            <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-4 rounded-xl w-fit mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+              <HomeIcon className="h-7 w-7 text-purple-600" />
+            </div>
+            <h3 className="font-bold text-gray-900 mb-3 text-lg">My Properties</h3>
+            <p className="text-gray-600 leading-relaxed">View and manage all your listings</p>
           </motion.div>
         </div>
       </motion.section>

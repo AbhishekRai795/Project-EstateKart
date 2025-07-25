@@ -8,7 +8,7 @@ import { SearchBar } from '../../components/common/SearchBar';
 
 export const UserProperties: React.FC = () => {
   const { user } = useAuth();
-  const { properties, favoriteProperties, toggleFavorite } = useProperty();
+  const { properties, catalogueProperties, toggleCatalogue } = useProperty();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filteredProperties, setFilteredProperties] = useState(properties);
   const [sortBy, setSortBy] = useState('recent');
@@ -17,7 +17,10 @@ export const UserProperties: React.FC = () => {
   const [scheduleForm, setScheduleForm] = useState({
     date: '',
     time: '',
-    message: ''
+    message: '',
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: ''
   });
 
   const handleSearch = (query: string, filters: any) => {
@@ -93,11 +96,31 @@ export const UserProperties: React.FC = () => {
 
   const handleScheduleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the schedule request to your backend
-    console.log('Schedule viewing:', { propertyId: selectedPropertyId, ...scheduleForm });
+    
+    const schedulingData = {
+      propertyId: selectedPropertyId,
+      propertyTitle: properties.find(p => p.id === selectedPropertyId)?.title,
+      clientName: scheduleForm.name,
+      clientEmail: scheduleForm.email,
+      clientPhone: scheduleForm.phone,
+      date: scheduleForm.date,
+      time: scheduleForm.time,
+      message: scheduleForm.message,
+      status: 'scheduled',
+      createdAt: new Date()
+    };
+    
+    console.log('Schedule viewing:', schedulingData);
     alert('Viewing scheduled successfully! The lister will contact you soon.');
     setShowScheduleModal(false);
-    setScheduleForm({ date: '', time: '', message: '' });
+    setScheduleForm({ 
+      date: '', 
+      time: '', 
+      message: '', 
+      name: user?.name || '', 
+      email: user?.email || '', 
+      phone: '' 
+    });
   };
 
   const containerVariants = {
@@ -194,8 +217,8 @@ export const UserProperties: React.FC = () => {
                 key={property.id}
                 property={property}
                 viewMode={viewMode}
-                onFavoriteToggle={user ? toggleFavorite : undefined}
-                isFavorite={user ? favoriteProperties.includes(property.id) : false}
+                onCatalogueToggle={user ? toggleCatalogue : undefined}
+                isInCatalogue={user ? catalogueProperties.includes(property.id) : false}
                 onScheduleViewing={handleScheduleViewing}
               />
             ))}
@@ -211,26 +234,30 @@ export const UserProperties: React.FC = () => {
 
       {/* Sign in prompt for non-authenticated users */}
       {!user && (
-        <motion.div variants={itemVariants} className="mt-12 bg-primary-50 border border-primary-200 rounded-xl p-6 text-center">
-          <h3 className="text-lg font-semibold text-primary-900 mb-2">
+        <motion.div variants={itemVariants} className="mt-16 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-200 rounded-2xl p-10 text-center">
+          <h3 className="text-2xl font-bold text-primary-900 mb-4">
             Want personalized recommendations?
           </h3>
-          <p className="text-primary-700 mb-4">
-            Sign in to save favorites, get customized property suggestions, and list your own properties
+          <p className="text-primary-700 mb-8 text-lg">
+            Sign in to save properties to your catalogue, get AI-powered recommendations, and list your own properties
           </p>
-          <div className="flex items-center justify-center space-x-4">
-            <a
+          <div className="flex items-center justify-center space-x-6">
+            <motion.a
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
               href="/auth/login"
-              className="bg-primary-500 text-white px-6 py-2 rounded-lg hover:bg-primary-600 transition-colors"
+              className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-primary-500/25"
             >
               Sign In
-            </a>
-            <a
+            </motion.a>
+            <motion.a
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
               href="/auth/register"
-              className="border border-primary-500 text-primary-600 px-6 py-2 rounded-lg hover:bg-primary-50 transition-colors"
+              className="border-2 border-primary-500 text-primary-600 hover:bg-primary-50 hover:border-primary-600 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300"
             >
               Sign Up
-            </a>
+            </motion.a>
           </div>
         </motion.div>
       )}
@@ -238,9 +265,9 @@ export const UserProperties: React.FC = () => {
       {filteredProperties.length > 0 && (
         <motion.div variants={itemVariants} className="mt-12 text-center">
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-primary-500 text-white px-8 py-3 rounded-lg hover:bg-primary-600 transition-colors font-medium"
+            className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-10 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-primary-500/25"
           >
             Load More Properties
           </motion.button>
@@ -249,23 +276,61 @@ export const UserProperties: React.FC = () => {
 
       {/* Schedule Viewing Modal */}
       {showScheduleModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md"
+            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg border border-gray-200"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">Schedule Property Viewing</h3>
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-2xl font-bold text-gray-900">Schedule Property Viewing</h3>
               <button
                 onClick={() => setShowScheduleModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X className="h-6 w-6" />
               </button>
             </div>
 
-            <form onSubmit={handleScheduleSubmit} className="space-y-4">
+            <form onSubmit={handleScheduleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  value={scheduleForm.name}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={scheduleForm.email}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number (Optional)
+                </label>
+                <input
+                  type="tel"
+                  value={scheduleForm.phone}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, phone: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Preferred Date
@@ -274,7 +339,7 @@ export const UserProperties: React.FC = () => {
                   type="date"
                   value={scheduleForm.date}
                   onChange={(e) => setScheduleForm(prev => ({ ...prev, date: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                   required
                   min={new Date().toISOString().split('T')[0]}
                 />
@@ -287,7 +352,7 @@ export const UserProperties: React.FC = () => {
                 <select
                   value={scheduleForm.time}
                   onChange={(e) => setScheduleForm(prev => ({ ...prev, time: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                   required
                 >
                   <option value="">Select time</option>
@@ -308,23 +373,23 @@ export const UserProperties: React.FC = () => {
                 <textarea
                   value={scheduleForm.message}
                   onChange={(e) => setScheduleForm(prev => ({ ...prev, message: e.target.value }))}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all"
                   placeholder="Any specific requirements or questions..."
                 />
               </div>
 
-              <div className="flex space-x-3 pt-4">
+              <div className="flex space-x-4 pt-6">
                 <button
                   type="button"
                   onClick={() => setShowScheduleModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl transition-all duration-300 font-bold shadow-lg hover:shadow-primary-500/25"
                 >
                   Schedule Viewing
                 </button>

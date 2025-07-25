@@ -7,7 +7,8 @@ import { Register } from '../pages/auth/Register';
 import { Landing } from '../pages/Landing';
 import { PropertyDetail } from '../pages/PropertyDetail';
 import { UserProperties } from '../pages/user/Properties';
-import { UserFavorites } from '../pages/user/Favorites';
+import { UserCatalogue } from '../pages/user/Catalogue';
+import { UserRecommendations } from '../pages/user/Recommendations';
 import { ListerDashboard } from '../pages/lister/Dashboard';
 import { ListerProperties } from '../pages/lister/Properties';
 import { AddProperty } from '../pages/lister/AddProperty';
@@ -42,8 +43,11 @@ const AppRouter: React.FC = () => {
           <Route path="/property/:id" element={<PropertyDetail />} />
           
           {/* Protected Routes - require authentication */}
-          <Route path="/favorites" element={
-            user ? <UserFavorites /> : <Navigate to="/auth/login" />
+          <Route path="/catalogue" element={
+            user ? <UserCatalogue /> : <Navigate to="/auth/login" />
+          } />
+          <Route path="/recommendations" element={
+            user ? <UserRecommendations /> : <Navigate to="/auth/login" />
           } />
           <Route path="/user-dashboard" element={
             user ? <UserDashboard /> : <Navigate to="/auth/login" />
