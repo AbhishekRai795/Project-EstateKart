@@ -128,6 +128,9 @@ export const UserDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recentProperties.map((property) => (
             <PropertyCard
+          )
+          )
+          }
         <div className="grid md:grid-cols-3 gap-12 max-w-7xl mx-auto">
               property={property}
               onCatalogueToggle={toggleCatalogue}
@@ -224,5 +227,6 @@ export const UserDashboard: React.FC = () => {
         </div>
       </motion.section>
     </motion.div>
+  )
   );
 };
