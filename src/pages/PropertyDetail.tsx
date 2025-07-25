@@ -21,7 +21,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
-  User
+  User,
+  Heart
 } from 'lucide-react';
 import { useProperty } from '../contexts/PropertyContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -30,7 +31,7 @@ export const PropertyDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { properties, catalogueProperties, toggleCatalogue } = useProperty();
+  const { properties, catalogueProperties, toggleCatalogue, favorites, toggleFavorite } = useProperty();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -68,6 +69,7 @@ export const PropertyDetail: React.FC = () => {
   }
 
   const isInCatalogue = catalogueProperties.includes(property.id);
+  const isFavorite = favorites.includes(property.id);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => 
@@ -161,9 +163,20 @@ export const PropertyDetail: React.FC = () => {
             
             <div className="flex items-center space-x-3">
               <motion.button
-                <ShoppingCart
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                    isInCatalogue ? 'text-blue-500 fill-current' : 'text-gray-600'
+                onClick={() => toggleCatalogue(property.id)}
+                className={`p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors ${
+                  isInCatalogue ? 'text-blue-500 fill-current' : 'text-gray-600'
+                }`}
+              >
+                <ShoppingCart className="h-5 w-5" />
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
               >
                 <Share2 className="h-5 w-5 text-gray-600" />
               </motion.button>
@@ -517,7 +530,7 @@ export const PropertyDetail: React.FC = () => {
           </motion.div>
         </div>
       )}
-    </div>
+
       {/* Schedule Viewing Modal */}
       {showScheduleModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -642,5 +655,6 @@ export const PropertyDetail: React.FC = () => {
           </motion.div>
         </div>
       )}
+    </div>
   );
 };
