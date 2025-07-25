@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Filter, Grid, List, MapPin } from 'lucide-react';
 import { useProperty } from '../../contexts/PropertyContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { PropertyCard } from '../../components/common/PropertyCard';
 import { SearchBar } from '../../components/common/SearchBar';
 
 export const UserProperties: React.FC = () => {
+  const { user } = useAuth();
   const { properties, favoriteProperties, toggleFavorite } = useProperty();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filteredProperties, setFilteredProperties] = useState(properties);
@@ -170,8 +172,8 @@ export const UserProperties: React.FC = () => {
               <PropertyCard
                 key={property.id}
                 property={property}
-                onFavoriteToggle={toggleFavorite}
-                isFavorite={favoriteProperties.includes(property.id)}
+                onFavoriteToggle={user ? toggleFavorite : undefined}
+                isFavorite={user ? favoriteProperties.includes(property.id) : false}
               />
             ))}
           </div>
@@ -184,6 +186,31 @@ export const UserProperties: React.FC = () => {
         )}
       </motion.div>
 
+      {/* Sign in prompt for non-authenticated users */}
+      {!user && (
+        <motion.div variants={itemVariants} className="mt-12 bg-primary-50 border border-primary-200 rounded-xl p-6 text-center">
+          <h3 className="text-lg font-semibold text-primary-900 mb-2">
+            Want personalized recommendations?
+          </h3>
+          <p className="text-primary-700 mb-4">
+            Sign in to save favorites, get customized property suggestions, and list your own properties
+          </p>
+          <div className="flex items-center justify-center space-x-4">
+            <a
+              href="/auth/login"
+              className="bg-primary-500 text-white px-6 py-2 rounded-lg hover:bg-primary-600 transition-colors"
+            >
+              Sign In
+            </a>
+            <a
+              href="/auth/register"
+              className="border border-primary-500 text-primary-600 px-6 py-2 rounded-lg hover:bg-primary-50 transition-colors"
+            >
+              Sign Up
+            </a>
+          </div>
+        </motion.div>
+      )}
       {/* Load More */}
       {filteredProperties.length > 0 && (
         <motion.div variants={itemVariants} className="mt-12 text-center">

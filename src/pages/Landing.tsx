@@ -1,9 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home, Search, Heart, BarChart3, Users, MapPin, Star, ArrowRight } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Landing: React.FC = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -57,27 +61,38 @@ export const Landing: React.FC = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-              <Link to="/auth/register?role=user">
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-primary-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl flex items-center space-x-2"
-                >
-                  <Search className="h-5 w-5" />
-                  <span>Find Properties</span>
-                </motion.button>
-              </Link>
+              <button
+                onClick={() => navigate('/properties')}
+                className="bg-primary-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl flex items-center space-x-2"
+              >
+                <Search className="h-5 w-5" />
+                <span>Browse Properties</span>
+              </button>
               
-              <Link to="/auth/register?role=lister">
+              {!user && (
+                <Link to="/auth/register">
+                  <motion.button
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="border-2 border-primary-500 text-primary-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-primary-50 transition-all flex items-center space-x-2"
+                  >
+                    <BarChart3 className="h-5 w-5" />
+                    <span>Join EstateKart</span>
+                  </motion.button>
+                </Link>
+              )}
+              
+              {user && (
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate('/dashboard')}
                   className="border-2 border-primary-500 text-primary-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-primary-50 transition-all flex items-center space-x-2"
                 >
                   <BarChart3 className="h-5 w-5" />
-                  <span>List Properties</span>
+                  <span>Lister Dashboard</span>
                 </motion.button>
-              </Link>
+              )}
             </div>
           </motion.div>
         </div>
@@ -113,7 +128,7 @@ export const Landing: React.FC = () => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Smart Search</h3>
               <p className="text-gray-600 mb-6">
-                Advanced filtering, map integration, and AI-powered recommendations to find your perfect property
+                Advanced filtering, map integration, and personalized recommendations to find your perfect property
               </p>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center"><ArrowRight className="h-4 w-4 mr-2 text-blue-500" />Interactive property maps</li>
@@ -122,7 +137,7 @@ export const Landing: React.FC = () => {
               </ul>
             </motion.div>
 
-            {/* For Listers */}
+            {/* For Property Listers */}
             <motion.div
               variants={itemVariants}
               whileHover={{ y: -8, scale: 1.02 }}
@@ -133,7 +148,7 @@ export const Landing: React.FC = () => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Analytics Dashboard</h3>
               <p className="text-gray-600 mb-6">
-                Comprehensive insights into property performance, viewer engagement, and market trends
+                Comprehensive insights into your property performance, viewer engagement, and market trends
               </p>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center"><ArrowRight className="h-4 w-4 mr-2 text-primary-500" />Real-time view tracking</li>
@@ -203,16 +218,28 @@ export const Landing: React.FC = () => {
               Join thousands of users who trust EstateKart for their real estate needs
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/auth/register?role=user">
+              <Link to="/auth/register">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-primary-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-primary-600 transition-all shadow-lg"
                 >
-                  Start as Buyer
+                  Join EstateKart
                 </motion.button>
               </Link>
-              <Link to="/auth/register?role=lister">
+              <button
+                onClick={() => navigate('/properties')}
+                className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white hover:text-gray-900 transition-all"
+              >
+                Browse Properties
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </motion.div>
+  );
+};
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

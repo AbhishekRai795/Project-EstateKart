@@ -7,27 +7,19 @@ import { useAuth } from '../../contexts/AuthContext';
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'user' | 'lister'>('user');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login, loading } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
-  React.useEffect(() => {
-    const roleParam = searchParams.get('role');
-    if (roleParam === 'lister' || roleParam === 'user') {
-      setRole(roleParam);
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     try {
-      await login(email, password, role);
-      navigate(`/${role}/dashboard`);
+      await login(email, password);
+      navigate('/dashboard');
     } catch (err) {
       setError('Invalid credentials. Please try again.');
     }
@@ -56,37 +48,10 @@ export const Login: React.FC = () => {
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome back</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to your {role} account
+            Sign in to your account
           </p>
         </div>
 
-        {/* Role Selection */}
-        <div className="mb-6">
-          <div className="flex rounded-lg bg-gray-100 p-1">
-            <button
-              type="button"
-              onClick={() => setRole('user')}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                role === 'user'
-                  ? 'bg-white text-primary-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Property Buyer
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole('lister')}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                role === 'lister'
-                  ? 'bg-white text-primary-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Property Lister
-            </button>
-          </div>
-        </div>
 
         {/* Login Form */}
         <motion.div
@@ -176,7 +141,7 @@ export const Login: React.FC = () => {
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
               <Link
-                to={`/auth/register?role=${role}`}
+                to="/auth/register"
                 className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
               >
                 Sign up

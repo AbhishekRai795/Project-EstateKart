@@ -222,7 +222,7 @@ export const AddProperty: React.FC = () => {
     };
 
     addProperty(propertyData);
-    navigate('/lister/properties');
+    navigate('/my-properties');
   };
 
   // TODO: Function to update S3 object metadata
@@ -278,7 +278,7 @@ export const AddProperty: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/lister/properties')}
+            onClick={() => navigate('/my-properties')}
             className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -736,7 +736,7 @@ export const AddProperty: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             type="button"
-            onClick={() => navigate('/lister/properties')}
+            onClick={() => navigate('/my-properties')}
             className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             Cancel

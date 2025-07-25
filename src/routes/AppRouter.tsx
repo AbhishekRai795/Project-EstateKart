@@ -4,10 +4,15 @@ import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/common/Header';
 import { Login } from '../pages/auth/Login';
 import { Register } from '../pages/auth/Register';
-import { UserRoutes } from './UserRoutes';
-import { ListerRoutes } from './ListerRoutes';
 import { Landing } from '../pages/Landing';
 import { PropertyDetail } from '../pages/PropertyDetail';
+import { UserProperties } from '../pages/user/Properties';
+import { UserFavorites } from '../pages/user/Favorites';
+import { ListerDashboard } from '../pages/lister/Dashboard';
+import { ListerProperties } from '../pages/lister/Properties';
+import { AddProperty } from '../pages/lister/AddProperty';
+import { ListerAnalytics } from '../pages/lister/Analytics';
+import { ListerQueries } from '../pages/lister/Queries';
 
 const AppRouter: React.FC = () => {
   const { user, loading } = useAuth();
@@ -26,19 +31,32 @@ const AppRouter: React.FC = () => {
         <Header />
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={user ? <Navigate to={`/${user.role}/dashboard`} /> : <Landing />} />
-          <Route path="/auth/login" element={!user ? <Login /> : <Navigate to={`/${user.role}/dashboard`} />} />
-          <Route path="/auth/register" element={!user ? <Register /> : <Navigate to={`/${user.role}/dashboard`} />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/auth/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
+          <Route path="/auth/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
           
-          {/* Property Detail - accessible to both users and listers */}
+          {/* Public property browsing */}
+          <Route path="/properties" element={<UserProperties />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
           
-          {/* Protected Routes */}
-          <Route path="/user/*" element={
-            user && user.role === 'user' ? <UserRoutes /> : <Navigate to="/auth/login?role=user" />
+          {/* Protected Routes - require authentication */}
+          <Route path="/favorites" element={
+            user ? <UserFavorites /> : <Navigate to="/auth/login" />
           } />
-          <Route path="/lister/*" element={
-            user && user.role === 'lister' ? <ListerRoutes /> : <Navigate to="/auth/login?role=lister" />
+          <Route path="/dashboard" element={
+            user ? <ListerDashboard /> : <Navigate to="/auth/login" />
+          } />
+          <Route path="/my-properties" element={
+            user ? <ListerProperties /> : <Navigate to="/auth/login" />
+          } />
+          <Route path="/add-property" element={
+            user ? <AddProperty /> : <Navigate to="/auth/login" />
+          } />
+          <Route path="/analytics" element={
+            user ? <ListerAnalytics /> : <Navigate to="/auth/login" />
+          } />
+          <Route path="/queries" element={
+            user ? <ListerQueries /> : <Navigate to="/auth/login" />
           } />
           
           {/* Fallback */}

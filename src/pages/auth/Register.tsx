@@ -11,20 +11,12 @@ export const Register: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
-  const [role, setRole] = useState<'user' | 'lister'>('user');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const { register, loading } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
-  React.useEffect(() => {
-    const roleParam = searchParams.get('role');
-    if (roleParam === 'lister' || roleParam === 'user') {
-      setRole(roleParam);
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +33,8 @@ export const Register: React.FC = () => {
     }
 
     try {
-      await register(formData.email, formData.password, formData.name, role);
-      navigate(`/${role}/dashboard`);
+      await register(formData.email, formData.password, formData.name);
+      navigate('/dashboard');
     } catch (err) {
       setError('Registration failed. Please try again.');
     }
@@ -75,37 +67,10 @@ export const Register: React.FC = () => {
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">Create account</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Join as a {role === 'user' ? 'property buyer' : 'property lister'}
+            Join EstateKart to browse and list properties
           </p>
         </div>
 
-        {/* Role Selection */}
-        <div className="mb-6">
-          <div className="flex rounded-lg bg-gray-100 p-1">
-            <button
-              type="button"
-              onClick={() => setRole('user')}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                role === 'user'
-                  ? 'bg-white text-primary-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Property Buyer
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole('lister')}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                role === 'lister'
-                  ? 'bg-white text-primary-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Property Lister
-            </button>
-          </div>
-        </div>
 
         {/* Registration Form */}
         <motion.div
@@ -228,7 +193,7 @@ export const Register: React.FC = () => {
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
               <Link
-                to={`/auth/login?role=${role}`}
+                to="/auth/login"
                 className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
               >
                 Sign in

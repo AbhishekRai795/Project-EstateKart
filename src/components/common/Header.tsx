@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, User, LogOut, Menu, X, BarChart3, Heart, Settings, MessageSquare } from 'lucide-react';
+import { Home, User, LogOut, Menu, X, BarChart3, Heart, Settings, MessageSquare, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const Header: React.FC = () => {
@@ -21,20 +21,12 @@ export const Header: React.FC = () => {
     return location.pathname.startsWith(path);
   };
 
-  const userNavItems = [
-    { path: '/user/dashboard', label: 'Dashboard', icon: Home },
-    { path: '/user/properties', label: 'Properties', icon: Home },
-    { path: '/user/favorites', label: 'Favorites', icon: Heart },
+  const navItems = [
+    { path: '/properties', label: 'Browse Properties', icon: Search },
+    { path: '/favorites', label: 'Favorites', icon: Heart },
+    { path: '/dashboard', label: 'Lister Dashboard', icon: BarChart3 },
   ];
 
-  const listerNavItems = [
-    { path: '/lister/dashboard', label: 'Dashboard', icon: Home },
-    { path: '/lister/properties', label: 'Properties', icon: Home },
-    { path: '/lister/queries', label: 'Queries', icon: MessageSquare },
-    { path: '/lister/analytics', label: 'Analytics', icon: BarChart3 },
-  ];
-
-  const navItems = user?.role === 'lister' ? listerNavItems : userNavItems;
 
   return (
     <header className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
@@ -42,7 +34,7 @@ export const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link 
-            to={user ? `/${user.role}/dashboard` : '/'} 
+            to="/" 
             className="flex items-center space-x-2 group"
           >
             <motion.div

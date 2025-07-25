@@ -87,6 +87,46 @@ export const ListerDashboard: React.FC = () => {
         </div>
       </motion.div>
 
+      {/* My Properties Section */}
+      <motion.section variants={itemVariants} className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">My Properties</h2>
+          <button 
+            onClick={() => navigate('/my-properties')}
+            className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
+          >
+            View all →
+          </button>
+        </div>
+        
+        {listerProperties.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listerProperties.slice(0, 3).map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                showStats={true}
+                onClick={() => navigate(`/property/${property.id}`)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-md p-8 text-center">
+            <HomeIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No properties listed yet</h3>
+            <p className="text-gray-600 mb-4">Start by adding your first property listing</p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/add-property')}
+              className="bg-primary-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-600 transition-colors inline-flex items-center space-x-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Add Property</span>
+            </motion.button>
+          </div>
+        )}
+      </motion.section>
       {/* Stats Cards */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard
@@ -129,45 +169,6 @@ export const ListerDashboard: React.FC = () => {
       </div>
 
       {/* Recent Properties */}
-      <motion.section variants={itemVariants} className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Your Properties</h2>
-          <button 
-            onClick={() => navigate('/lister/properties')}
-            className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
-          >
-            View all →
-          </button>
-        </div>
-        
-        {listerProperties.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listerProperties.slice(0, 6).map((property) => (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                showStats={true}
-                onClick={() => navigate(`/property/${property.id}`)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-xl shadow-md p-12 text-center">
-            <HomeIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No properties yet</h3>
-            <p className="text-gray-600 mb-6">Start by adding your first property listing</p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/lister/add-property')}
-              className="bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors inline-flex items-center space-x-2"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Add Property</span>
-            </motion.button>
-          </div>
-        )}
-      </motion.section>
 
       {/* Quick Actions */}
       <motion.section variants={itemVariants}>
@@ -176,7 +177,7 @@ export const ListerDashboard: React.FC = () => {
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/lister/add-property')}
+            onClick={() => navigate('/add-property')}
             className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
           >
             <div className="bg-primary-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-primary-200 transition-colors">
@@ -201,7 +202,7 @@ export const ListerDashboard: React.FC = () => {
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/lister/analytics')}
+            onClick={() => navigate('/analytics')}
             className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
           >
             <div className="bg-blue-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-blue-200 transition-colors">

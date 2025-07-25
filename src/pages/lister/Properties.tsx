@@ -62,7 +62,7 @@ export const ListerProperties: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/lister/add-property')}
+            onClick={() => navigate('/add-property')}
             className="bg-primary-500 text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center space-x-2 shadow-lg"
           >
             <Plus className="h-5 w-5" />
@@ -145,7 +145,7 @@ export const ListerProperties: React.FC = () => {
           <div className="flex items-center space-x-4">
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onClick={() => navigate('/add-property')}
               className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
             >
               <option value="all">All Status</option>
@@ -177,7 +177,7 @@ export const ListerProperties: React.FC = () => {
                       whileTap={{ scale: 0.9 }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/lister/edit-property/${property.id}`);
+                        navigate(`/edit-property/${property.id}`);
                       }}
                       className="p-2 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-colors"
                     >

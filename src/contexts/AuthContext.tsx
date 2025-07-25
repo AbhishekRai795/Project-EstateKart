@@ -4,15 +4,14 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: 'user' | 'lister';
   avatar?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, role: 'user' | 'lister') => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (email: string, password: string, name: string, role: 'user' | 'lister') => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
   loading: boolean;
 }
 
@@ -39,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string, role: 'user' | 'lister') => {
+  const login = async (email: string, password: string) => {
     setLoading(true);
     // Simulate API call - replace with AWS Cognito integration
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -48,7 +47,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: Math.random().toString(36).substr(2, 9),
       email,
       name: email.split('@')[0],
-      role,
       avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`
     };
     
@@ -57,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   };
 
-  const register = async (email: string, password: string, name: string, role: 'user' | 'lister') => {
+  const register = async (email: string, password: string, name: string) => {
     setLoading(true);
     // Simulate API call - replace with AWS Cognito integration
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -66,7 +64,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: Math.random().toString(36).substr(2, 9),
       email,
       name,
-      role,
       avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`
     };
     
