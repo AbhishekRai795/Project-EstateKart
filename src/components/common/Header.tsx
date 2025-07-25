@@ -26,9 +26,9 @@ export const Header: React.FC = () => {
     { path: '/properties', label: 'Browse Properties', icon: Search },
     ...(user ? [
       { path: '/user-dashboard', label: 'My Dashboard', icon: User },
-      { path: '/favorites', label: 'Favorites', icon: Heart },
-      { path: '/dashboard', label: 'Lister Dashboard', icon: BarChart3 },
+      { path: '/catalogue', label: 'My Catalogue', icon: ShoppingCart },
       { path: '/add-property', label: 'List Property', icon: Plus },
+      { path: '/dashboard', label: 'Manage Properties', icon: BarChart3 },
     ] : [])
   ];
 
