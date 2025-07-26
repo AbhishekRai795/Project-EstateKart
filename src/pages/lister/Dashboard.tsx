@@ -52,37 +52,133 @@ export const ListerDashboard: React.FC = () => {
 
       {/* Welcome Banner */}
       <motion.div variants={itemVariants} className="mb-8">
-        <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-8 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
-          <div className="relative z-10 flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Welcome back, {user?.name}! 👋</h2>
-              <p className="text-primary-100">
-                Here's what's happening with your properties today
-              </p>
-            </div>
-            <div className="hidden md:block">
-              <Link
-                to="/add-property"
-                className="group bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 border border-white/30 hover:border-white/50 hover:scale-105"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Add Property</span>
-              </Link>
-            </div>
-          </div>
+        <div className="bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden">
+          {/* Animated background blobs */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 translate-x-40 animate-blob"></div>
+          <div className="absolute bottom-0 left-0 w-60 h-60 bg-white/5 rounded-full translate-y-30 -translate-x-30 animate-blob animation-delay-2000"></div>
+          <div className="absolute top-1/2 left-1/2 w-40 h-40 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 animate-blob animation-delay-4000"></div>
           
-          {/* Mobile Add Property Button */}
-          <div className="md:hidden mt-4">
+          <div className="relative z-10">
+            <h1 className="text-4xl font-black mb-4">
+              Welcome back, {user?.name}! 👋
+            </h1>
+            <p className="text-primary-100 text-xl font-light">
+              Here's what's happening with your properties today
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Mobile Add Property Button - Moved outside banner */}
+      <motion.div variants={itemVariants} className="md:hidden mb-8">
+        <Link
+          to="/add-property"
+          className="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+        >
+          <Plus className="w-5 h-5" />
+          <span>Add Property</span>
+        </Link>
+      </motion.div>
+
+      {/* Quick Actions - Enhanced with floating add button */}
+      <motion.div variants={itemVariants} className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
+          <div className="hidden md:block">
             <Link
               to="/add-property"
-              className="group bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center space-x-2 border border-white/30 hover:border-white/50"
+              className="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <Plus className="w-5 h-5" />
               <span>Add Property</span>
             </Link>
           </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Add Property */}
+          <Link
+            to="/add-property"
+            className="group bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl text-center hover:shadow-primary-500/20 transition-all duration-500 hover:scale-105 hover:-translate-y-2 transform border border-gray-100/50 relative overflow-hidden cursor-pointer"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute top-4 right-4 w-12 h-12 bg-green-100 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500"></div>
+            
+            <div className="relative z-10">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl text-white mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <Plus className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
+                Add Property
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                List a new property for sale or rent
+              </p>
+            </div>
+          </Link>
+
+          {/* My Properties */}
+          <Link
+            to="/lister/properties"
+            className="group bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl text-center hover:shadow-primary-500/20 transition-all duration-500 hover:scale-105 hover:-translate-y-2 transform border border-gray-100/50 relative overflow-hidden cursor-pointer"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute top-4 right-4 w-12 h-12 bg-blue-100 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500"></div>
+            
+            <div className="relative z-10">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl text-white mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <Building className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
+                My Properties
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                View and manage all your listings
+              </p>
+            </div>
+          </Link>
+
+          {/* Client Management */}
+          <Link
+            to="/lister/clients"
+            className="group bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl text-center hover:shadow-primary-500/20 transition-all duration-500 hover:scale-105 hover:-translate-y-2 transform border border-gray-100/50 relative overflow-hidden cursor-pointer"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute top-4 right-4 w-12 h-12 bg-purple-100 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500"></div>
+            
+            <div>
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl text-white mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <Users className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
+                Client Management
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Manage queries and scheduled viewings
+              </p>
+            </div>
+          </Link>
+
+          {/* Analytics */}
+          <Link
+            to="/lister/analytics"
+            className="group bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl text-center hover:shadow-primary-500/20 transition-all duration-500 hover:scale-105 hover:-translate-y-2 transform border border-gray-100/50 relative overflow-hidden cursor-pointer"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-orange-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute top-4 right-4 w-12 h-12 bg-orange-100 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500"></div>
+            
+            <div className="relative z-10">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl text-white mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <BarChart3 className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
+                Analytics
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Detailed insights and performance metrics
+              </p>
+            </div>
+          </Link>
         </div>
       </motion.div>
 
