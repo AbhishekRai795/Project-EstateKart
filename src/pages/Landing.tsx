@@ -1,23 +1,31 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, ShoppingCart, TrendingUp, MapPin, Home as HomeIcon, Star, Sparkles, Plus } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useProperty } from '../../contexts/PropertyContext';
-import { PropertyCard } from '../../components/common/PropertyCard';
-import { SearchBar } from '../../components/common/SearchBar';
-import { StatsCard } from '../../components/analytics/StatsCard';
+import { Search, ShoppingCart, TrendingUp, Sparkles, Plus, Heart, BarChart3 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useProperty, Property } from '../contexts/PropertyContext'; // Import Property type from context
+import { PropertyCard } from '../components/common/PropertyCard';
+import { SearchBar } from '../components/common/SearchBar';
+import { StatsCard } from '../components/analytics/StatsCard';
 
-export const UserDashboard: React.FC = () => {
+interface SearchFilters {
+  location?: string;
+  priceRange?: [number, number];
+  propertyType?: string;
+}
+
+export const Landing: React.FC = () => {
   const { user } = useAuth();
   const { properties, catalogueProperties, toggleCatalogue } = useProperty();
+  const navigate = useNavigate();
 
   // Get recent and featured properties
-  const recentProperties = properties.slice(0, 6);
-  const recommendedProperties = properties.filter(p => p.views > 200).slice(0, 3);
+  const recentProperties: Property[] = properties.slice(0, 6);
+  const recommendedProperties: Property[] = properties.filter((p: Property) => p.views > 200).slice(0, 3);
   const catalogueCount = catalogueProperties.length;
   const viewedCount = 12; // Mock data
 
-  const handleSearch = (query: string, filters: any) => {
+  const handleSearch = (query: string, filters: SearchFilters) => {
     console.log('Search:', query, filters);
     // Implement search logic here
   };
@@ -105,7 +113,7 @@ export const UserDashboard: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recommendedProperties.map((property) => (
+          {recommendedProperties.map((property: Property) => (
             <PropertyCard
               key={property.id}
               property={property}
@@ -126,24 +134,19 @@ export const UserDashboard: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recentProperties.map((property) => (
+          {recentProperties.map((property: Property) => (
             <PropertyCard
-          )
-          )
-          }
-        <div className="grid md:grid-cols-3 gap-12 max-w-7xl mx-auto">
+              key={property.id}
               property={property}
               onCatalogueToggle={toggleCatalogue}
               isInCatalogue={catalogueProperties.includes(property.id)}
             />
-            className="group bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl text-center hover:shadow-primary-500/20 transition-all duration-500 hover:scale-105 hover:-translate-y-2 transform border border-gray-100/50 relative overflow-hidden"
+          ))}
         </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="bg-gradient-to-br from-primary-100 to-primary-200 p-5 rounded-2xl w-fit mx-auto mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 relative z-10">
+      </motion.section>
 
       {/* Quick Actions */}
-            <h3 className="text-2xl font-bold mb-6 text-gray-900 relative z-10">Browse Properties</h3>
-            <p className="text-gray-600 leading-relaxed relative z-10">
+      <motion.section variants={itemVariants} className="mb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -153,14 +156,13 @@ export const UserDashboard: React.FC = () => {
             <div className="bg-primary-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-primary-200 transition-colors">
               <Search className="h-6 w-6 text-primary-600" />
             </div>
-            className="group bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl text-center hover:shadow-primary-500/20 transition-all duration-500 hover:scale-105 hover:-translate-y-2 transform border border-gray-100/50 relative overflow-hidden"
+            <h3 className="font-semibold text-gray-900 mb-2">Advanced Search</h3>
             <p className="text-sm text-gray-600">Use filters to find exactly what you're looking for</p>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="bg-gradient-to-br from-primary-100 to-primary-200 p-5 rounded-2xl w-fit mx-auto mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 relative z-10">
+          </motion.button>
 
           <motion.div
-            <h3 className="text-2xl font-bold mb-6 text-gray-900 relative z-10">Build Your Catalogue</h3>
-            <p className="text-gray-600 leading-relaxed relative z-10">
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
           >
             <div className="bg-red-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-red-200 transition-colors">
@@ -170,63 +172,71 @@ export const UserDashboard: React.FC = () => {
             <p className="text-sm text-gray-600">View all your saved properties in one place</p>
           </motion.div>
 
-            className="group bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl text-center hover:shadow-primary-500/20 transition-all duration-500 hover:scale-105 hover:-translate-y-2 transform border border-gray-100/50 relative overflow-hidden"
+          <motion.div
             whileHover={{ scale: 1.05 }}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="bg-gradient-to-br from-primary-100 to-primary-200 p-5 rounded-2xl w-fit mx-auto mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 relative z-10">
+            whileTap={{ scale: 0.95 }}
             className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
           >
-            <h3 className="text-2xl font-bold mb-6 text-gray-900 relative z-10">List Your Property</h3>
-            <p className="text-gray-600 leading-relaxed relative z-10">
+            <div className="bg-green-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-green-200 transition-colors">
+              <Plus className="h-6 w-6 text-green-600" />
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">List Property</h3>
+            <p className="text-sm text-gray-600">Add your property to our marketplace</p>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group"
+          >
+            <div className="bg-blue-100 p-3 rounded-lg w-fit mb-4 group-hover:bg-blue-200 transition-colors">
+              <BarChart3 className="h-6 w-6 text-blue-600" />
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">Analytics</h3>
+            <p className="text-sm text-gray-600">View market trends and insights</p>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* CTA Section for Non-authenticated Users */}
+      {!user && (
+        <motion.section variants={itemVariants} className="text-center mt-24">
+          <h2 className="text-4xl font-bold mb-8 text-gray-900">Ready to Get Started?</h2>
+          <p className="text-2xl text-gray-700 mb-12 font-light">
+            Join thousands of users finding their perfect property
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-8 justify-center">
             <motion.div
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          </motion.div>
+            >
               <Link
-                to="/user-dashboard"
-                className="group bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white px-12 py-6 rounded-2xl font-bold text-xl transition-all duration-500 flex items-center gap-4 shadow-2xl hover:shadow-gray-500/30 relative overflow-hidden"
+                to="/auth/register"
+                className="group bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-500 shadow-2xl hover:shadow-primary-500/30 relative overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <BarChart3 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300 relative z-10" />
-                <span className="relative z-10">My Dashboard</span>
-            className="text-center mt-24"
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <span className="relative z-10">Create Account</span>
               </Link>
-            <p className="text-2xl text-gray-700 mb-12 font-light">
-            whileTap={{ scale: 0.95 }}
-            <motion.div
-            <div className="flex flex-col sm:flex-row gap-8 justify-center">
-              <motion.div
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              <Link
-                <Link
-                  to="/auth/register"
-                  className="group bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-500 shadow-2xl hover:shadow-primary-500/30 relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <span className="relative z-10">Create Account</span>
-                </Link>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                <span className="relative z-10">Join EstateKart</span>
-                <Link
-                  to="/auth/login"
-                  className="group border-2 border-primary-500 text-primary-600 hover:bg-primary-50 hover:border-primary-600 px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-500 hover:shadow-lg relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-primary-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <span className="relative z-10">Sign In</span>
-                </Link>
-              </motion.div>
             </motion.div>
-          </motion.div>
-        </div>
-      </motion.section>
+            
+            <motion.div
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              <Link
+                to="/auth/login"
+                className="group border-2 border-primary-500 text-primary-600 hover:bg-primary-50 hover:border-primary-600 px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-500 hover:shadow-lg relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-primary-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <span className="relative z-10">Sign In</span>
+              </Link>
+            </motion.div>
+          </div>
+        </motion.section>
+      )}
     </motion.div>
-  )
   );
 };
