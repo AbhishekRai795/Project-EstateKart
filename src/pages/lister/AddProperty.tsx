@@ -2,33 +2,29 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Home, 
+  ArrowLeft, 
+  Upload, 
+  X, 
   MapPin, 
   DollarSign, 
-  Bed, 
-  Bath, 
-  Square, 
-  Upload, 
-  X,
-  Plus,
-  Save,
-  ArrowLeft,
-  Camera,
-  Link as LinkIcon,
-  Image as ImageIcon
+  Home,
+  Bath,
+  Bed,
+  Square,
+  Calendar,
+  Car,
+  Check,
+  ImageIcon,
+  Link2
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProperty } from '../../contexts/PropertyContext';
 
-// TODO: Import AWS SDK for S3 operations
-// import AWS from 'aws-sdk';
-// import { uploadToS3, deleteFromS3 } from '../../services/s3Service';
-
 export const AddProperty: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { addProperty } = useProperty();
-  const navigate = useNavigate();
-
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -39,153 +35,69 @@ export const AddProperty: React.FC = () => {
     area: '',
     type: 'house' as 'house' | 'apartment' | 'condo' | 'villa',
     status: 'available' as 'available' | 'pending' | 'sold',
-    images: [] as string[],
-    amenities: [] as string[],
     yearBuilt: '',
     parkingSpaces: '',
-    furnished: false,
-    petFriendly: false,
-    contactPhone: '',
-    contactEmail: ''
+    contactName: '',
+    contactEmail: '',
+    contactPhone: ''
   });
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [newImageUrl, setNewImageUrl] = useState('');
+  const [imageInput, setImageInput] = useState('');
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [uploadMethod, setUploadMethod] = useState<'url' | 'upload'>('url');
-  const [uploadingImages, setUploadingImages] = useState<boolean>(false);
-  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [imageUploadMethod, setImageUploadMethod] = useState<'file' | 'url'>('file');
 
-  // TODO: Initialize AWS S3 configuration
-  // const s3 = new AWS.S3({
-  //   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-  //   secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-  //   region: process.env.REACT_APP_AWS_REGION
-  // });
-
-  const availableAmenities = [
-    'Swimming Pool', 'Gym', 'Parking', 'Garden', 'Balcony', 'Elevator',
-    'Security', 'Air Conditioning', 'Heating', 'Fireplace', 'Laundry',
-    'Storage', 'Terrace', 'Garage', 'Basement', 'Attic'
+  const amenitiesList = [
+    'Swimming Pool', 'Gym', 'Parking', 'Balcony', 'Garden', 'Security',
+    'Elevator', 'Air Conditioning', 'Heating', 'Internet', 'Furnished',
+    'Pet Friendly', 'Laundry', 'Fireplace', 'Terrace', 'Storage'
   ];
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const addImageUrl = () => {
-    if (newImageUrl.trim() && !imageUrls.includes(newImageUrl.trim())) {
-      setImageUrls(prev => [...prev, newImageUrl.trim()]);
-      setNewImageUrl('');
-    }
-  };
-
-  const removeImageUrl = (index: number) => {
-    const imageToRemove = imageUrls[index];
-    setImageUrls(prev => prev.filter((_, i) => i !== index));
-    
-    // TODO: If this is an S3 URL, delete from S3 bucket
-    // if (imageToRemove.includes('s3.amazonaws.com') || imageToRemove.includes('amazonaws.com')) {
-    //   const key = extractS3KeyFromUrl(imageToRemove);
-    //   deleteFromS3(key).catch(console.error);
-    // }
-  };
-
-  // TODO: Function to extract S3 key from URL
-  // const extractS3KeyFromUrl = (url: string): string => {
-  //   const urlParts = url.split('/');
-  //   return urlParts.slice(-2).join('/'); // Assuming format: bucket/folder/filename
-  // };
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  // Handle file upload
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || imageUrls.length >= 5) return;
 
     setUploadingImages(true);
-
-    try {
-      const uploadPromises = Array.from(files).map(async (file, index) => {
-        // TODO: Validate file type and size
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        const maxSize = 5 * 1024 * 1024; // 5MB
-
-        if (!allowedTypes.includes(file.type)) {
-          throw new Error(`File ${file.name} is not a supported image format`);
-        }
-
-        if (file.size > maxSize) {
-          throw new Error(`File ${file.name} is too large. Maximum size is 5MB`);
-        }
-
-        // TODO: Generate unique filename
-        const timestamp = Date.now();
-        const randomString = Math.random().toString(36).substring(2, 15);
-        const fileExtension = file.name.split('.').pop();
-        const fileName = `properties/${user?.id}/${timestamp}-${randomString}.${fileExtension}`;
-
-        // TODO: Upload to S3 with progress tracking
-        // const uploadParams = {
-        //   Bucket: process.env.REACT_APP_S3_BUCKET_NAME,
-        //   Key: fileName,
-        //   Body: file,
-        //   ContentType: file.type,
-        //   ACL: 'public-read', // Make images publicly accessible
-        //   Metadata: {
-        //     'uploaded-by': user?.id || 'unknown',
-        //     'property-id': 'temp', // Will be updated after property creation
-        //     'upload-timestamp': timestamp.toString()
-        //   }
-        // };
-
-        // Track upload progress
-        const fileId = `${file.name}-${index}`;
-        setUploadProgress(prev => ({ ...prev, [fileId]: 0 }));
-
-        // TODO: Implement S3 upload with progress
-        // const upload = s3.upload(uploadParams);
-        // 
-        // upload.on('httpUploadProgress', (progress) => {
-        //   const percentCompleted = Math.round((progress.loaded / progress.total) * 100);
-        //   setUploadProgress(prev => ({ ...prev, [fileId]: percentCompleted }));
-        // });
-        //
-        // const result = await upload.promise();
-        // return result.Location; // S3 URL
-
-        // TEMPORARY: Create object URL for preview (remove when S3 is implemented)
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const result = e.target?.result as string;
-            // Simulate upload progress
-            let progress = 0;
-            const interval = setInterval(() => {
-              progress += 10;
-              setUploadProgress(prev => ({ ...prev, [fileId]: progress }));
-              if (progress >= 100) {
-                clearInterval(interval);
-                resolve(result);
-              }
-            }, 100);
-          };
-          reader.readAsDataURL(file);
-        });
-      });
-
-      const uploadedUrls = await Promise.all(uploadPromises);
-      setImageUrls(prev => [...prev, ...uploadedUrls]);
+    
+    for (let i = 0; i < Math.min(files.length, 5 - imageUrls.length); i++) {
+      const file = files[i];
       
-      // Clear progress tracking
-      setUploadProgress({});
+      // Create a local URL for preview (in real app, you'd upload to S3/Cloudinary)
+      const localUrl = URL.createObjectURL(file);
       
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      alert(`Error uploading images: ${error}`);
-    } finally {
-      setUploadingImages(false);
-      // Reset file input
-      event.target.value = '';
+      // For demo purposes, we'll use placeholder images
+      // In production, you'd upload to your image service here
+      const demoImageUrls = [
+        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800'
+      ];
+      
+      const randomImage = demoImageUrls[Math.floor(Math.random() * demoImageUrls.length)];
+      setImageUrls(prev => [...prev, randomImage]);
     }
+    
+    setUploadingImages(false);
+    e.target.value = ''; // Reset file input
+  };
+
+  const handleAddImageUrl = () => {
+    if (imageInput.trim() && imageUrls.length < 5) {
+      setImageUrls(prev => [...prev, imageInput.trim()]);
+      setImageInput('');
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImageUrls(prev => prev.filter((_, i) => i !== index));
   };
 
   const toggleAmenity = (amenity: string) => {
@@ -198,12 +110,7 @@ export const AddProperty: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!user) return;
-
-    // TODO: Update S3 metadata with actual property ID after creation
-    // const propertyId = generatePropertyId(); // Generate unique property ID
-    // await updateS3Metadata(imageUrls, propertyId);
 
     const propertyData = {
       ...formData,
@@ -222,32 +129,8 @@ export const AddProperty: React.FC = () => {
     };
 
     addProperty(propertyData);
-    navigate('/my-properties');
+    navigate('/lister/dashboard');
   };
-
-  // TODO: Function to update S3 object metadata
-  // const updateS3Metadata = async (imageUrls: string[], propertyId: string) => {
-  //   const updatePromises = imageUrls
-  //     .filter(url => url.includes('amazonaws.com'))
-  //     .map(async (url) => {
-  //       const key = extractS3KeyFromUrl(url);
-  //       const copyParams = {
-  //         Bucket: process.env.REACT_APP_S3_BUCKET_NAME,
-  //         CopySource: `${process.env.REACT_APP_S3_BUCKET_NAME}/${key}`,
-  //         Key: key,
-  //         Metadata: {
-  //           'uploaded-by': user?.id || 'unknown',
-  //           'property-id': propertyId,
-  //           'upload-timestamp': Date.now().toString()
-  //         },
-  //         MetadataDirective: 'REPLACE'
-  //       };
-  //       
-  //       return s3.copyObject(copyParams).promise();
-  //     });
-  //   
-  //   await Promise.all(updatePromises);
-  // };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -273,34 +156,27 @@ export const AddProperty: React.FC = () => {
       className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
     >
       {/* Header */}
-      <motion.div variants={itemVariants} className="mb-8">
-        <div className="flex items-center space-x-4 mb-6">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/my-properties')}
+      <motion.div variants={itemVariants} className="flex items-center justify-between mb-8">
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => navigate('/lister/dashboard')}
             className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
           >
-            <ArrowLeft className="h-5 w-5" />
-          </motion.button>
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-3">
-              <div className="bg-primary-100 p-2 rounded-lg">
-                <Plus className="h-6 w-6 text-primary-600" />
-              </div>
-              <span>Add New Property</span>
-            </h1>
-            <p className="text-gray-600 mt-2">Fill in the details to list your property</p>
+            <h1 className="text-3xl font-black text-gray-900">Add New Property</h1>
+            <p className="text-gray-600">Fill in the details to list your property</p>
           </div>
         </div>
       </motion.div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Information */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
-            <Home className="h-5 w-5 text-primary-600" />
-            <span>Basic Information</span>
+        <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <Home className="w-6 h-6 mr-3 text-primary-600" />
+            Basic Information
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -312,7 +188,7 @@ export const AddProperty: React.FC = () => {
                 type="text"
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 placeholder="e.g., Modern Downtown Apartment"
                 required
               />
@@ -326,27 +202,40 @@ export const AddProperty: React.FC = () => {
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none"
-                placeholder="Describe your property in detail..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all"
+                placeholder="Describe your property, its features, and what makes it special..."
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Price ($) *
+                <DollarSign className="w-4 h-4 inline mr-1" />
+                Price *
               </label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                  placeholder="450000"
-                  required
-                />
-              </div>
+              <input
+                type="number"
+                value={formData.price}
+                onChange={(e) => handleInputChange('price', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                placeholder="450000"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <MapPin className="w-4 h-4 inline mr-1" />
+                Location *
+              </label>
+              <input
+                type="text"
+                value={formData.location}
+                onChange={(e) => handleInputChange('location', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                placeholder="Downtown, New York"
+                required
+              />
             </div>
 
             <div>
@@ -356,7 +245,7 @@ export const AddProperty: React.FC = () => {
               <select
                 value={formData.type}
                 onChange={(e) => handleInputChange('type', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 required
               >
                 <option value="house">House</option>
@@ -366,79 +255,70 @@ export const AddProperty: React.FC = () => {
               </select>
             </div>
 
-            <div className="md:col-span-2">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location *
+                Status
               </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
-                  value={formData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                  placeholder="e.g., Downtown, New York"
-                  required
-                />
-              </div>
+              <select
+                value={formData.status}
+                onChange={(e) => handleInputChange('status', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+              >
+                <option value="available">Available</option>
+                <option value="pending">Pending</option>
+                <option value="sold">Sold</option>
+              </select>
             </div>
           </div>
         </motion.div>
 
         {/* Property Details */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
-            <Square className="h-5 w-5 text-primary-600" />
-            <span>Property Details</span>
-          </h2>
+        <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Property Details</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Bed className="w-4 h-4 inline mr-1" />
                 Bedrooms *
               </label>
-              <div className="relative">
-                <Bed className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="number"
-                  value={formData.bedrooms}
-                  onChange={(e) => handleInputChange('bedrooms', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                  placeholder="3"
-                  min="0"
-                  required
-                />
-              </div>
+              <input
+                type="number"
+                value={formData.bedrooms}
+                onChange={(e) => handleInputChange('bedrooms', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                placeholder="3"
+                min="0"
+                required
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Bath className="w-4 h-4 inline mr-1" />
                 Bathrooms *
               </label>
-              <div className="relative">
-                <Bath className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="number"
-                  value={formData.bathrooms}
-                  onChange={(e) => handleInputChange('bathrooms', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                  placeholder="2"
-                  min="0"
-                  step="0.5"
-                  required
-                />
-              </div>
+              <input
+                type="number"
+                value={formData.bathrooms}
+                onChange={(e) => handleInputChange('bathrooms', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                placeholder="2"
+                min="0"
+                required
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Square className="w-4 h-4 inline mr-1" />
                 Area (sq ft) *
               </label>
               <input
                 type="number"
                 value={formData.area}
                 onChange={(e) => handleInputChange('area', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 placeholder="1200"
                 min="0"
                 required
@@ -447,13 +327,14 @@ export const AddProperty: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="w-4 h-4 inline mr-1" />
                 Year Built
               </label>
               <input
                 type="number"
                 value={formData.yearBuilt}
                 onChange={(e) => handleInputChange('yearBuilt', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 placeholder="2020"
                 min="1800"
                 max={new Date().getFullYear()}
@@ -462,295 +343,237 @@ export const AddProperty: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Car className="w-4 h-4 inline mr-1" />
                 Parking Spaces
               </label>
               <input
                 type="number"
                 value={formData.parkingSpaces}
                 onChange={(e) => handleInputChange('parkingSpaces', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 placeholder="2"
                 min="0"
               />
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => handleInputChange('status', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-              >
-                <option value="available">Available</option>
-                <option value="pending">Pending</option>
-                <option value="sold">Sold</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="furnished"
-                checked={formData.furnished}
-                onChange={(e) => handleInputChange('furnished', e.target.checked)}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-              />
-              <label htmlFor="furnished" className="ml-2 text-sm text-gray-700">
-                Furnished
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="petFriendly"
-                checked={formData.petFriendly}
-                onChange={(e) => handleInputChange('petFriendly', e.target.checked)}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-              />
-              <label htmlFor="petFriendly" className="ml-2 text-sm text-gray-700">
-                Pet Friendly
-              </label>
-            </div>
           </div>
         </motion.div>
 
-        {/* Images Section - Enhanced */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
-            <ImageIcon className="h-5 w-5 text-primary-600" />
-            <span>Property Images</span>
+        {/* Images - RESTORED FILE UPLOAD */}
+        <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <Upload className="w-6 h-6 mr-3 text-primary-600" />
+            Property Images
           </h2>
           
           {/* Upload Method Toggle */}
-          <div className="mb-6">
-            <div className="flex rounded-lg bg-gray-100 p-1 w-fit">
-              <button
-                type="button"
-                onClick={() => setUploadMethod('url')}
-                className={`flex items-center space-x-2 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                  uploadMethod === 'url'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <LinkIcon className="h-4 w-4" />
-                <span>Image URL</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setUploadMethod('upload')}
-                className={`flex items-center space-x-2 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                  uploadMethod === 'upload'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <Camera className="h-4 w-4" />
-                <span>Upload Files</span>
-              </button>
-            </div>
+          <div className="flex bg-gray-100 rounded-lg p-1 mb-6 w-fit">
+            <button
+              type="button"
+              onClick={() => setImageUploadMethod('file')}
+              className={`flex items-center px-4 py-2 rounded-md transition-colors ${
+                imageUploadMethod === 'file'
+                  ? 'bg-white text-primary-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <ImageIcon className="w-4 h-4 mr-2" />
+              Upload Files
+            </button>
+            <button
+              type="button"
+              onClick={() => setImageUploadMethod('url')}
+              className={`flex items-center px-4 py-2 rounded-md transition-colors ${
+                imageUploadMethod === 'url'
+                  ? 'bg-white text-primary-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Link2 className="w-4 h-4 mr-2" />
+              Add URLs
+            </button>
           </div>
 
-          <div className="space-y-4">
-            {uploadMethod === 'url' ? (
-              /* URL Input Method */
-              <div className="flex space-x-2">
+          {/* File Upload */}
+          {imageUploadMethod === 'file' && (
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="image-upload"
+                  disabled={imageUrls.length >= 5 || uploadingImages}
+                />
+                <label
+                  htmlFor="image-upload"
+                  className={`cursor-pointer ${imageUrls.length >= 5 ? 'cursor-not-allowed opacity-50' : ''}`}
+                >
+                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-gray-900 mb-2">
+                    {uploadingImages ? 'Uploading...' : 'Click to upload images'}
+                  </p>
+                  <p className="text-gray-500">
+                    PNG, JPG, JPEG up to 10MB each (Max 5 images)
+                  </p>
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* URL Input */}
+          {imageUploadMethod === 'url' && (
+            <div className="space-y-4">
+              <div className="flex gap-4">
                 <input
                   type="url"
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Enter image URL (e.g., https://images.pexels.com/...)"
+                  value={imageInput}
+                  onChange={(e) => setImageInput(e.target.value)}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Enter image URL"
                 />
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   type="button"
-                  onClick={addImageUrl}
-                  className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                  onClick={handleAddImageUrl}
+                  disabled={!imageInput.trim() || imageUrls.length >= 5}
+                  className="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Add
-                </motion.button>
+                  Add Image
+                </button>
               </div>
-            ) : (
-              /* File Upload Method */
-              <div>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="image-upload"
-                    disabled={uploadingImages}
-                  />
-                  <label
-                    htmlFor="image-upload"
-                    className="cursor-pointer flex flex-col items-center space-y-4"
-                  >
-                    <div className="bg-primary-100 p-4 rounded-full">
-                      <Upload className="h-8 w-8 text-primary-600" />
-                    </div>
-                    <div>
-                      <p className="text-lg font-medium text-gray-900">
-                        {uploadingImages ? 'Uploading...' : 'Upload Images'}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Click to select or drag and drop images here
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Supports: JPG, PNG, WebP (Max 5MB each)
-                      </p>
-                    </div>
-                  </label>
-                </div>
+            </div>
+          )}
 
-                {/* Upload Progress */}
-                {Object.keys(uploadProgress).length > 0 && (
-                  <div className="space-y-2">
-                    {Object.entries(uploadProgress).map(([fileId, progress]) => (
-                      <div key={fileId} className="bg-gray-50 rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-gray-700">{fileId.split('-')[0]}</span>
-                          <span className="text-sm text-gray-500">{progress}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-primary-500 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Image Preview Grid */}
-            {imageUrls.length > 0 && (
+          {/* Image Preview */}
+          {imageUrls.length > 0 && (
+            <div className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {imageUrls.map((url, index) => (
                   <div key={index} className="relative group">
                     <img
                       src={url}
                       alt={`Property ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
+                      className="w-full h-32 object-cover rounded-lg border border-gray-200"
                     />
                     <button
                       type="button"
-                      onClick={() => removeImageUrl(index)}
+                      onClick={() => handleRemoveImage(index)}
                       className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="w-4 h-4" />
                     </button>
-                    {index === 0 && (
-                      <div className="absolute bottom-2 left-2 bg-primary-500 text-white px-2 py-1 rounded text-xs font-medium">
-                        Main Image
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
-            )}
-
-            {/* Image Guidelines */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-blue-900 mb-2">📸 Image Guidelines</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• First image will be used as the main property image</li>
-                <li>• Upload high-quality images for better engagement</li>
-                <li>• Include exterior, interior, and key feature photos</li>
-                <li>• Recommended: 5-10 images per property</li>
-              </ul>
             </div>
-          </div>
+          )}
+
+          <p className="text-sm text-gray-500 mt-4">
+            You can add up to 5 images. {imageUrls.length}/5 images added.
+          </p>
         </motion.div>
 
         {/* Amenities */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Amenities</h2>
+        <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Amenities</h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {availableAmenities.map((amenity) => (
-              <motion.button
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {amenitiesList.map((amenity) => (
+              <label
                 key={amenity}
-                type="button"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => toggleAmenity(amenity)}
-                className={`p-3 rounded-lg border text-sm font-medium transition-all ${
+                className={`flex items-center p-3 rounded-xl border-2 cursor-pointer transition-all ${
                   selectedAmenities.includes(amenity)
-                    ? 'bg-primary-500 text-white border-primary-500'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-primary-300'
+                    ? 'border-primary-500 bg-primary-50 text-primary-700'
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                {amenity}
-              </motion.button>
+                <input
+                  type="checkbox"
+                  checked={selectedAmenities.includes(amenity)}
+                  onChange={() => toggleAmenity(amenity)}
+                  className="sr-only"
+                />
+                <div className={`w-5 h-5 rounded mr-3 flex items-center justify-center ${
+                  selectedAmenities.includes(amenity)
+                    ? 'bg-primary-500'
+                    : 'border-2 border-gray-300'
+                }`}>
+                  {selectedAmenities.includes(amenity) && (
+                    <Check className="w-3 h-3 text-white" />
+                  )}
+                </div>
+                <span className="text-sm font-medium">{amenity}</span>
+              </label>
             ))}
           </div>
         </motion.div>
 
         {/* Contact Information */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Contact Information</h2>
+        <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contact Phone
+                Contact Name *
               </label>
               <input
-                type="tel"
-                value={formData.contactPhone}
-                onChange={(e) => handleInputChange('contactPhone', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                placeholder="+1 (555) 123-4567"
+                type="text"
+                value={formData.contactName}
+                onChange={(e) => handleInputChange('contactName', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                placeholder="John Smith"
+                required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contact Email
+                Contact Email *
               </label>
               <input
                 type="email"
                 value={formData.contactEmail}
                 onChange={(e) => handleInputChange('contactEmail', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                placeholder="contact@example.com"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                placeholder="john@example.com"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Contact Phone *
+              </label>
+              <input
+                type="tel"
+                value={formData.contactPhone}
+                onChange={(e) => handleInputChange('contactPhone', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                placeholder="+1 (555) 123-4567"
+                required
               />
             </div>
           </div>
         </motion.div>
 
-        {/* Submit Button */}
-        <motion.div variants={itemVariants} className="flex justify-end space-x-4">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+        {/* Submit Buttons */}
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 pt-6">
+          <button
             type="button"
-            onClick={() => navigate('/my-properties')}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            onClick={() => navigate('/lister/dashboard')}
+            className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium"
           >
             Cancel
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          </button>
+          <button
             type="submit"
             disabled={uploadingImages}
-            className="px-8 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Save className="h-5 w-5" />
-            <span>{uploadingImages ? 'Uploading...' : 'List Property'}</span>
-          </motion.button>
+            {uploadingImages ? 'Uploading...' : 'List Property'}
+          </button>
         </motion.div>
       </form>
     </motion.div>

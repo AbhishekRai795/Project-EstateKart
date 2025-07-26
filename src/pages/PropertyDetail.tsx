@@ -181,7 +181,7 @@ export const PropertyDetail: React.FC = () => {
                 <Share2 className="h-5 w-5 text-gray-600" />
               </motion.button>
               
-              {user?.role === 'user' && (
+              {user?.userType === 'user' && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

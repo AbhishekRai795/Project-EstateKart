@@ -41,7 +41,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     if (onClick) {
       onClick();
     } else {
-      // Default navigation based on user role
+      // Navigate to property detail page
       navigate(`/property/${property.id}`);
     }
   };
@@ -70,120 +70,111 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   if (viewMode === 'list') {
     return (
       <motion.div
-        whileHover={{ y: -3, scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100 cursor-pointer"
         onClick={handleCardClick}
-        className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer group border border-gray-100 hover:border-primary-200"
       >
         <div className="flex">
           {/* Image Section - Left */}
-          <div className="relative w-72 h-56 flex-shrink-0 overflow-hidden">
+          <div className="w-1/3 relative">
             <img
               src={property.images[0]}
               alt={property.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className="w-full h-48 object-cover"
             />
             
             {/* Status Badge */}
-            <div className="absolute top-4 left-4">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(property.status)} shadow-lg`}>
-                {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-              </span>
+            <div className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(property.status)}`}>
+              {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
             </div>
 
             {/* Price Badge */}
-            <div className="absolute bottom-4 left-4">
-              <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-xl font-bold text-lg shadow-lg">
-                {formatPrice(property.price)}
-              </div>
+            <div className="absolute bottom-3 left-3 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+              {formatPrice(property.price)}
             </div>
           </div>
 
           {/* Content Section - Right */}
-          <div className="flex-1 p-8 flex flex-col justify-between">
+          <div className="w-2/3 p-6 flex flex-col justify-between">
             <div>
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors duration-300">
-                  {property.title}
-                </h3>
-                
-                {/* Action Buttons */}
-                <div className="flex items-center space-x-3">
-                  {user && onCatalogueToggle && (
-                    <motion.button
-                      whileHover={{ scale: 1.15 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={handleCatalogueClick}
-                      className="p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-primary-300"
-                    >
-                      <ShoppingCart
-                        className={`h-5 w-5 transition-colors duration-300 ${
-                          isInCatalogue ? 'text-blue-500 fill-current' : 'text-gray-600'
-                        }`}
-                      />
-                    </motion.button>
-                  )}
-                  
-                  {onScheduleViewing && (
-                    <motion.button
-                      whileHover={{ scale: 1.05, y: -1 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleScheduleViewing}
-                      className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-primary-500/25 flex items-center gap-2"
-                    >
-                      <Calendar className="h-4 w-4" />
-                      Schedule Viewing
-                    </motion.button>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex items-center text-gray-600 mb-4">
-                <MapPin className="h-5 w-5 mr-2 text-primary-500" />
-                <span className="text-base font-medium">{property.location}</span>
+              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                {property.title}
+              </h3>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 mb-4">
+                {user && onCatalogueToggle && (
+                  <button
+                    onClick={handleCatalogueClick}
+                    className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                      isInCatalogue
+                        ? 'bg-primary-100 text-primary-700 hover:bg-primary-200'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <ShoppingCart className="w-3 h-3" />
+                    <span>{isInCatalogue ? 'In Catalogue' : 'Add to Catalogue'}</span>
+                  </button>
+                )}
+
+                {onScheduleViewing && (
+                  <button
+                    onClick={handleScheduleViewing}
+                    className="flex items-center space-x-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-200 transition-colors"
+                  >
+                    <Calendar className="w-3 h-3" />
+                    <span>Schedule Viewing</span>
+                  </button>
+                )}
               </div>
 
-              <p className="text-gray-600 text-base mb-6 line-clamp-2 leading-relaxed">
+              <div className="flex items-center text-gray-600 mb-2">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span className="text-sm">{property.location}</span>
+              </div>
+
+              <p className="text-gray-600 text-sm line-clamp-2 mb-4">
                 {property.description}
               </p>
 
               {/* Property Details */}
-              <div className="flex items-center space-x-6 text-gray-600 mb-6">
-                <div className="flex items-center bg-gray-50 px-3 py-2 rounded-lg">
-                  <Bed className="h-5 w-5 mr-2 text-primary-500" />
-                  <span className="font-medium">{property.bedrooms}</span>
+              <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                <div className="flex items-center">
+                  <Bed className="w-4 h-4 mr-1" />
+                  <span>{property.bedrooms}</span>
                 </div>
-                <div className="flex items-center bg-gray-50 px-3 py-2 rounded-lg">
-                  <Bath className="h-5 w-5 mr-2 text-primary-500" />
-                  <span className="font-medium">{property.bathrooms}</span>
+                <div className="flex items-center">
+                  <Bath className="w-4 h-4 mr-1" />
+                  <span>{property.bathrooms}</span>
                 </div>
-                <div className="flex items-center bg-gray-50 px-3 py-2 rounded-lg">
-                  <Square className="h-5 w-5 mr-2 text-primary-500" />
-                  <span className="font-medium">{property.area} sqft</span>
+                <div className="flex items-center">
+                  <Square className="w-4 h-4 mr-1" />
+                  <span>{property.area} sqft</span>
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
               {/* Stats for Lister View */}
               {showStats && (
-                <div className="flex items-center space-x-6 text-gray-600">
+                <div className="flex items-center space-x-4 text-sm text-gray-500">
                   <div className="flex items-center">
-                    <Eye className="h-5 w-5 mr-2 text-blue-500" />
-                    <span className="font-medium">{property.views} views</span>
+                    <Eye className="w-4 h-4 mr-1" />
+                    <span>{property.views} views</span>
                   </div>
                   <div className="flex items-center">
-                    <DollarSign className="h-5 w-5 mr-2 text-green-500" />
-                    <span className="font-medium">{property.offers} offers</span>
+                    <DollarSign className="w-4 h-4 mr-1" />
+                    <span>{property.offers} offers</span>
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* Lister Info */}
-              <div className="text-right">
-                <p className="text-sm text-gray-500">Listed by</p>
-                <p className="text-base font-bold text-gray-700">{property.listerName}</p>
+            {/* Lister Info */}
+            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+              <div className="text-sm text-gray-500">
+                <span className="block">Listed by</span>
+                <span className="font-medium text-gray-900">{property.listerName}</span>
               </div>
             </div>
           </div>
@@ -194,115 +185,110 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
 
   return (
     <motion.div
-      whileHover={{ y: -6, scale: 1.03 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -5, scale: 1.02 }}
+      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden group border border-gray-100 cursor-pointer"
       onClick={handleCardClick}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer group border border-gray-100 hover:border-primary-200"
     >
       {/* Image Section */}
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative">
         <img
           src={property.images[0]}
           alt={property.title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
         />
         
         {/* Status Badge */}
-        <div className="absolute top-4 left-4">
-          <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(property.status)} shadow-lg`}>
-            {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-          </span>
+        <div className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(property.status)}`}>
+          {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
         </div>
 
         {/* Catalogue Button */}
         {user && onCatalogueToggle && (
-          <motion.button
-            whileHover={{ scale: 1.15 }}
-            whileTap={{ scale: 0.9 }}
+          <button
             onClick={handleCatalogueClick}
-            className="absolute top-4 right-4 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-primary-300"
+            className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 ${
+              isInCatalogue
+                ? 'bg-primary-600 text-white shadow-lg'
+                : 'bg-white/90 text-gray-600 hover:bg-primary-600 hover:text-white shadow-lg'
+            }`}
           >
-            <ShoppingCart
-              className={`h-5 w-5 transition-colors duration-300 ${
-                isInCatalogue ? 'text-blue-500 fill-current' : 'text-gray-600'
-              }`}
-            />
-          </motion.button>
+            <ShoppingCart className="w-4 h-4" />
+          </button>
         )}
 
         {/* Price Badge */}
-        <div className="absolute bottom-4 left-4">
-          <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-xl font-bold text-lg shadow-lg">
-            {formatPrice(property.price)}
-          </div>
+        <div className="absolute bottom-3 left-3 bg-primary-600/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-bold">
+          {formatPrice(property.price)}
         </div>
-        
+
         {/* Schedule Viewing Button */}
         {onScheduleViewing && (
-          <motion.button
-            whileHover={{ scale: 1.05, y: -1 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={handleScheduleViewing}
-            className="absolute bottom-4 right-4 px-4 py-2 bg-white text-primary-600 rounded-xl text-sm font-bold hover:bg-primary-50 transition-all duration-300 shadow-lg hover:shadow-xl border border-gray-200 hover:border-primary-300 flex items-center gap-2"
+            className="absolute bottom-3 right-3 bg-blue-600/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-700 transition-colors"
           >
-            <Calendar className="h-4 w-4" />
+            <Calendar className="w-3 h-3 inline mr-1" />
             Schedule Viewing
-          </motion.button>
+          </button>
         )}
       </div>
 
       {/* Content Section */}
-      <div className="p-8">
-        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors duration-300">
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-1">
           {property.title}
         </h3>
-        
-        <div className="flex items-center text-gray-600 mb-4">
-          <MapPin className="h-5 w-5 mr-2 text-primary-500" />
-          <span className="text-base font-medium">{property.location}</span>
+
+        <div className="flex items-center text-gray-600 mb-3">
+          <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+          <span className="text-sm line-clamp-1">{property.location}</span>
         </div>
 
-        <p className="text-gray-600 text-base mb-6 line-clamp-2 leading-relaxed">
+        <p className="text-gray-600 text-sm line-clamp-2 mb-4">
           {property.description}
         </p>
 
         {/* Property Details */}
-        <div className="flex items-center justify-between text-gray-600 mb-6">
+        <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center bg-gray-50 px-3 py-2 rounded-lg">
-              <Bed className="h-5 w-5 mr-2 text-primary-500" />
-              <span className="font-medium">{property.bedrooms}</span>
+            <div className="flex items-center">
+              <Bed className="w-4 h-4 mr-1" />
+              <span>{property.bedrooms}</span>
             </div>
-            <div className="flex items-center bg-gray-50 px-3 py-2 rounded-lg">
-              <Bath className="h-5 w-5 mr-2 text-primary-500" />
-              <span className="font-medium">{property.bathrooms}</span>
+            <div className="flex items-center">
+              <Bath className="w-4 h-4 mr-1" />
+              <span>{property.bathrooms}</span>
             </div>
-            <div className="flex items-center bg-gray-50 px-3 py-2 rounded-lg">
-              <Square className="h-5 w-5 mr-2 text-primary-500" />
-              <span className="font-medium">{property.area} sqft</span>
+            <div className="flex items-center">
+              <Square className="w-4 h-4 mr-1" />
+              <span>{property.area} sqft</span>
             </div>
           </div>
         </div>
 
         {/* Stats for Lister View */}
         {showStats && (
-          <div className="flex items-center justify-between text-gray-600 pt-4 border-t border-gray-100 mb-4">
+          <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
             <div className="flex items-center">
-              <Eye className="h-5 w-5 mr-2 text-blue-500" />
-              <span className="font-medium">{property.views} views</span>
+              <Eye className="w-4 h-4 mr-1" />
+              <span>{property.views} views</span>
             </div>
             <div className="flex items-center">
-              <DollarSign className="h-5 w-5 mr-2 text-green-500" />
-              <span className="font-medium">{property.offers} offers</span>
+              <DollarSign className="w-4 h-4 mr-1" />
+              <span>{property.offers} offers</span>
             </div>
           </div>
         )}
 
         {/* Lister Info */}
-        <div className="pt-4 border-t border-gray-100">
-          <p className="text-sm text-gray-500">Listed by</p>
-          <p className="text-base font-bold text-gray-700">{property.listerName}</p>
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div className="text-sm text-gray-500">
+            <span className="block">Listed by</span>
+            <span className="font-medium text-gray-900">{property.listerName}</span>
+          </div>
         </div>
       </div>
     </motion.div>

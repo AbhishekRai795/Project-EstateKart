@@ -13,7 +13,7 @@ export const UserProperties: React.FC = () => {
   const [filteredProperties, setFilteredProperties] = useState(properties);
   const [sortBy, setSortBy] = useState('recent');
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
+  const [selectedPropertyId, setSelectedPropertyId] = useState('');
   const [scheduleForm, setScheduleForm] = useState({
     date: '',
     time: '',
@@ -68,7 +68,7 @@ export const UserProperties: React.FC = () => {
   const handleSort = (sortType: string) => {
     setSortBy(sortType);
     let sorted = [...filteredProperties];
-
+    
     switch (sortType) {
       case 'price-low':
         sorted = sorted.sort((a, b) => a.price - b.price);
@@ -96,7 +96,6 @@ export const UserProperties: React.FC = () => {
 
   const handleScheduleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     const schedulingData = {
       propertyId: selectedPropertyId,
       propertyTitle: properties.find(p => p.id === selectedPropertyId)?.title,
@@ -109,17 +108,18 @@ export const UserProperties: React.FC = () => {
       status: 'scheduled',
       createdAt: new Date()
     };
-    
+
     console.log('Schedule viewing:', schedulingData);
     alert('Viewing scheduled successfully! The lister will contact you soon.');
+    
     setShowScheduleModal(false);
-    setScheduleForm({ 
-      date: '', 
-      time: '', 
-      message: '', 
-      name: user?.name || '', 
-      email: user?.email || '', 
-      phone: '' 
+    setScheduleForm({
+      date: '',
+      time: '',
+      message: '',
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: ''
     });
   };
 
@@ -147,9 +147,13 @@ export const UserProperties: React.FC = () => {
       className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
     >
       {/* Header */}
-      <motion.div variants={itemVariants} className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Explore Properties</h1>
-        <p className="text-gray-600">Discover your perfect home from our curated listings</p>
+      <motion.div variants={itemVariants} className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+          Explore Properties
+        </h1>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Discover your perfect home from our curated listings
+        </p>
       </motion.div>
 
       {/* Search */}
@@ -158,14 +162,12 @@ export const UserProperties: React.FC = () => {
       </motion.div>
 
       {/* Controls */}
-      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-600">
-            {filteredProperties.length} properties found
-          </span>
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div className="text-gray-600">
+          <span className="font-medium">{filteredProperties.length}</span> properties found
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           {/* Sort Dropdown */}
           <select
             value={sortBy}
@@ -179,7 +181,7 @@ export const UserProperties: React.FC = () => {
           </select>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-md transition-colors ${
@@ -188,7 +190,7 @@ export const UserProperties: React.FC = () => {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <Grid className="h-4 w-4" />
+              <Grid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('list')}
@@ -198,7 +200,7 @@ export const UserProperties: React.FC = () => {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <List className="h-4 w-4" />
+              <List className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -207,25 +209,25 @@ export const UserProperties: React.FC = () => {
       {/* Properties Grid/List */}
       <motion.div variants={itemVariants}>
         {filteredProperties.length > 0 ? (
-          <div className={`${
-            viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-              : 'space-y-6'
+          <div className={`grid gap-6 ${
+            viewMode === 'grid' 
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+              : 'grid-cols-1'
           }`}>
             {filteredProperties.map((property) => (
               <PropertyCard
                 key={property.id}
                 property={property}
+                onCatalogueToggle={toggleCatalogue}
+                isInCatalogue={catalogueProperties.includes(property.id)}
                 viewMode={viewMode}
-                onCatalogueToggle={user ? toggleCatalogue : undefined}
-                isInCatalogue={user ? catalogueProperties.includes(property.id) : false}
                 onScheduleViewing={handleScheduleViewing}
               />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <MapPin className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <div className="text-center py-16">
+            <MapPin className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No properties found</h3>
             <p className="text-gray-600">Try adjusting your search criteria or filters</p>
           </div>
@@ -234,170 +236,184 @@ export const UserProperties: React.FC = () => {
 
       {/* Sign in prompt for non-authenticated users */}
       {!user && (
-        <motion.div variants={itemVariants} className="mt-16 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-200 rounded-2xl p-10 text-center">
-          <h3 className="text-2xl font-bold text-primary-900 mb-4">
-            Want personalized recommendations?
-          </h3>
-          <p className="text-primary-700 mb-8 text-lg">
+        <motion.div variants={itemVariants} className="mt-16 bg-gradient-to-r from-primary-500 to-primary-600 rounded-3xl p-8 text-center text-white">
+          <h3 className="text-2xl font-bold mb-4">Want personalized recommendations?</h3>
+          <p className="text-primary-100 mb-6">
             Sign in to save properties to your catalogue, get AI-powered recommendations, and list your own properties
           </p>
-          <div className="flex items-center justify-center space-x-6">
-            <motion.a
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              href="/auth/login"
-              className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-primary-500/25"
-            >
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="bg-white text-primary-600 px-6 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors">
               Sign In
-            </motion.a>
-            <motion.a
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              href="/auth/register"
-              className="border-2 border-primary-500 text-primary-600 hover:bg-primary-50 hover:border-primary-600 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300"
-            >
+            </button>
+            <button className="border-2 border-white text-white px-6 py-3 rounded-xl font-medium hover:bg-white/10 transition-colors">
               Sign Up
-            </motion.a>
+            </button>
           </div>
         </motion.div>
       )}
+
       {/* Load More */}
       {filteredProperties.length > 0 && (
-        <motion.div variants={itemVariants} className="mt-12 text-center">
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-10 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-primary-500/25"
-          >
+        <motion.div variants={itemVariants} className="text-center mt-12">
+          <button className="bg-primary-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-primary-700 transition-colors">
             Load More Properties
-          </motion.button>
+          </button>
         </motion.div>
       )}
 
-      {/* Schedule Viewing Modal */}
-      {showScheduleModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg border border-gray-200"
+      {/* Schedule Viewing Modal - FIXED VERSION */}
+       {/* Schedule Viewing Modal - FULLY FIXED VERSION */}
+{showScheduleModal && (
+  <>
+    {/* Backdrop Overlay */}
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={() => setShowScheduleModal(false)}
+    >
+      {/* Modal Container with Proper Sizing */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto mx-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Header */}
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+          <h3 className="text-xl font-bold text-gray-900">Schedule Property Viewing</h3>
+          <button
+            onClick={() => setShowScheduleModal(false)}
+            className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-2xl font-bold text-gray-900">Schedule Property Viewing</h3>
-              <button
-                onClick={() => setShowScheduleModal(false)}
-                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Modal Content */}
+        <form onSubmit={handleScheduleSubmit} className="p-6 space-y-4">
+          {/* Your Name */}
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              Your Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={scheduleForm.name}
+              onChange={(e) => setScheduleForm(prev => ({ ...prev, name: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+              required
+            />
+          </div>
+
+          {/* Email Address */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={scheduleForm.email}
+              onChange={(e) => setScheduleForm(prev => ({ ...prev, email: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+              required
+            />
+          </div>
+
+          {/* Phone Number */}
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              Phone Number (Optional)
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              value={scheduleForm.phone}
+              onChange={(e) => setScheduleForm(prev => ({ ...prev, phone: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+            />
+          </div>
+
+          {/* Date and Time in a responsive row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Preferred Date */}
+            <div>
+              <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
+                Preferred Date
+              </label>
+              <input
+                id="date"
+                type="date"
+                value={scheduleForm.date}
+                onChange={(e) => setScheduleForm(prev => ({ ...prev, date: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                required
+                min={new Date().toISOString().split('T')[0]}
+              />
             </div>
 
-            <form onSubmit={handleScheduleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Name
-                </label>
-                <input
-                  type="text"
-                  value={scheduleForm.name}
-                  onChange={(e) => setScheduleForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                  required
-                />
-              </div>
+            {/* Preferred Time */}
+            <div>
+              <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-2">
+                Preferred Time
+              </label>
+              <select
+                id="time"
+                value={scheduleForm.time}
+                onChange={(e) => setScheduleForm(prev => ({ ...prev, time: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                required
+              >
+                <option value="">Select time</option>
+                <option value="9:00 AM">9:00 AM</option>
+                <option value="10:00 AM">10:00 AM</option>
+                <option value="11:00 AM">11:00 AM</option>
+                <option value="2:00 PM">2:00 PM</option>
+                <option value="3:00 PM">3:00 PM</option>
+                <option value="4:00 PM">4:00 PM</option>
+                <option value="5:00 PM">5:00 PM</option>
+              </select>
+            </div>
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={scheduleForm.email}
-                  onChange={(e) => setScheduleForm(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                  required
-                />
-              </div>
+          {/* Message */}
+          <div>
+            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+              Message (Optional)
+            </label>
+            <textarea
+              id="message"
+              value={scheduleForm.message}
+              onChange={(e) => setScheduleForm(prev => ({ ...prev, message: e.target.value }))}
+              rows={3}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all"
+              placeholder="Any specific requirements or questions..."
+            />
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number (Optional)
-                </label>
-                <input
-                  type="tel"
-                  value={scheduleForm.phone}
-                  onChange={(e) => setScheduleForm(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Preferred Date
-                </label>
-                <input
-                  type="date"
-                  value={scheduleForm.date}
-                  onChange={(e) => setScheduleForm(prev => ({ ...prev, date: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                  required
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Preferred Time
-                </label>
-                <select
-                  value={scheduleForm.time}
-                  onChange={(e) => setScheduleForm(prev => ({ ...prev, time: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                  required
-                >
-                  <option value="">Select time</option>
-                  <option value="09:00">9:00 AM</option>
-                  <option value="10:00">10:00 AM</option>
-                  <option value="11:00">11:00 AM</option>
-                  <option value="14:00">2:00 PM</option>
-                  <option value="15:00">3:00 PM</option>
-                  <option value="16:00">4:00 PM</option>
-                  <option value="17:00">5:00 PM</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Message (Optional)
-                </label>
-                <textarea
-                  value={scheduleForm.message}
-                  onChange={(e) => setScheduleForm(prev => ({ ...prev, message: e.target.value }))}
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all"
-                  placeholder="Any specific requirements or questions..."
-                />
-              </div>
-
-              <div className="flex space-x-4 pt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowScheduleModal(false)}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl transition-all duration-300 font-bold shadow-lg hover:shadow-primary-500/25"
-                >
-                  Schedule Viewing
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
-    </motion.div>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => setShowScheduleModal(false)}
+              className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
+            >
+              Schedule Viewing
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  </>
+)}
+</motion.div>
   );
 };

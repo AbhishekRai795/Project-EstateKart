@@ -39,6 +39,8 @@ export default {
         'slide-up': 'slideUp 0.4s ease-out',
         'scale-in': 'scaleIn 0.3s ease-out',
         'bounce-soft': 'bounceSoft 0.6s ease-out',
+        'blob': 'blob 7s infinite',
+        'slide-infinite': 'slideInfinite 20s linear infinite', // Unchanged but no pause on hover
       },
       keyframes: {
         blob: {
@@ -53,6 +55,14 @@ export default {
           },
           '100%': {
             transform: 'translate(0px, 0px) scale(1)',
+          },
+        },
+        slideInfinite: {
+          '0%': {
+            transform: 'translateX(0)',
+          },
+          '100%': {
+            transform: 'translateX(-50%)', // This creates the seamless loop
           },
         },
         fadeIn: {
@@ -71,12 +81,12 @@ export default {
           '0%': { transform: 'scale(0.9)' },
           '50%': { transform: 'scale(1.05)' },
           '100%': { transform: 'scale(1)' },
-        }
+        },
       },
       animationDelay: {
         '2000': '2s',
         '4000': '4s',
-      }
+      },
     },
   },
   plugins: [],

@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
 
-
 export interface Property {
   id: string;
   title: string;
@@ -24,10 +23,12 @@ export interface Property {
 interface PropertyContextType {
   properties: Property[];
   catalogueProperties: string[];
+  favorites: string[]; // Added favorites
   addProperty: (property: Omit<Property, 'id' | 'createdAt' | 'views' | 'offers'>) => void;
   updateProperty: (id: string, updates: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
   toggleCatalogue: (propertyId: string) => void;
+  toggleFavorite: (propertyId: string) => void; // Added toggleFavorite
   getPropertiesByLister: (listerId: string) => Property[];
   getPropertyAnalytics: (listerId: string) => any;
 }
@@ -109,6 +110,7 @@ export const PropertyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   ]);
 
   const [catalogueProperties, setCatalogueProperties] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]); // Added favorites state
 
   const addProperty = (propertyData: Omit<Property, 'id' | 'createdAt' | 'views' | 'offers'>) => {
     const newProperty: Property = {
@@ -122,7 +124,7 @@ export const PropertyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const updateProperty = (id: string, updates: Partial<Property>) => {
-    setProperties(prev => prev.map(property => 
+    setProperties(prev => prev.map(property =>
       property.id === id ? { ...property, ...updates } : property
     ));
   };
@@ -132,8 +134,17 @@ export const PropertyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const toggleCatalogue = (propertyId: string) => {
-    setCatalogueProperties(prev => 
-      prev.includes(propertyId) 
+    setCatalogueProperties(prev =>
+      prev.includes(propertyId)
+        ? prev.filter(id => id !== propertyId)
+        : [...prev, propertyId]
+    );
+  };
+
+  // Added toggleFavorite function
+  const toggleFavorite = (propertyId: string) => {
+    setFavorites(prev =>
+      prev.includes(propertyId)
         ? prev.filter(id => id !== propertyId)
         : [...prev, propertyId]
     );
@@ -148,13 +159,13 @@ export const PropertyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const totalViews = listerProperties.reduce((sum, prop) => sum + prop.views, 0);
     const totalOffers = listerProperties.reduce((sum, prop) => sum + prop.offers, 0);
     const conversionRate = totalViews > 0 ? (totalOffers / totalViews * 100).toFixed(2) : '0';
-    
+
     return {
       totalProperties: listerProperties.length,
       totalViews,
       totalOffers,
       conversionRate,
-      averagePrice: listerProperties.length > 0 
+      averagePrice: listerProperties.length > 0
         ? Math.round(listerProperties.reduce((sum, prop) => sum + prop.price, 0) / listerProperties.length)
         : 0,
       propertiesByStatus: {
@@ -169,10 +180,12 @@ export const PropertyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     <PropertyContext.Provider value={{
       properties,
       catalogueProperties,
+      favorites, // Added favorites to context
       addProperty,
       updateProperty,
       deleteProperty,
       toggleCatalogue,
+      toggleFavorite, // Added toggleFavorite to context
       getPropertiesByLister,
       getPropertyAnalytics
     }}>
