@@ -12,7 +12,8 @@ import {
   Calendar,
   Building,
   MapPin,
-  ArrowRight
+  ArrowRight,
+  ArrowRight as ArrowRightIcon
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProperty } from '../../contexts/PropertyContext';
@@ -65,20 +66,24 @@ export const ListerDashboard: React.FC = () => {
             <p className="text-primary-100 text-xl font-light">
               Here's what's happening with your properties today
             </p>
+            
+            {/* Add Property Button in Banner */}
+            <div className="mt-8">
+              <Link
+                to="/add-property"
+                className="group bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 shadow-2xl hover:shadow-white/20 relative overflow-hidden transform hover:scale-105 inline-flex items-center space-x-3"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <Plus className="w-6 h-6 relative z-10" />
+                <span className="relative z-10">Add New Property</span>
+                <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
         </div>
       </motion.div>
 
       {/* Mobile Add Property Button - Moved outside banner */}
-      <motion.div variants={itemVariants} className="md:hidden mb-8">
-        <Link
-          to="/add-property"
-          className="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Add Property</span>
-        </Link>
-      </motion.div>
 
       {/* Quick Actions - Enhanced with floating add button */}
       
