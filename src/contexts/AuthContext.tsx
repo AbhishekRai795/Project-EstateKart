@@ -1,29 +1,41 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import {
+  signUp,
+  confirmSignUp,
+  signIn,
+  signOut,
+  getCurrentUser,
+  fetchUserAttributes,
+  resendSignUpCode,
+  resetPassword,
+  confirmResetPassword,
+} from 'aws-amplify/auth';
 
 interface User {
   id: string;
   email: string;
   name: string;
   avatar?: string;
-  userType?: 'user' | 'lister'; // Add user type for future use
+  userType?: 'user' | 'lister';
+  emailVerified?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<{ needsVerification: boolean }>;
   loading: boolean;
-  // Add these for future Cognito integration
-  confirmSignUp?: (email: string, code: string) => Promise<void>;
-  resendSignUpCode?: (email: string) => Promise<void>;
-  forgotPassword?: (email: string) => Promise<void>;
-  resetPassword?: (email: string, code: string, newPassword: string) => Promise<void>;
+  confirmSignUp: (email: string, code: string) => Promise<void>;
+  resendSignUpCode: (email: string) => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (email: string, code: string, newPassword: string) => Promise<void>;
+  isAuthFlow: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
+const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
@@ -31,104 +43,236 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthFlow, setIsAuthFlow] = useState(false);
 
   useEffect(() => {
-    // Simulate checking for existing session
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    checkAuthState();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    setLoading(true);
+  const checkAuthState = async (): Promise<void> => {
     try {
-      // Simulate API call - replace with AWS Cognito integration
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const currentUser = await getCurrentUser();
+      const attributes = await fetchUserAttributes();
       
-      const mockUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email,
-        name: email.split('@')[0],
-        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`,
-        userType: 'user' // Default to user type
+      const userData: User = {
+        id: currentUser.userId,
+        email: attributes.email || '',
+        name: attributes.name || attributes.given_name || attributes.email?.split('@')[0] || '',
+        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${attributes.email}`,
+        userType: 'user',
+        emailVerified: attributes.email_verified === 'true'
       };
 
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      setUser(userData);
+      setIsAuthFlow(false);
     } catch (error) {
-      throw new Error('Invalid credentials. Please try again.');
+      console.log('No authenticated user found');
+      setUser(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (email: string, password: string, name: string) => {
+  const login = async (email: string, password: string): Promise<void> => {
     setLoading(true);
     try {
-      // Simulate API call - replace with AWS Cognito integration
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email,
-        name,
-        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`,
-        userType: 'user'
-      };
+      const { isSignedIn, nextStep } = await signIn({
+        username: email,
+        password,
+      });
 
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-    } catch (error) {
-      throw new Error('Registration failed. Please try again.');
+      if (isSignedIn) {
+        await checkAuthState();
+      } else if (nextStep?.signInStep === 'CONFIRM_SIGN_UP') {
+        setLoading(false);
+        setIsAuthFlow(true);
+        throw new Error('Please verify your email address before signing in');
+      } else {
+        setLoading(false);
+        throw new Error('Sign in failed - unexpected step');
+      }
+    } catch (error: any) {
+      setLoading(false);
+      
+      // FIXED: Better error categorization
+      console.error('Login error:', error);
+      
+      if (error.message?.includes('User is not confirmed')) {
+        setIsAuthFlow(true);
+        throw new Error('Please verify your email address before signing in');
+      } else if (error.message?.includes('NotAuthorizedException') || error.message?.includes('Incorrect username or password')) {
+        throw new Error('Invalid email or password. Please check your credentials.');
+      } else if (error.message?.includes('UserNotFoundException')) {
+        throw new Error('No account found with this email address. Please sign up first.');
+      } else if (error.message?.includes('TooManyRequestsException')) {
+        throw new Error('Too many failed login attempts. Please wait a few minutes before trying again.');
+      } else {
+        throw new Error(error.message || 'Login failed. Please try again.');
+      }
+    }
+  };
+
+  const register = async (email: string, password: string, name: string): Promise<{ needsVerification: boolean }> => {
+    setLoading(true);
+    setIsAuthFlow(true);
+    
+    try {
+      const { isSignUpComplete } = await signUp({
+        username: email,
+        password,
+        options: {
+          userAttributes: {
+            email,
+            given_name: name.trim(),
+            name: name.trim()
+          },
+        },
+      });
+      
+      if (isSignUpComplete) {
+        setIsAuthFlow(false);
+        setLoading(false);
+        return { needsVerification: false };
+      } else {
+        setLoading(false);
+        return { needsVerification: true };
+      }
+    } catch (error: any) {
+      setLoading(false);
+      setIsAuthFlow(false);
+      
+      // FIXED: Better registration error handling
+      console.error('Registration error:', error);
+      
+      if (error.message?.includes('UsernameExistsException') || error.message?.includes('User already exists')) {
+        throw new Error('An account with this email already exists. Please try signing in instead.');
+      } else if (error.message?.includes('InvalidParameterException') && error.message?.includes('email')) {
+        throw new Error('Please enter a valid email address.');
+      } else if (error.message?.includes('InvalidPasswordException') || error.message?.includes('Password policy')) {
+        throw new Error('Password does not meet security requirements. Please check the requirements below.');
+      } else {
+        throw new Error(error.message || 'Registration failed. Please try again.');
+      }
+    }
+  };
+
+  const confirmSignUpHandler = async (email: string, code: string): Promise<void> => {
+    setLoading(true);
+    try {
+      const { isSignUpComplete } = await confirmSignUp({
+        username: email,
+        confirmationCode: code,
+      });
+
+      if (!isSignUpComplete) {
+        throw new Error('Sign up confirmation failed');
+      }
+      
+      setIsAuthFlow(false);
+    } catch (error: any) {
+      setLoading(false);
+      
+      // FIXED: Better verification error handling
+      console.error('Verification error:', error);
+      
+      if (error.message?.includes('CodeMismatchException')) {
+        throw new Error('Invalid verification code. Please check the code and try again.');
+      } else if (error.message?.includes('ExpiredCodeException')) {
+        throw new Error('Verification code has expired. Please request a new code.');
+      } else if (error.message?.includes('LimitExceededException')) {
+        throw new Error('Too many verification attempts. Please wait before trying again.');
+      } else {
+        throw new Error(error.message || 'Email verification failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = () => {
+  const resendSignUpCodeHandler = async (email: string): Promise<void> => {
+    try {
+      await resendSignUpCode({
+        username: email,
+      });
+    } catch (error: any) {
+      console.error('Resend code error:', error);
+      
+      if (error.message?.includes('LimitExceededException')) {
+        throw new Error('Too many requests. Please wait before requesting another code.');
+      } else {
+        throw new Error(error.message || 'Failed to resend verification code');
+      }
+    }
+  };
+
+  const logout = (): void => {
+    signOut();
     setUser(null);
-    localStorage.removeItem('user');
+    setIsAuthFlow(false);
   };
 
-  // Future Cognito methods (placeholder implementations)
-  const confirmSignUp = async (email: string, code: string) => {
-    // Will be implemented with AWS Cognito
-    console.log('Confirm sign up:', email, code);
+  const forgotPassword = async (email: string): Promise<void> => {
+    try {
+      await resetPassword({
+        username: email,
+      });
+    } catch (error: any) {
+      console.error('Forgot password error:', error);
+      
+      if (error.message?.includes('UserNotFoundException')) {
+        throw new Error('No account found with this email address.');
+      } else if (error.message?.includes('LimitExceededException')) {
+        throw new Error('Too many requests. Please wait before trying again.');
+      } else {
+        throw new Error(error.message || 'Failed to send reset code');
+      }
+    }
   };
 
-  const resendSignUpCode = async (email: string) => {
-    // Will be implemented with AWS Cognito
-    console.log('Resend code:', email);
-  };
-
-  const forgotPassword = async (email: string) => {
-    // Will be implemented with AWS Cognito
-    console.log('Forgot password:', email);
-  };
-
-  const resetPassword = async (email: string, code: string, newPassword: string) => {
-    // Will be implemented with AWS Cognito
-    console.log('Reset password:', email, code);
+  const resetPasswordHandler = async (email: string, code: string, newPassword: string): Promise<void> => {
+    try {
+      await confirmResetPassword({
+        username: email,
+        confirmationCode: code,
+        newPassword,
+      });
+    } catch (error: any) {
+      console.error('Reset password error:', error);
+      
+      if (error.message?.includes('CodeMismatchException')) {
+        throw new Error('Invalid reset code. Please check the code and try again.');
+      } else if (error.message?.includes('ExpiredCodeException')) {
+        throw new Error('Reset code has expired. Please request a new one.');
+      } else if (error.message?.includes('InvalidPasswordException')) {
+        throw new Error('New password does not meet security requirements.');
+      } else {
+        throw new Error(error.message || 'Failed to reset password');
+      }
+    }
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      login,
-      logout,
-      register,
-      loading,
-      confirmSignUp,
-      resendSignUpCode,
-      forgotPassword,
-      resetPassword
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        register,
+        loading,
+        confirmSignUp: confirmSignUpHandler,
+        resendSignUpCode: resendSignUpCodeHandler,
+        forgotPassword,
+        resetPassword: resetPasswordHandler,
+        isAuthFlow
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
+export { useAuth, AuthProvider };
+export default AuthProvider;

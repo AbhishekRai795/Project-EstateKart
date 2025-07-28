@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom'; // NO BrowserRouter import
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/common/Header';
 import { Auth } from '../pages/auth/Auth';
@@ -17,63 +17,179 @@ import { UserDashboard } from '../pages/user/Dashboard';
 import { ClientManagement } from '../pages/lister/ClientManagement';
 import { Profile } from '../pages/user/Profile';
 
-
-const AppRouter: React.FC = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
+// FIXED: Enhanced route protection
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading, isAuthFlow } = useAuth();
+  
+  if (loading && !isAuthFlow) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-primary-600 font-semibold">Loading EstateKart...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto"></div>
+          <div className="mt-4 text-lg text-gray-600">Loading EstateKart...</div>
         </div>
       </div>
     );
-  };
+  }
+  
+  if (!user && !isAuthFlow) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// FIXED: Auth route protection - redirect logged-in users
+const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto"></div>
+          <div className="mt-4 text-lg text-gray-600">Loading EstateKart...</div>
+        </div>
+      </div>
+    );
+  }
+  
+  // FIXED: Redirect authenticated users to prevent loops
+  if (user) {
+    return <Navigate to="/user-dashboard" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+const AppRouter: React.FC = () => {
+  const { loading, isAuthFlow } = useAuth();
+
+  if (loading && !isAuthFlow) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600 mx-auto"></div>
+          <div className="mt-4 text-lg text-gray-600">Loading EstateKart...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/landing" element={<Landing />} />
-          
-          {/* Unified Auth Routes */}
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/auth/login" element={<Navigate to="/auth?mode=signin" replace />} />
-          <Route path="/auth/register" element={<Navigate to="/auth?mode=signup" replace />} />
-          
-          {/* Property Routes */}
-          <Route path="/property/:id" element={<PropertyDetail />} />
-          <Route path="/properties" element={<UserProperties />} />
-
-          {/* User Routes */}
-          <Route path="/user-dashboard" element={<UserDashboard />} />
-          <Route path="/dashboard" element={user ? <UserDashboard /> : <Navigate to="/auth" />} />
-          <Route path="/catalogue" element={<UserCatalogue />} />
-          <Route path="/recommendations" element={<UserRecommendations />} />
-          <Route path="/profile" element={<Profile />} />
-
-
-          {/* Lister Routes - FIXED PATHS */}
-          <Route path="/lister/dashboard" element={<ListerDashboard />} />
-          <Route path="/lister/properties" element={<ListerProperties />} />
-          <Route path="/lister/analytics" element={<ListerAnalytics />} />
-          <Route path="/lister/queries" element={<ListerQueries />} />
-          <Route path="/lister/clients" element={<ClientManagement />} />
-          
-          {/* Add Property Route - ACCESSIBLE FROM BOTH PATHS */}
-          <Route path="/add-property" element={<AddProperty />} />
-          <Route path="/lister/add-property" element={<AddProperty />} />
-
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
-    </Router>
+    // FIXED: NO Router wrapper - it's provided by main.tsx
+    <div className="flex flex-col min-h-screen">
+      <Routes>
+        {/* Public Routes - No authentication required */}
+        <Route path="/" element={<Landing />} />
+        
+        {/* FIXED: Auth route with protection against logged-in users */}
+        <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
+        
+        {/* FIXED: Public Property Browsing - Header included for navigation */}
+        <Route path="/property" element={
+          <>
+            <Header />
+            <UserProperties />
+          </>
+        } />
+        <Route path="/property/:id" element={
+          <>
+            <Header />
+            <PropertyDetail />
+          </>
+        } />
+        
+        {/* Protected Routes - Require authentication */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Header />
+            <UserDashboard />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/user-dashboard" element={
+          <ProtectedRoute>
+            <Header />
+            <UserDashboard />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/catalogue" element={
+          <ProtectedRoute>
+            <Header />
+            <UserCatalogue />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/recommendations" element={
+          <ProtectedRoute>
+            <Header />
+            <UserRecommendations />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Header />
+            <Profile />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/properties" element={
+          <ProtectedRoute>
+            <Header />
+            <UserProperties />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/add-property" element={
+          <ProtectedRoute>
+            <Header />
+            <AddProperty />
+          </ProtectedRoute>
+        } />
+        
+        {/* Lister Routes */}
+        <Route path="/lister/dashboard" element={
+          <ProtectedRoute>
+            <Header />
+            <ListerDashboard />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/lister/properties" element={
+          <ProtectedRoute>
+            <Header />
+            <ListerProperties />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/lister/analytics" element={
+          <ProtectedRoute>
+            <Header />
+            <ListerAnalytics />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/lister/queries" element={
+          <ProtectedRoute>
+            <Header />
+            <ListerQueries />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/lister/clients" element={
+          <ProtectedRoute>
+            <Header />
+            <ClientManagement />
+          </ProtectedRoute>
+        } />
+        
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </div>
   );
 };
 
