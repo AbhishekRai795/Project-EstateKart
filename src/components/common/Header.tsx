@@ -42,16 +42,16 @@ export const Header: React.FC = () => {
     { 
       section: 'Browse',
       items: [
-        { path: '/properties', label: 'Browse Properties', icon: Search },
+        { path: '/user/properties', label: 'Browse Properties', icon: Search },
       ]
     },
     // User Account Section
     ...(user ? [{
       section: 'My Account',
       items: [
-        { path: '/user-dashboard', label: 'My Dashboard', icon: User },
-        { path: '/catalogue', label: 'My Catalogue', icon: ShoppingCart },
-        { path: '/recommendations', label: 'Recommendations', icon: Sparkles },
+        { path: '/user/dashboard', label: 'My Dashboard', icon: User },
+        { path: '/user/catalogue', label: 'My Catalogue', icon: ShoppingCart },
+        { path: '/user/recommendations', label: 'Recommendations', icon: Sparkles },
       ]
     }] : []),
     // Lister Tools Section
@@ -69,7 +69,7 @@ export const Header: React.FC = () => {
     ...(user ? [{
       section: 'Settings',
       items: [
-        { path: '/profile', label: 'Profile Settings', icon: Settings },
+        { path: '/user/profile', label: 'Profile Settings', icon: Settings },
       ]
     }] : [])
   ];

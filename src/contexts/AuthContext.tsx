@@ -56,7 +56,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const currentUser = await getCurrentUser();
       const attributes = await fetchUserAttributes();
-      
+
       const userData: User = {
         id: currentUser.userId,
         email: attributes.email || '',
@@ -77,7 +77,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (email: string, password: string): Promise<void> => {
-    setLoading(true);
+    // Don't set loading to true here - let the UI handle it
     try {
       const { isSignedIn, nextStep } = await signIn({
         username: email,
@@ -87,20 +87,16 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       if (isSignedIn) {
         await checkAuthState();
       } else if (nextStep?.signInStep === 'CONFIRM_SIGN_UP') {
-        setLoading(false);
         setIsAuthFlow(true);
         throw new Error('Please verify your email address before signing in');
       } else {
-        setLoading(false);
         throw new Error('Sign in failed - unexpected step');
       }
     } catch (error: any) {
-      setLoading(false);
-      
-      // FIXED: Better error categorization
       console.error('Login error:', error);
       
-      if (error.message?.includes('User is not confirmed')) {
+      // Enhanced error handling
+      if (error.message?.includes('User is not confirmed') || error.message?.includes('verify your email')) {
         setIsAuthFlow(true);
         throw new Error('Please verify your email address before signing in');
       } else if (error.message?.includes('NotAuthorizedException') || error.message?.includes('Incorrect username or password')) {
@@ -116,11 +112,10 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (email: string, password: string, name: string): Promise<{ needsVerification: boolean }> => {
-    setLoading(true);
     setIsAuthFlow(true);
     
     try {
-      const { isSignUpComplete } = await signUp({
+      const { isSignUpComplete, nextStep } = await signUp({
         username: email,
         password,
         options: {
@@ -131,22 +126,20 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
           },
         },
       });
-      
+
       if (isSignUpComplete) {
         setIsAuthFlow(false);
-        setLoading(false);
         return { needsVerification: false };
-      } else {
-        setLoading(false);
+      } else if (nextStep.signUpStep === 'CONFIRM_SIGN_UP') {
         return { needsVerification: true };
+      } else {
+        throw new Error('Unexpected signup flow');
       }
     } catch (error: any) {
-      setLoading(false);
       setIsAuthFlow(false);
-      
-      // FIXED: Better registration error handling
       console.error('Registration error:', error);
       
+      // Enhanced registration error handling
       if (error.message?.includes('UsernameExistsException') || error.message?.includes('User already exists')) {
         throw new Error('An account with this email already exists. Please try signing in instead.');
       } else if (error.message?.includes('InvalidParameterException') && error.message?.includes('email')) {
@@ -160,7 +153,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const confirmSignUpHandler = async (email: string, code: string): Promise<void> => {
-    setLoading(true);
     try {
       const { isSignUpComplete } = await confirmSignUp({
         username: email,
@@ -170,14 +162,12 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!isSignUpComplete) {
         throw new Error('Sign up confirmation failed');
       }
-      
+
       setIsAuthFlow(false);
     } catch (error: any) {
-      setLoading(false);
-      
-      // FIXED: Better verification error handling
       console.error('Verification error:', error);
       
+      // Enhanced verification error handling
       if (error.message?.includes('CodeMismatchException')) {
         throw new Error('Invalid verification code. Please check the code and try again.');
       } else if (error.message?.includes('ExpiredCodeException')) {
@@ -187,8 +177,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         throw new Error(error.message || 'Email verification failed. Please try again.');
       }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -199,7 +187,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error: any) {
       console.error('Resend code error:', error);
-      
       if (error.message?.includes('LimitExceededException')) {
         throw new Error('Too many requests. Please wait before requesting another code.');
       } else {
@@ -221,7 +208,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error: any) {
       console.error('Forgot password error:', error);
-      
       if (error.message?.includes('UserNotFoundException')) {
         throw new Error('No account found with this email address.');
       } else if (error.message?.includes('LimitExceededException')) {
@@ -241,7 +227,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error: any) {
       console.error('Reset password error:', error);
-      
       if (error.message?.includes('CodeMismatchException')) {
         throw new Error('Invalid reset code. Please check the code and try again.');
       } else if (error.message?.includes('ExpiredCodeException')) {
@@ -266,7 +251,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         resendSignUpCode: resendSignUpCodeHandler,
         forgotPassword,
         resetPassword: resetPasswordHandler,
-        isAuthFlow
+        isAuthFlow,
       }}
     >
       {children}

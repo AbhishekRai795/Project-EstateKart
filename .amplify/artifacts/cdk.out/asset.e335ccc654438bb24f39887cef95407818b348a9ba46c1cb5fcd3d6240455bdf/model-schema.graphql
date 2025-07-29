@@ -1,0 +1,67 @@
+type Property @model @auth(rules: [{allow: public, provider: apiKey, operations: [create, read, update, delete]}])
+{
+  id: ID! @primaryKey
+  title: String!
+  description: String!
+  price: Int!
+  location: String!
+  type: PropertyType @index(queryField: "listPropertiesByType")
+  bedrooms: Int!
+  bathrooms: Int!
+  area: Int!
+  status: PropertyStatus @index(queryField: "listPropertiesByStatus")
+  images: [String]
+  features: [String]
+  views: Int
+  listerId: String! @index(queryField: "listPropertiesByLister")
+  listerName: String
+  listerEmail: String
+  listerPhone: String
+  createdAt: AWSDateTime @index(queryField: "listPropertiesByDate")
+  updatedAt: AWSDateTime
+}
+
+type UserPreference @model @auth(rules: [{allow: public, provider: apiKey, operations: [create, read, update, delete]}])
+{
+  id: ID! @primaryKey
+  userId: String!
+  catalogueProperties: [String]
+  favoriteProperties: [String]
+  searchHistory: [String]
+  priceRange: AWSJSON
+  preferredLocations: [String]
+}
+
+type PropertyViewing @model @auth(rules: [{allow: public, provider: apiKey, operations: [create, read, update, delete]}])
+{
+  id: ID! @primaryKey
+  propertyId: String!
+  clientName: String!
+  clientEmail: String!
+  clientPhone: String
+  date: AWSDate!
+  time: String!
+  message: String
+  status: PropertyViewingStatus
+  listerId: String!
+  createdAt: AWSDateTime
+}
+
+enum PropertyType {
+  house
+  apartment
+  condo
+  villa
+}
+
+enum PropertyStatus {
+  available
+  pending
+  sold
+}
+
+enum PropertyViewingStatus {
+  scheduled
+  completed
+  cancelled
+}

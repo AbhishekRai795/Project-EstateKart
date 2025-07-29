@@ -1,0 +1,573 @@
+type Property @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  title: String!
+  description: String!
+  price: Int!
+  location: String!
+  type: PropertyType
+  bedrooms: Int!
+  bathrooms: Int!
+  area: Int!
+  status: PropertyStatus
+  images: [String]
+  features: [String]
+  views: Int
+  listerId: String!
+  listerName: String
+  listerEmail: String
+  listerPhone: String
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  owner: String
+}
+
+type UserPreference @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  userId: String!
+  catalogueProperties: [String]
+  favoriteProperties: [String]
+  searchHistory: [String]
+  priceRange: AWSJSON
+  preferredLocations: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  owner: String
+}
+
+type PropertyViewing @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  propertyId: String!
+  clientName: String!
+  clientEmail: String!
+  clientPhone: String
+  date: AWSDate!
+  time: String!
+  message: String
+  status: PropertyViewingStatus
+  listerId: String!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime!
+  owner: String
+}
+
+enum PropertyType {
+  house
+  apartment
+  condo
+  villa
+}
+
+enum PropertyStatus {
+  available
+  pending
+  sold
+}
+
+enum PropertyViewingStatus {
+  scheduled
+  completed
+  cancelled
+}
+
+input AmplifyAIConversationTurnErrorInput {
+  errorType: String!
+  message: String!
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelSubscriptionStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  in: [String]
+  notIn: [String]
+}
+
+input ModelSubscriptionIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  in: [Int]
+  notIn: [Int]
+}
+
+input ModelSubscriptionFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  in: [Float]
+  notIn: [Float]
+}
+
+input ModelSubscriptionBooleanInput {
+  ne: Boolean
+  eq: Boolean
+}
+
+input ModelSubscriptionIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  in: [ID]
+  notIn: [ID]
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelPropertyConnection @aws_iam @aws_cognito_user_pools {
+  items: [Property]!
+  nextToken: String
+}
+
+input ModelPropertyTypeInput {
+  eq: PropertyType
+  ne: PropertyType
+}
+
+input ModelPropertyStatusInput {
+  eq: PropertyStatus
+  ne: PropertyStatus
+}
+
+input ModelPropertyFilterInput {
+  id: ModelIDInput
+  title: ModelStringInput
+  description: ModelStringInput
+  price: ModelIntInput
+  location: ModelStringInput
+  type: ModelPropertyTypeInput
+  bedrooms: ModelIntInput
+  bathrooms: ModelIntInput
+  area: ModelIntInput
+  status: ModelPropertyStatusInput
+  images: ModelStringInput
+  features: ModelStringInput
+  views: ModelIntInput
+  listerId: ModelStringInput
+  listerName: ModelStringInput
+  listerEmail: ModelStringInput
+  listerPhone: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelPropertyFilterInput]
+  or: [ModelPropertyFilterInput]
+  not: ModelPropertyFilterInput
+  owner: ModelStringInput
+}
+
+type Query {
+  getProperty(id: ID!): Property @aws_iam @aws_cognito_user_pools
+  listProperties(id: ID, filter: ModelPropertyFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelPropertyConnection @aws_iam @aws_cognito_user_pools
+  listPropertiesByType(type: PropertyType!, sortDirection: ModelSortDirection, filter: ModelPropertyFilterInput, limit: Int, nextToken: String): ModelPropertyConnection @aws_iam @aws_cognito_user_pools
+  listPropertiesByStatus(status: PropertyStatus!, sortDirection: ModelSortDirection, filter: ModelPropertyFilterInput, limit: Int, nextToken: String): ModelPropertyConnection @aws_iam @aws_cognito_user_pools
+  listPropertiesByLister(listerId: String!, sortDirection: ModelSortDirection, filter: ModelPropertyFilterInput, limit: Int, nextToken: String): ModelPropertyConnection @aws_iam @aws_cognito_user_pools
+  listPropertiesByDate(createdAt: AWSDateTime!, sortDirection: ModelSortDirection, filter: ModelPropertyFilterInput, limit: Int, nextToken: String): ModelPropertyConnection @aws_iam @aws_cognito_user_pools
+  getUserPreference(id: ID!): UserPreference @aws_iam @aws_cognito_user_pools
+  listUserPreferences(id: ID, filter: ModelUserPreferenceFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelUserPreferenceConnection @aws_iam @aws_cognito_user_pools
+  getPropertyViewing(id: ID!): PropertyViewing @aws_iam @aws_cognito_user_pools
+  listPropertyViewings(id: ID, filter: ModelPropertyViewingFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelPropertyViewingConnection @aws_iam @aws_cognito_user_pools
+}
+
+input ModelPropertyConditionInput {
+  title: ModelStringInput
+  description: ModelStringInput
+  price: ModelIntInput
+  location: ModelStringInput
+  type: ModelPropertyTypeInput
+  bedrooms: ModelIntInput
+  bathrooms: ModelIntInput
+  area: ModelIntInput
+  status: ModelPropertyStatusInput
+  images: ModelStringInput
+  features: ModelStringInput
+  views: ModelIntInput
+  listerId: ModelStringInput
+  listerName: ModelStringInput
+  listerEmail: ModelStringInput
+  listerPhone: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelPropertyConditionInput]
+  or: [ModelPropertyConditionInput]
+  not: ModelPropertyConditionInput
+  owner: ModelStringInput
+}
+
+input CreatePropertyInput {
+  id: ID
+  title: String!
+  description: String!
+  price: Int!
+  location: String!
+  type: PropertyType
+  bedrooms: Int!
+  bathrooms: Int!
+  area: Int!
+  status: PropertyStatus
+  images: [String]
+  features: [String]
+  views: Int
+  listerId: String!
+  listerName: String
+  listerEmail: String
+  listerPhone: String
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+input UpdatePropertyInput {
+  id: ID!
+  title: String
+  description: String
+  price: Int
+  location: String
+  type: PropertyType
+  bedrooms: Int
+  bathrooms: Int
+  area: Int
+  status: PropertyStatus
+  images: [String]
+  features: [String]
+  views: Int
+  listerId: String
+  listerName: String
+  listerEmail: String
+  listerPhone: String
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+input DeletePropertyInput {
+  id: ID!
+}
+
+type Mutation {
+  createProperty(input: CreatePropertyInput!, condition: ModelPropertyConditionInput): Property @aws_iam @aws_cognito_user_pools
+  updateProperty(input: UpdatePropertyInput!, condition: ModelPropertyConditionInput): Property @aws_iam @aws_cognito_user_pools
+  deleteProperty(input: DeletePropertyInput!, condition: ModelPropertyConditionInput): Property @aws_iam @aws_cognito_user_pools
+  createUserPreference(input: CreateUserPreferenceInput!, condition: ModelUserPreferenceConditionInput): UserPreference @aws_iam @aws_cognito_user_pools
+  updateUserPreference(input: UpdateUserPreferenceInput!, condition: ModelUserPreferenceConditionInput): UserPreference @aws_iam @aws_cognito_user_pools
+  deleteUserPreference(input: DeleteUserPreferenceInput!, condition: ModelUserPreferenceConditionInput): UserPreference @aws_iam @aws_cognito_user_pools
+  createPropertyViewing(input: CreatePropertyViewingInput!, condition: ModelPropertyViewingConditionInput): PropertyViewing @aws_iam @aws_cognito_user_pools
+  updatePropertyViewing(input: UpdatePropertyViewingInput!, condition: ModelPropertyViewingConditionInput): PropertyViewing @aws_iam @aws_cognito_user_pools
+  deletePropertyViewing(input: DeletePropertyViewingInput!, condition: ModelPropertyViewingConditionInput): PropertyViewing @aws_iam @aws_cognito_user_pools
+}
+
+input ModelSubscriptionPropertyFilterInput {
+  id: ModelSubscriptionIDInput
+  title: ModelSubscriptionStringInput
+  description: ModelSubscriptionStringInput
+  price: ModelSubscriptionIntInput
+  location: ModelSubscriptionStringInput
+  type: ModelSubscriptionStringInput
+  bedrooms: ModelSubscriptionIntInput
+  bathrooms: ModelSubscriptionIntInput
+  area: ModelSubscriptionIntInput
+  status: ModelSubscriptionStringInput
+  images: ModelSubscriptionStringInput
+  features: ModelSubscriptionStringInput
+  views: ModelSubscriptionIntInput
+  listerId: ModelSubscriptionStringInput
+  listerName: ModelSubscriptionStringInput
+  listerEmail: ModelSubscriptionStringInput
+  listerPhone: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionPropertyFilterInput]
+  or: [ModelSubscriptionPropertyFilterInput]
+  owner: ModelStringInput
+}
+
+type Subscription {
+  onCreateProperty(filter: ModelSubscriptionPropertyFilterInput): Property @aws_subscribe(mutations: ["createProperty"]) @aws_iam @aws_cognito_user_pools
+  onUpdateProperty(filter: ModelSubscriptionPropertyFilterInput): Property @aws_subscribe(mutations: ["updateProperty"]) @aws_iam @aws_cognito_user_pools
+  onDeleteProperty(filter: ModelSubscriptionPropertyFilterInput): Property @aws_subscribe(mutations: ["deleteProperty"]) @aws_iam @aws_cognito_user_pools
+  onCreateUserPreference(filter: ModelSubscriptionUserPreferenceFilterInput, owner: String): UserPreference @aws_subscribe(mutations: ["createUserPreference"]) @aws_iam @aws_cognito_user_pools
+  onUpdateUserPreference(filter: ModelSubscriptionUserPreferenceFilterInput, owner: String): UserPreference @aws_subscribe(mutations: ["updateUserPreference"]) @aws_iam @aws_cognito_user_pools
+  onDeleteUserPreference(filter: ModelSubscriptionUserPreferenceFilterInput, owner: String): UserPreference @aws_subscribe(mutations: ["deleteUserPreference"]) @aws_iam @aws_cognito_user_pools
+  onCreatePropertyViewing(filter: ModelSubscriptionPropertyViewingFilterInput, owner: String): PropertyViewing @aws_subscribe(mutations: ["createPropertyViewing"]) @aws_iam @aws_cognito_user_pools
+  onUpdatePropertyViewing(filter: ModelSubscriptionPropertyViewingFilterInput, owner: String): PropertyViewing @aws_subscribe(mutations: ["updatePropertyViewing"]) @aws_iam @aws_cognito_user_pools
+  onDeletePropertyViewing(filter: ModelSubscriptionPropertyViewingFilterInput, owner: String): PropertyViewing @aws_subscribe(mutations: ["deletePropertyViewing"]) @aws_iam @aws_cognito_user_pools
+}
+
+type ModelUserPreferenceConnection @aws_iam @aws_cognito_user_pools {
+  items: [UserPreference]!
+  nextToken: String
+}
+
+input ModelUserPreferenceFilterInput {
+  id: ModelIDInput
+  userId: ModelStringInput
+  catalogueProperties: ModelStringInput
+  favoriteProperties: ModelStringInput
+  searchHistory: ModelStringInput
+  priceRange: ModelStringInput
+  preferredLocations: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelUserPreferenceFilterInput]
+  or: [ModelUserPreferenceFilterInput]
+  not: ModelUserPreferenceFilterInput
+  owner: ModelStringInput
+}
+
+input ModelUserPreferenceConditionInput {
+  userId: ModelStringInput
+  catalogueProperties: ModelStringInput
+  favoriteProperties: ModelStringInput
+  searchHistory: ModelStringInput
+  priceRange: ModelStringInput
+  preferredLocations: ModelStringInput
+  and: [ModelUserPreferenceConditionInput]
+  or: [ModelUserPreferenceConditionInput]
+  not: ModelUserPreferenceConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  owner: ModelStringInput
+}
+
+input CreateUserPreferenceInput {
+  id: ID
+  userId: String!
+  catalogueProperties: [String]
+  favoriteProperties: [String]
+  searchHistory: [String]
+  priceRange: AWSJSON
+  preferredLocations: [String]
+}
+
+input UpdateUserPreferenceInput {
+  id: ID!
+  userId: String
+  catalogueProperties: [String]
+  favoriteProperties: [String]
+  searchHistory: [String]
+  priceRange: AWSJSON
+  preferredLocations: [String]
+}
+
+input DeleteUserPreferenceInput {
+  id: ID!
+}
+
+input ModelSubscriptionUserPreferenceFilterInput {
+  id: ModelSubscriptionIDInput
+  userId: ModelSubscriptionStringInput
+  catalogueProperties: ModelSubscriptionStringInput
+  favoriteProperties: ModelSubscriptionStringInput
+  searchHistory: ModelSubscriptionStringInput
+  priceRange: ModelSubscriptionStringInput
+  preferredLocations: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionUserPreferenceFilterInput]
+  or: [ModelSubscriptionUserPreferenceFilterInput]
+  owner: ModelStringInput
+}
+
+type ModelPropertyViewingConnection @aws_iam @aws_cognito_user_pools {
+  items: [PropertyViewing]!
+  nextToken: String
+}
+
+input ModelPropertyViewingStatusInput {
+  eq: PropertyViewingStatus
+  ne: PropertyViewingStatus
+}
+
+input ModelPropertyViewingFilterInput {
+  id: ModelIDInput
+  propertyId: ModelStringInput
+  clientName: ModelStringInput
+  clientEmail: ModelStringInput
+  clientPhone: ModelStringInput
+  date: ModelStringInput
+  time: ModelStringInput
+  message: ModelStringInput
+  status: ModelPropertyViewingStatusInput
+  listerId: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelPropertyViewingFilterInput]
+  or: [ModelPropertyViewingFilterInput]
+  not: ModelPropertyViewingFilterInput
+  owner: ModelStringInput
+}
+
+input ModelPropertyViewingConditionInput {
+  propertyId: ModelStringInput
+  clientName: ModelStringInput
+  clientEmail: ModelStringInput
+  clientPhone: ModelStringInput
+  date: ModelStringInput
+  time: ModelStringInput
+  message: ModelStringInput
+  status: ModelPropertyViewingStatusInput
+  listerId: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelPropertyViewingConditionInput]
+  or: [ModelPropertyViewingConditionInput]
+  not: ModelPropertyViewingConditionInput
+  updatedAt: ModelStringInput
+  owner: ModelStringInput
+}
+
+input CreatePropertyViewingInput {
+  id: ID
+  propertyId: String!
+  clientName: String!
+  clientEmail: String!
+  clientPhone: String
+  date: AWSDate!
+  time: String!
+  message: String
+  status: PropertyViewingStatus
+  listerId: String!
+  createdAt: AWSDateTime
+}
+
+input UpdatePropertyViewingInput {
+  id: ID!
+  propertyId: String
+  clientName: String
+  clientEmail: String
+  clientPhone: String
+  date: AWSDate
+  time: String
+  message: String
+  status: PropertyViewingStatus
+  listerId: String
+  createdAt: AWSDateTime
+}
+
+input DeletePropertyViewingInput {
+  id: ID!
+}
+
+input ModelSubscriptionPropertyViewingFilterInput {
+  id: ModelSubscriptionIDInput
+  propertyId: ModelSubscriptionStringInput
+  clientName: ModelSubscriptionStringInput
+  clientEmail: ModelSubscriptionStringInput
+  clientPhone: ModelSubscriptionStringInput
+  date: ModelSubscriptionStringInput
+  time: ModelSubscriptionStringInput
+  message: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  listerId: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionPropertyViewingFilterInput]
+  or: [ModelSubscriptionPropertyViewingFilterInput]
+  owner: ModelStringInput
+}
