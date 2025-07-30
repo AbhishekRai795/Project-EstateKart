@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ShoppingCart, TrendingUp, Home as HomeIcon, Star, Sparkles, Plus, Heart, X, Calendar } from 'lucide-react';
+import { Search, ShoppingCart, TrendingUp, Home as HomeIcon, Star, Sparkles, Plus, Heart } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { PropertyCard } from '../../components/common/PropertyCard';
 import { SearchBar } from '../../components/common/SearchBar';
@@ -8,7 +8,6 @@ import { StatsCard } from '../../components/analytics/StatsCard';
 import { useNavigate } from 'react-router-dom';
 import {
   useProperties,
-  useScheduleViewing,
   useUserPreferences,
   useToggleCatalogue,
   useToggleFavorite,
@@ -24,19 +23,9 @@ export const UserDashboard: React.FC = () => {
   const { data: preferences, refetch: refetchPreferences, isLoading: isLoadingPreferences } = useUserPreferences();
   const toggleCatalogue = useToggleCatalogue();
   const toggleFavorite = useToggleFavorite();
-  const scheduleViewing = useScheduleViewing();
 
   // UI State
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [selectedPropertyId, setSelectedPropertyId] = useState('');
-  const [scheduleForm, setScheduleForm] = useState({
-    date: '',
-    time: '',
-    message: '',
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: ''
-  });
+  const [, setSelectedPropertyId] = useState('');
 
   // Refetch user preferences when the component mounts or the user changes
   useEffect(() => {
@@ -50,12 +39,12 @@ export const UserDashboard: React.FC = () => {
     .filter(property => property.id && property.title)
     .map(property => ({
       ...property,
-      images: property.imageUrls?.filter(Boolean) || [],
+      images: property.imageUrls?.filter(Boolean) as string[] || [],
       createdAt: property.createdAt ? new Date(property.createdAt) : new Date(),
     })), [properties]);
 
   const recentProperties = React.useMemo(() => transformedProperties
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 6), [transformedProperties]);
 
   const recommendedProperties = React.useMemo(() => transformedProperties
@@ -88,26 +77,6 @@ export const UserDashboard: React.FC = () => {
 
   const handleScheduleViewing = (propertyId: string) => {
     setSelectedPropertyId(propertyId);
-    setShowScheduleModal(true);
-  };
-
-  const handleScheduleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const property = transformedProperties.find(p => p.id === selectedPropertyId);
-    if (!property) return;
-
-    await scheduleViewing.mutateAsync({
-      propertyId: selectedPropertyId,
-      clientName: scheduleForm.name,
-      clientEmail: scheduleForm.email,
-      clientPhone: scheduleForm.phone,
-      date: scheduleForm.date,
-      time: scheduleForm.time,
-      message: scheduleForm.message,
-      listerId: property.listerId,
-    });
-    alert('Viewing scheduled successfully!');
-    setShowScheduleModal(false);
   };
 
   const containerVariants = {
@@ -138,18 +107,20 @@ export const UserDashboard: React.FC = () => {
       className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 md:p-8"
     >
       <div className="max-w-7xl mx-auto">
-        <motion.div variants={itemVariants} className="relative mb-12 overflow-hidden">
-          <div className="bg-gradient-to-r from-primary-600 to-primary-800 rounded-3xl p-8 md:p-12 text-white relative">
-            <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-36 -translate-y-36 animate-pulse"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48 animate-pulse delay-1000"></div>
+        <motion.div variants={itemVariants} className="mb-12">
+          <div className="bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden">
+            {/* Animated background blobs */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 translate-x-40 animate-blob"></div>
+            <div className="absolute bottom-0 left-0 w-60 h-60 bg-white/5 rounded-full translate-y-30 -translate-x-30 animate-blob animation-delay-2000"></div>
+            
             <div className="relative z-10">
-              <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl md:text-5xl font-bold mb-4">
+              <h1 className="text-4xl font-black mb-4">
                 Welcome back, {user?.name?.split(' ')[0] || 'User'}! 👋
-              </motion.h1>
-              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-xl text-primary-100 max-w-2xl mb-6">
+              </h1>
+              <p className="text-primary-100 text-xl font-light max-w-2xl mb-6">
                 Discover your perfect property from {totalProperties} amazing listings
-              </motion.p>
-              <div className="flex flex-wrap gap-6 mt-8">
+              </p>
+              <div className="flex flex-wrap gap-x-6 gap-y-2 mt-8">
                 <div className="flex items-center space-x-2"><div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center"><HomeIcon className="h-4 w-4" /></div><span>{totalProperties} Properties</span></div>
                 <div className="flex items-center space-x-2"><div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center"><ShoppingCart className="h-4 w-4" /></div><span>{catalogueCount} In Catalogue</span></div>
                 <div className="flex items-center space-x-2"><div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center"><Heart className="h-4 w-4" /></div><span>{favoriteCount} Favorites</span></div>

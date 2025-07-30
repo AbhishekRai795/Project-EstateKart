@@ -3,10 +3,10 @@ import { propertyService, CreatePropertyInput } from '../services/propertyServic
 import { getCurrentUser } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
-import UserPreferenceService from '../services/userPreferenceService';
 
 const client = generateClient<Schema>();
 
+// --- CORE PROPERTY HOOKS ---
 export const useProperties = () => {
   return useQuery({
     queryKey: ['properties'],
@@ -35,7 +35,6 @@ export const useListerProperties = () => {
 
 export const useCreateProperty = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (input: CreatePropertyInput) => propertyService.createProperty(input),
     onSuccess: () => {
@@ -47,7 +46,6 @@ export const useCreateProperty = () => {
 
 export const useUpdateProperty = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<CreatePropertyInput> }) =>
       propertyService.updateProperty(id, updates),
@@ -59,40 +57,135 @@ export const useUpdateProperty = () => {
   });
 };
 
+// NEW: Mutation hook for deleting a property
+export const useDeleteProperty = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (propertyId: string) => propertyService.deleteProperty(propertyId),
+    onSuccess: () => {
+      // Invalidate both general and lister-specific queries to ensure UI consistency
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: ['lister-properties'] });
+    },
+    onError: (error) => {
+      console.error("Error deleting property:", error);
+      // You could add a user-facing notification here
+    }
+  });
+};
+
+
 export const useScheduleViewing = () => {
   return useMutation({
     mutationFn: propertyService.scheduleViewing,
   });
 };
 
-// Central hook for managing user preferences
+
+// --- USER PREFERENCE HOOKS ---
 export const useUserPreferences = () => {
   return useQuery({
     queryKey: ['user-preferences'],
-    queryFn: UserPreferenceService.getUserPreferences,
+    queryFn: async (): Promise<Schema['UserPreference']['type'] | null> => {
+      try {
+        const user = await getCurrentUser();
+        const { data: preferences } = await client.models.UserPreference.list({
+          filter: { userId: { eq: user.userId } },
+        });
+
+        if (preferences.length > 0) {
+          return preferences[0];
+        }
+
+        const { data: newPreferences } = await client.models.UserPreference.create({
+          userId: user.userId,
+          catalogueProperties: [],
+          favoriteProperties: [],
+        });
+        return newPreferences;
+
+      } catch (error) {
+        return null;
+      }
+    },
+    staleTime: 5 * 60 * 1000,
   });
 };
 
-// Hook to toggle a property in the user's catalogue
 export const useToggleCatalogue = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (propertyId: string) => UserPreferenceService.toggleCatalogue(propertyId),
+    mutationFn: async (propertyId: string) => {
+      const user = await getCurrentUser(); 
+      
+      const currentPreferences = await queryClient.fetchQuery<Schema['UserPreference']['type'] | null>({
+        queryKey: ['user-preferences'],
+      });
+
+      const currentCatalogue = (currentPreferences?.catalogueProperties || []).filter((id): id is string => id !== null);
+      const newCatalogue = currentCatalogue.includes(propertyId)
+        ? currentCatalogue.filter((id: string) => id !== propertyId)
+        : [...currentCatalogue, propertyId];
+      
+      if (currentPreferences?.id) {
+        const { data } = await client.models.UserPreference.update({
+          id: currentPreferences.id,
+          catalogueProperties: newCatalogue.filter(Boolean),
+        });
+        return data;
+      } else {
+        const { data } = await client.models.UserPreference.create({
+          userId: user.userId,
+          catalogueProperties: newCatalogue.filter(Boolean),
+        });
+        return data;
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-preferences'] });
     },
+    onError: (error) => {
+        console.error("Error toggling catalogue:", error);
+    }
   });
 };
 
-// Hook to toggle a property in the user's favorites
 export const useToggleFavorite = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (propertyId: string) => UserPreferenceService.toggleFavorite(propertyId),
+    mutationFn: async (propertyId: string) => {
+      const user = await getCurrentUser();
+      
+      const currentPreferences = await queryClient.fetchQuery<Schema['UserPreference']['type'] | null>({
+        queryKey: ['user-preferences'],
+      });
+      
+      const currentFavorites = (currentPreferences?.favoriteProperties || []).filter((id): id is string => id !== null);
+      const newFavorites = currentFavorites.includes(propertyId)
+        ? currentFavorites.filter((id: string) => id !== propertyId)
+        : [...currentFavorites, propertyId];
+
+      if (currentPreferences?.id) {
+        const { data } = await client.models.UserPreference.update({
+          id: currentPreferences.id,
+          favoriteProperties: newFavorites.filter(Boolean),
+        });
+        return data;
+      } else {
+        const { data } = await client.models.UserPreference.create({
+          userId: user.userId,
+          favoriteProperties: newFavorites.filter(Boolean),
+        });
+        return data;
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-preferences'] });
     },
+    onError: (error) => {
+        console.error("Error toggling favorite:", error);
+    }
   });
 };

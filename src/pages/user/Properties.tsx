@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Grid, List, Loader2, X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { PropertyCard } from '../../components/common/PropertyCard';
 import { SearchBar } from '../../components/common/SearchBar';
@@ -23,7 +23,6 @@ export const UserProperties: React.FC = () => {
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
-  const [sortBy, setSortBy] = useState('recent');
   const [isSearching, setIsSearching] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState('');
@@ -65,13 +64,6 @@ export const UserProperties: React.FC = () => {
     // Implement other filters as needed
     setFilteredProperties(localFiltered);
     setIsSearching(false);
-  };
-
-  const handleSort = (sortType: string) => {
-    setSortBy(sortType);
-    let sorted = [...filteredProperties];
-    // Sorting logic...
-    setFilteredProperties(sorted);
   };
 
   // FIX: Added the missing handler function for scheduling a viewing

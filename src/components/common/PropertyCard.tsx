@@ -15,6 +15,7 @@ interface PropertyCardProps {
   showStats?: boolean;
   viewMode?: 'grid' | 'list';
   onScheduleViewing?: (propertyId: string) => void;
+  isListerView?: boolean; // NEW: Prop to indicate if the card is being viewed by the lister
 }
 
 export const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -26,12 +27,12 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   onClick,
   showStats = false,
   viewMode = 'grid',
-  onScheduleViewing
+  onScheduleViewing,
+  isListerView = false, // Default to false
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // FIX: Redirects to login if user is not authenticated
   const handleProtectedAction = (action?: (id: string) => void) => (e: React.MouseEvent) => {
     e.stopPropagation();
     if (user) {
@@ -66,8 +67,21 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     }
   };
 
-  // FIX: Using a reliable placeholder service
   const imageUrl = property.images?.[0] || `https://placehold.co/400x256/EFEFEF/333333?text=No+Image`;
+
+  const ScheduleButton = ({ isList = false }) => (
+    <motion.button 
+      whileHover={{ scale: isListerView ? 1 : 1.05 }} 
+      whileTap={{ scale: isListerView ? 1 : 0.95 }} 
+      onClick={handleProtectedAction(onScheduleViewing)} 
+      disabled={isListerView}
+      className={`flex items-center space-x-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-lg transition-all duration-300 ${isListerView ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-orange-500/25'} ${isList ? 'px-4 py-2 rounded-xl' : 'absolute bottom-4 right-4 px-3 py-2 rounded-xl text-sm'}`}
+      title={isListerView ? "You cannot schedule a viewing for your own property" : "Schedule a viewing"}
+    >
+      <Calendar size={16} />
+      <span>{isList ? 'Schedule Viewing' : 'Schedule'}</span>
+    </motion.button>
+  );
 
   if (viewMode === 'list') {
     return (
@@ -93,9 +107,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleProtectedAction(onFavoriteToggle)} className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold transition-all duration-300 ${isFavorite ? 'bg-red-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-red-50 hover:text-red-600'}`}>
               <Heart size={16} /><span>{isFavorite ? 'Favorite' : 'Add to Favorites'}</span>
             </motion.button>
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleProtectedAction(onScheduleViewing)} className="flex items-center space-x-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:shadow-orange-500/25 transition-all duration-300">
-              <Calendar size={16} /><span>Schedule Viewing</span>
-            </motion.button>
+            <ScheduleButton isList={true} />
           </div>
           <div className="flex items-center text-gray-600 mb-3"><MapPin size={16} className="mr-2" /><span>{property.location}</span></div>
           <p className="text-gray-600 mb-4 line-clamp-2">{property.description}</p>
@@ -107,7 +119,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
           {showStats && (
             <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
               <div className="flex items-center space-x-1"><Eye size={14} /><span>{property.views} views</span></div>
-              <div className="flex items-center space-x-1"><DollarSign size={14} /><span>{property.offers} offers</span></div>
+              <div className="flex items-center space-x-1"><DollarSign size={14} /><span>{property.offers || 0} offers</span></div>
             </div>
           )}
           <div className="text-sm text-gray-500"><span className="font-medium">Listed by</span><span className="ml-2 text-primary-600 font-semibold">{property.listerName}</span></div>
@@ -132,9 +144,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
           <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={handleProtectedAction(onFavoriteToggle)} className={`p-3 rounded-full shadow-lg transition-all duration-300 ${isFavorite ? 'bg-red-500 text-white' : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-600'}`}><Heart size={16} /></motion.button>
         </div>
         <div className="absolute bottom-4 left-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-2xl font-bold text-lg shadow-lg">{formatPrice(property.price)}</div>
-        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleProtectedAction(onScheduleViewing)} className="absolute bottom-4 right-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-2 rounded-xl text-sm font-semibold shadow-lg hover:shadow-orange-500/25 transition-all duration-300 flex items-center space-x-2">
-          <Calendar size={16} /><span>Schedule</span>
-        </motion.button>
+        <ScheduleButton />
       </div>
       <div className="p-6">
         <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-300">{property.title}</h3>
@@ -150,7 +160,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         {showStats && (
           <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
             <div className="flex items-center space-x-1"><Eye size={14} /><span>{property.views} views</span></div>
-            <div className="flex items-center space-x-1"><DollarSign size={14} /><span>{property.offers} offers</span></div>
+            <div className="flex items-center space-x-1"><DollarSign size={14} /><span>{property.offers || 0} offers</span></div>
           </div>
         )}
         <div className="text-sm text-gray-500"><span className="font-medium">Listed by</span><span className="ml-2 text-primary-600 font-semibold">{property.listerName}</span></div>

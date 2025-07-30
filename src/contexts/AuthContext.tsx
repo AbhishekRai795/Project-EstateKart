@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   signUp,
   confirmSignUp,
@@ -10,6 +10,7 @@ import {
   resetPassword,
   confirmResetPassword,
 } from 'aws-amplify/auth';
+import type { SignUpOutput } from 'aws-amplify/auth';
 
 interface User {
   id: string;
@@ -24,8 +25,8 @@ interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (email: string, password: string, name: string) => Promise<{ needsVerification: boolean }>;
-  loading: boolean;
+  register: (email: string, password: string, name: string) => Promise<SignUpOutput>;
+  loading: boolean; // This is now ONLY for the initial app load
   confirmSignUp: (email: string, code: string) => Promise<void>;
   resendSignUpCode: (email: string) => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
@@ -48,102 +49,87 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isAuthFlow, setIsAuthFlow] = useState(false);
 
-  useEffect(() => {
-    checkAuthState();
-  }, []);
-
-  const checkAuthState = async (): Promise<void> => {
-    setLoading(true);
+  const checkAuthState = useCallback(async (): Promise<User | null> => {
     try {
       const currentUser = await getCurrentUser();
       const attributes = await fetchUserAttributes();
-
+      
       const userData: User = {
         id: currentUser.userId,
         email: attributes.email || '',
-        name: attributes.name || attributes.given_name || attributes.email?.split('@')[0] || '',
-        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${attributes.email}`,
-        userType: 'user', // You can enhance this later based on user groups or roles
+        name: attributes.name || attributes.given_name || attributes.email?.split('@')[0] || 'User',
+        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${attributes.name || attributes.email}`,
+        userType: 'user',
         emailVerified: attributes.email_verified === 'true'
       };
 
       setUser(userData);
+      return userData;
     } catch (error) {
       setUser(null);
-    } finally {
-      setLoading(false);
+      return null;
     }
-  };
+  }, []);
 
+  useEffect(() => {
+    const initializeAuth = async () => {
+      await checkAuthState();
+      setLoading(false); // This global loading is ONLY for the initial app load.
+    };
+    initializeAuth();
+  }, [checkAuthState]);
+  
+  // FIX: Removed the global setLoading calls from this function.
+  // The local 'isProcessing' state in Auth.tsx will now correctly handle the button's loading state
+  // without triggering the full-page loader.
   const login = async (email: string, password: string): Promise<void> => {
     try {
       await signIn({ username: email, password });
-      // FIX: Await the checkAuthState to ensure the user session is fully updated
-      // before the login function resolves. This prevents race conditions.
       await checkAuthState();
     } catch (error: any) {
-      console.error('Login error:', error);
+      setUser(null);
       if (error.name === 'UserNotConfirmedException') {
-        throw new Error('Please verify your email address before signing in.');
+        throw new Error('Please verify your email before signing in.');
       }
-      throw new Error('Invalid email or password. Please try again.');
+      // This error will be caught and displayed on the Auth page.
+      throw new Error('Incorrect username or password.'); 
     }
   };
 
-  const register = async (email: string, password: string, name: string): Promise<{ needsVerification: boolean }> => {
+  const register = async (email: string, password: string, name: string): Promise<SignUpOutput> => {
     setIsAuthFlow(true);
     try {
-      const { nextStep } = await signUp({
-        username: email,
-        password,
-        options: {
-          userAttributes: { email, name },
-        },
-      });
-      return { needsVerification: nextStep.signUpStep === 'CONFIRM_SIGN_UP' };
-    } catch (error: any) {
-      setIsAuthFlow(false);
-      throw new Error(error.message || 'Registration failed.');
+        const result = await signUp({
+            username: email,
+            password,
+            options: { userAttributes: { email, name } },
+        });
+        return result;
+    } finally {
+        // isAuthFlow remains true until verification
     }
   };
 
   const confirmSignUpHandler = async (email: string, code: string): Promise<void> => {
-    try {
-      await confirmSignUp({ username: email, confirmationCode: code });
-      setIsAuthFlow(false);
-    } catch (error: any) {
-      throw new Error(error.message || 'Verification failed.');
-    }
-  };
-
-  const resendSignUpCodeHandler = async (email: string): Promise<void> => {
-    try {
-      await resendSignUpCode({ username: email });
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to resend code.');
-    }
-  };
-
-  const logout = async (): Promise<void> => {
-    await signOut();
-    setUser(null);
+    await confirmSignUp({ username: email, confirmationCode: code });
     setIsAuthFlow(false);
   };
   
-  const forgotPassword = async (email: string): Promise<void> => {
-    try {
-      await resetPassword({ username: email });
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to send reset code.');
-    }
+  const logout = async (): Promise<void> => {
+    await signOut();
+    setUser(null);
+  };
+  
+  const resendSignUpCodeHandler = async (email: string) => {
+      await resendSignUpCode({ username: email });
   };
 
-  const resetPasswordHandler = async (email: string, code: string, newPassword: string): Promise<void> => {
-    try {
-      await confirmResetPassword({ username: email, confirmationCode: code, newPassword });
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to reset password.');
-    }
+  const forgotPasswordHandler = async (email: string) => {
+      await resetPassword({ username: email });
+  };
+  
+  const resetPasswordHandler = async (email: string, code: string, newPassword: string) => {
+      await confirmResetPassword({ username: email, newPassword, confirmationCode: code });
   };
 
   return (
@@ -156,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         confirmSignUp: confirmSignUpHandler,
         resendSignUpCode: resendSignUpCodeHandler,
-        forgotPassword,
+        forgotPassword: forgotPasswordHandler,
         resetPassword: resetPasswordHandler,
         isAuthFlow,
       }}

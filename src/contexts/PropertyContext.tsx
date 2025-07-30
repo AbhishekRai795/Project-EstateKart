@@ -16,7 +16,7 @@ export interface Property {
   listerName: string;
   createdAt: Date;
   views: number;
-  offers: number;
+  offers?: number; // FIX: Made the 'offers' property optional to match the backend schema.
   coordinates?: { lat: number; lng: number };
 }
 
@@ -157,7 +157,7 @@ export const PropertyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const getPropertyAnalytics = (listerId: string) => {
     const listerProperties = getPropertiesByLister(listerId);
     const totalViews = listerProperties.reduce((sum, prop) => sum + prop.views, 0);
-    const totalOffers = listerProperties.reduce((sum, prop) => sum + prop.offers, 0);
+    const totalOffers = listerProperties.reduce((sum, prop) => sum + (prop.offers || 0), 0);
     const conversionRate = totalViews > 0 ? (totalOffers / totalViews * 100).toFixed(2) : '0';
 
     return {

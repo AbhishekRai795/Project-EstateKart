@@ -9,12 +9,10 @@ import {
   useUserPreferences,
   useToggleCatalogue,
   useToggleFavorite,
-  useScheduleViewing,
 } from '../../hooks/useProperties';
-import { useAuth } from '../../contexts/AuthContext';
+import { Property } from '../../contexts/PropertyContext'; // Reusing type
 
 export const UserCatalogue: React.FC = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
 
   // Backend hooks
@@ -22,57 +20,82 @@ export const UserCatalogue: React.FC = () => {
   const { data: preferences, isLoading: isLoadingPreferences } = useUserPreferences();
   const toggleCatalogue = useToggleCatalogue();
   const toggleFavorite = useToggleFavorite();
-  const scheduleViewing = useScheduleViewing();
 
   // UI State
-  const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('recent');
   const [isSearching, setIsSearching] = useState(false);
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [selectedPropertyId, setSelectedPropertyId] = useState('');
-  const [scheduleForm, setScheduleForm] = useState({
-    date: '',
-    time: '',
-    message: '',
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: ''
-  });
 
-  const catalogueIds = preferences?.catalogueProperties;
-  // Create a stable, string-based dependency for the useEffect hook
-  const catalogueIdString = JSON.stringify(catalogueIds);
+  const catalogueIds = useMemo(() => new Set(preferences?.catalogueProperties || []), [preferences]);
 
-  // This useEffect now runs ONLY when the actual list of catalogue IDs changes
+  // FIX: This useEffect now correctly filters AND transforms the property data
+  // to match the 'Property' type interface, preventing TypeScript errors.
   useEffect(() => {
-    if (!catalogueIds || !allProperties.length) {
+    if (catalogueIds.size === 0 || !allProperties.length) {
       setFilteredProperties([]);
       return;
     }
-    const catalogueSet = new Set(catalogueIds);
-    const list = allProperties.filter(p => catalogueSet.has(p.id));
+    
+    const list = allProperties
+      .filter(p => p.id && catalogueIds.has(p.id))
+      .map(property => ({
+        // Spread all properties from the backend object
+        ...property,
+        // Ensure required fields from the frontend 'Property' type are present
+        id: property.id || '',
+        title: property.title || 'Untitled',
+        description: property.description || '',
+        price: property.price || 0,
+        location: property.location || 'N/A',
+        bedrooms: property.bedrooms || 0,
+        bathrooms: property.bathrooms || 0,
+        area: property.area || 0,
+        type: property.type || 'house',
+        status: property.status || 'available',
+        listerId: property.listerId || '',
+        listerName: property.listerName || 'N/A',
+        images: property.imageUrls?.filter(Boolean) as string[] || [], 
+        createdAt: property.createdAt ? new Date(property.createdAt) : new Date(),
+        views: property.views || 0,
+        offers: 0, // Default 'offers' to 0 as it's not in the backend schema
+      }));
+
     setFilteredProperties(list);
-  }, [catalogueIdString, allProperties]);
+  }, [catalogueIds, allProperties]);
 
 
-  // Memoize the catalogue list for functions that need it
-  const cataloguePropertiesList = useMemo(() => {
-    return filteredProperties;
-  }, [filteredProperties]);
-
-
-  const handleSearch = async (query: string, filters: any) => {
+  const handleSearch = async (query: string) => {
     setIsSearching(true);
-    let masterList = allProperties.filter(p => catalogueIds?.includes(p.id));
+    let masterList = allProperties
+      .filter(p => p.id && catalogueIds.has(p.id))
+      .map(property => ({
+        ...property,
+        id: property.id || '',
+        title: property.title || 'Untitled',
+        description: property.description || '',
+        price: property.price || 0,
+        location: property.location || 'N/A',
+        bedrooms: property.bedrooms || 0,
+        bathrooms: property.bathrooms || 0,
+        area: property.area || 0,
+        type: property.type || 'house',
+        status: property.status || 'available',
+        listerId: property.listerId || '',
+        listerName: property.listerName || 'N/A',
+        images: property.imageUrls?.filter(Boolean) as string[] || [],
+        createdAt: property.createdAt ? new Date(property.createdAt) : new Date(),
+        views: property.views || 0,
+        offers: 0,
+      }));
     
     let localFiltered = masterList;
 
     if (query) {
       localFiltered = localFiltered.filter(property =>
-        property.title?.toLowerCase().includes(query.toLowerCase()) ||
-        property.description?.toLowerCase().includes(query.toLowerCase()) ||
-        property.location?.toLowerCase().includes(query.toLowerCase())
+        property.title.toLowerCase().includes(query.toLowerCase()) ||
+        property.description.toLowerCase().includes(query.toLowerCase()) ||
+        property.location.toLowerCase().includes(query.toLowerCase())
       );
     }
     setFilteredProperties(localFiltered);
@@ -105,36 +128,13 @@ export const UserCatalogue: React.FC = () => {
 
   const clearCatalogue = async () => {
     if (window.confirm('Are you sure you want to clear your entire catalogue?')) {
-      const removalPromises = cataloguePropertiesList.map(p => toggleCatalogue.mutateAsync(p.id));
+      const removalPromises = filteredProperties.map(p => toggleCatalogue.mutateAsync(p.id));
       await Promise.all(removalPromises);
     }
   };
   
   const handleFavoriteToggle = (propertyId: string) => {
     toggleFavorite.mutate(propertyId);
-  };
-
-  const handleScheduleViewing = (propertyId: string) => {
-    setSelectedPropertyId(propertyId);
-    setShowScheduleModal(true);
-  };
-
-  const handleScheduleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const property = filteredProperties.find(p => p.id === selectedPropertyId);
-    if (!property) return;
-
-    await scheduleViewing.mutateAsync({
-      propertyId: selectedPropertyId,
-      clientName: scheduleForm.name,
-      clientEmail: scheduleForm.email,
-      clientPhone: scheduleForm.phone,
-      date: scheduleForm.date,
-      time: scheduleForm.time,
-      message: scheduleForm.message,
-      listerId: property.listerId,
-    });
-    setShowScheduleModal(false);
   };
 
   const containerVariants = {
@@ -158,8 +158,7 @@ export const UserCatalogue: React.FC = () => {
     );
   }
   
-  // Use the length of the source of truth for the empty state
-  const isCatalogueEmpty = !catalogueIds || catalogueIds.length === 0;
+  const isCatalogueEmpty = catalogueIds.size === 0;
 
   return (
     <motion.div
@@ -188,7 +187,7 @@ export const UserCatalogue: React.FC = () => {
           {!isCatalogueEmpty && (
             <div className="flex items-center space-x-4">
               <span className="bg-primary-100 text-primary-800 px-4 py-2 rounded-full text-sm font-medium">
-                {catalogueIds.length} {catalogueIds.length === 1 ? 'Property' : 'Properties'}
+                {catalogueIds.size} {catalogueIds.size === 1 ? 'Property' : 'Properties'}
               </span>
               <button onClick={clearCatalogue} className="text-red-600 hover:text-red-700 font-medium transition-colors flex items-center">
                 <Trash2 className="h-4 w-4 mr-1" />
@@ -249,7 +248,6 @@ export const UserCatalogue: React.FC = () => {
                       isInCatalogue={true}
                       onFavoriteToggle={handleFavoriteToggle}
                       isFavorite={preferences?.favoriteProperties?.includes(property.id)}
-                      onScheduleViewing={handleScheduleViewing}
                     />
                     <button
                       onClick={() => handleRemoveFromCatalogue(property.id)}
@@ -267,7 +265,17 @@ export const UserCatalogue: React.FC = () => {
                 <button
                   onClick={() => {
                     const catalogueSet = new Set(catalogueIds);
-                    setFilteredProperties(allProperties.filter(p => catalogueSet.has(p.id)));
+                    const originalList = allProperties
+                      .filter(p => p.id && catalogueSet.has(p.id))
+                      .map(p => ({
+                          ...p,
+                          images: p.imageUrls?.filter(Boolean) as string[] || [],
+                          createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
+                          views: p.views || 0,
+                          offers: 0,
+                          listerName: p.listerName || 'N/A'
+                      })) as Property[];
+                    setFilteredProperties(originalList);
                   }}
                   className="text-primary-600 hover:text-primary-700 font-medium"
                 >

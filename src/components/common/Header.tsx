@@ -75,7 +75,7 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Left Side - Hamburger + Logo */}
@@ -229,7 +229,7 @@ export const Header: React.FC = () => {
 
               {/* Menu Sections */}
               <div className="space-y-6">
-                {allMenuItems.map((section, sectionIndex) => (
+                {allMenuItems.map((section) => (
                   <div key={section.section}>
                     <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 px-2">
                       {section.section}
