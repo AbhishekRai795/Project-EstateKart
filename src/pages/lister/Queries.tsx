@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MessageSquare, Search, Filter, Star, Clock, User, Mail, Phone, AlertCircle, CheckCircle, Eye } from 'lucide-react';
+import { MessageSquare, Search, Clock, User, Mail, Phone, AlertCircle, CheckCircle, Eye } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface Query {

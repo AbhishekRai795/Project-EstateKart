@@ -7,7 +7,6 @@ import {
   LogOut, 
   Menu, 
   X, 
-  BarChart3, 
   Settings, 
   Search, 
   Plus, 

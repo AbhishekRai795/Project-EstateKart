@@ -1,0 +1,16 @@
+[33me7c51a0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33m0909c62[m HEAD@{1}: reset: moving to HEAD~1
+[33m28ef21b[m HEAD@{2}: commit: Initial data fetching, no catalouge function configured yet
+[33m0909c62[m HEAD@{3}: commit: Initial data fetching, no catalouge function configured yet
+[33me7c51a0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{4}: commit: Cognito is added
+[33me801e4e[m HEAD@{5}: pull origin main: Fast-forward
+[33med08a28[m HEAD@{6}: commit: Lister Dashboard Update
+[33m7305760[m HEAD@{7}: pull origin main: Fast-forward
+[33m44d19c9[m HEAD@{8}: pull origin main: Fast-forward
+[33ma9dc85f[m HEAD@{9}: commit: New Frontend
+[33m48a3bdc[m HEAD@{10}: commit: Changes
+[33m9e1dee4[m HEAD@{11}: pull origin main: Fast-forward
+[33m5345d82[m HEAD@{12}: reset: moving to HEAD
+[33m5345d82[m HEAD@{13}: pull origin main: Fast-forward
+[33mc870208[m HEAD@{14}: Branch: renamed refs/heads/master to refs/heads/main
+[33mc870208[m HEAD@{16}: commit (initial): Initial commit

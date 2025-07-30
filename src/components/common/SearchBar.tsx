@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Filter, SlidersHorizontal } from 'lucide-react';
+import { Search, MapPin,  SlidersHorizontal } from 'lucide-react';
 
 interface SearchFilters {
   location: string;

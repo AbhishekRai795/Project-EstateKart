@@ -3,63 +3,42 @@ import { motion } from 'framer-motion';
 import { MapPin, Bed, Bath, Square, ShoppingCart, Eye, DollarSign, Calendar, Heart } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Property } from '../../contexts/PropertyContext'; // Reusing existing type
 
 interface PropertyCardProps {
-  property: {
-    id: string;
-    title: string;
-    description: string;
-    price: number;
-    location: string;
-    bedrooms: number;
-    bathrooms: number;
-    area: number;
-    type: 'house' | 'apartment' | 'condo' | 'villa';
-    status: 'available' | 'pending' | 'sold';
-    imageUrls?: string[]; // Updated for backend images
-    listerId: string;
-    listerName: string;
-    createdAt: string;
-    views: number;
-    features?: string[];
-  };
+  property: Property;
   onCatalogueToggle?: (propertyId: string) => void;
   isInCatalogue?: boolean;
+  onFavoriteToggle?: (propertyId: string) => void;
+  isFavorite?: boolean;
   onClick?: () => void;
   showStats?: boolean;
   viewMode?: 'grid' | 'list';
   onScheduleViewing?: (propertyId: string) => void;
-  onFavoriteToggle?: (propertyId: string) => void;
-  isFavorite?: boolean;
 }
 
 export const PropertyCard: React.FC<PropertyCardProps> = ({
   property,
   onCatalogueToggle,
   isInCatalogue = false,
+  onFavoriteToggle,
+  isFavorite = false,
   onClick,
   showStats = false,
   viewMode = 'grid',
-  onScheduleViewing,
-  onFavoriteToggle,
-  isFavorite = false
+  onScheduleViewing
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleCatalogueClick = (e: React.MouseEvent) => {
+  // FIX: Redirects to login if user is not authenticated
+  const handleProtectedAction = (action?: (id: string) => void) => (e: React.MouseEvent) => {
     e.stopPropagation();
-    onCatalogueToggle?.(property.id);
-  };
-
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onFavoriteToggle?.(property.id);
-  };
-
-  const handleScheduleViewing = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onScheduleViewing?.(property.id);
+    if (user) {
+      action?.(property.id);
+    } else {
+      navigate('/auth?mode=signin');
+    }
   };
 
   const handleCardClick = () => {
@@ -80,139 +59,58 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'available':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'sold':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'available': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'sold': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  // Get main image with fallback
-  const mainImage = property.imageUrls && property.imageUrls.length > 0 
-    ? property.imageUrls[0] 
-    : 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800';
+  // FIX: Using a reliable placeholder service
+  const imageUrl = property.images?.[0] || `https://placehold.co/400x256/EFEFEF/333333?text=No+Image`;
 
   if (viewMode === 'list') {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ y: -2 }}
-        className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer border border-gray-100"
+        whileHover={{ y: -5 }}
+        className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-primary-500/20 border border-gray-100/50 cursor-pointer group flex items-center space-x-8"
         onClick={handleCardClick}
       >
-        <div className="flex flex-col md:flex-row">
-          {/* Image Section - Left */}
-          <div className="relative md:w-80 h-64 md:h-auto">
-            <img
-              src={mainImage}
-              alt={property.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-            
-            {/* Status Badge */}
-            <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(property.status)}`}>
-              {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-            </div>
+        <div className="relative w-80 h-48 flex-shrink-0">
+          <img src={imageUrl.replace('400x256', '320x192')} alt={property.title} className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500" />
+          <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(property.status)}`}>{property.status.charAt(0).toUpperCase() + property.status.slice(1)}</div>
+          <div className="absolute bottom-4 right-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-2xl font-bold text-lg shadow-lg">{formatPrice(property.price)}</div>
+        </div>
 
-            {/* Price Badge */}
-            <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-lg">
-              <span className="text-lg font-bold text-gray-900">{formatPrice(property.price)}</span>
-            </div>
+        <div className="flex-1">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-300">{property.title}</h3>
+          <div className="flex items-center space-x-4 mb-4">
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleProtectedAction(onCatalogueToggle)} className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold transition-all duration-300 ${isInCatalogue ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-primary-50 hover:text-primary-600'}`}>
+              <ShoppingCart size={16} /><span>{isInCatalogue ? 'In Catalogue' : 'Add to Catalogue'}</span>
+            </motion.button>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleProtectedAction(onFavoriteToggle)} className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold transition-all duration-300 ${isFavorite ? 'bg-red-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-red-50 hover:text-red-600'}`}>
+              <Heart size={16} /><span>{isFavorite ? 'Favorite' : 'Add to Favorites'}</span>
+            </motion.button>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleProtectedAction(onScheduleViewing)} className="flex items-center space-x-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:shadow-orange-500/25 transition-all duration-300">
+              <Calendar size={16} /><span>Schedule Viewing</span>
+            </motion.button>
           </div>
-
-          {/* Content Section - Right */}
-          <div className="flex-1 p-6 flex flex-col justify-between">
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{property.title}</h3>
-              
-              {/* Action Buttons */}
-              <div className="flex items-center space-x-2 mb-4">
-                {user && onCatalogueToggle && (
-                  <button
-                    onClick={handleCatalogueClick}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isInCatalogue
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-1 inline" />
-                    {isInCatalogue ? 'In Catalogue' : 'Add to Catalogue'}
-                  </button>
-                )}
-
-                {user && onFavoriteToggle && (
-                  <button
-                    onClick={handleFavoriteClick}
-                    className={`p-2 rounded-lg transition-colors ${
-                      isFavorite
-                        ? 'bg-red-100 text-red-600'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
-                  </button>
-                )}
-
-                {onScheduleViewing && (
-                  <button
-                    onClick={handleScheduleViewing}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
-                  >
-                    <Calendar className="h-4 w-4 mr-1 inline" />
-                    Schedule Viewing
-                  </button>
-                )}
-              </div>
-
-              <div className="flex items-center text-gray-600 mb-3">
-                <MapPin className="h-4 w-4 mr-1" />
-                <span className="text-sm">{property.location}</span>
-              </div>
-
-              <p className="text-gray-600 text-sm line-clamp-2 mb-4">{property.description}</p>
-            </div>
-
-            <div className="space-y-3">
-              {/* Property Details */}
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <Bed className="h-4 w-4 mr-1" />
-                  <span>{property.bedrooms}</span>
-                </div>
-                <div className="flex items-center">
-                  <Bath className="h-4 w-4 mr-1" />
-                  <span>{property.bathrooms}</span>
-                </div>
-                <div className="flex items-center">
-                  <Square className="h-4 w-4 mr-1" />
-                  <span>{property.area} sqft</span>
-                </div>
-              </div>
-
-              {/* Stats for Lister View */}
-              {showStats && (
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <div className="flex items-center">
-                    <Eye className="h-4 w-4 mr-1" />
-                    <span>{property.views} views</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Lister Info */}
-              <div className="flex items-center justify-between text-xs text-gray-500">
-                <span>Listed by</span>
-                <span className="font-medium">{property.listerName}</span>
-              </div>
-            </div>
+          <div className="flex items-center text-gray-600 mb-3"><MapPin size={16} className="mr-2" /><span>{property.location}</span></div>
+          <p className="text-gray-600 mb-4 line-clamp-2">{property.description}</p>
+          <div className="flex items-center space-x-6 text-gray-700 mb-4">
+            <div className="flex items-center space-x-2"><Bed size={16} /><span>{property.bedrooms}</span></div>
+            <div className="flex items-center space-x-2"><Bath size={16} /><span>{property.bathrooms}</span></div>
+            <div className="flex items-center space-x-2"><Square size={16} /><span>{property.area} sqft</span></div>
           </div>
+          {showStats && (
+            <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
+              <div className="flex items-center space-x-1"><Eye size={14} /><span>{property.views} views</span></div>
+              <div className="flex items-center space-x-1"><DollarSign size={14} /><span>{property.offers} offers</span></div>
+            </div>
+          )}
+          <div className="text-sm text-gray-500"><span className="font-medium">Listed by</span><span className="ml-2 text-primary-600 font-semibold">{property.listerName}</span></div>
         </div>
       </motion.div>
     );
@@ -222,111 +120,40 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group border border-gray-100"
+      whileHover={{ y: -10, scale: 1.02 }}
+      className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary-500/20 border border-gray-100/50 cursor-pointer group"
       onClick={handleCardClick}
     >
-      {/* Image Section */}
       <div className="relative h-64 overflow-hidden">
-        <img
-          src={mainImage}
-          alt={property.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-        />
-        
-        {/* Status Badge */}
-        <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(property.status)}`}>
-          {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
+        <img src={imageUrl} alt={property.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+        <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(property.status)}`}>{property.status.charAt(0).toUpperCase() + property.status.slice(1)}</div>
+        <div className="absolute top-4 right-4 flex flex-col space-y-2">
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={handleProtectedAction(onCatalogueToggle)} className={`p-3 rounded-full shadow-lg transition-all duration-300 ${isInCatalogue ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white' : 'bg-white/90 text-gray-700 hover:bg-primary-50 hover:text-primary-600'}`}><ShoppingCart size={16} /></motion.button>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={handleProtectedAction(onFavoriteToggle)} className={`p-3 rounded-full shadow-lg transition-all duration-300 ${isFavorite ? 'bg-red-500 text-white' : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-600'}`}><Heart size={16} /></motion.button>
         </div>
-
-        {/* Catalogue Button */}
-        {user && onCatalogueToggle && (
-          <button
-            onClick={handleCatalogueClick}
-            className={`absolute top-3 right-3 p-2 rounded-full transition-all ${
-              isInCatalogue
-                ? 'bg-primary-600 text-white'
-                : 'bg-white/80 text-gray-700 hover:bg-white'
-            }`}
-          >
-            <ShoppingCart className="h-4 w-4" />
-          </button>
-        )}
-
-        {/* Favorite Button */}
-        {user && onFavoriteToggle && (
-          <button
-            onClick={handleFavoriteClick}
-            className={`absolute top-3 right-14 p-2 rounded-full transition-all ${
-              isFavorite
-                ? 'bg-red-600 text-white'
-                : 'bg-white/80 text-gray-700 hover:bg-white'
-            }`}
-          >
-            <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
-          </button>
-        )}
-
-        {/* Price Badge */}
-        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-lg">
-          <span className="text-lg font-bold text-gray-900">{formatPrice(property.price)}</span>
-        </div>
-
-        {/* Schedule Viewing Button */}
-        {onScheduleViewing && (
-          <button
-            onClick={handleScheduleViewing}
-            className="absolute bottom-3 right-3 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium opacity-0 group-hover:opacity-100"
-          >
-            <Calendar className="h-4 w-4 mr-1 inline" />
-            Schedule Viewing
-          </button>
-        )}
+        <div className="absolute bottom-4 left-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-2xl font-bold text-lg shadow-lg">{formatPrice(property.price)}</div>
+        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleProtectedAction(onScheduleViewing)} className="absolute bottom-4 right-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-2 rounded-xl text-sm font-semibold shadow-lg hover:shadow-orange-500/25 transition-all duration-300 flex items-center space-x-2">
+          <Calendar size={16} /><span>Schedule</span>
+        </motion.button>
       </div>
-
-      {/* Content Section */}
-      <div className="p-5">
-        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{property.title}</h3>
-        
-        <div className="flex items-center text-gray-600 mb-3">
-          <MapPin className="h-4 w-4 mr-1" />
-          <span className="text-sm">{property.location}</span>
-        </div>
-
-        <p className="text-gray-600 text-sm line-clamp-2 mb-4">{property.description}</p>
-
-        {/* Property Details */}
-        <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-          <div className="flex items-center">
-            <Bed className="h-4 w-4 mr-1" />
-            <span>{property.bedrooms}</span>
-          </div>
-          <div className="flex items-center">
-            <Bath className="h-4 w-4 mr-1" />
-            <span>{property.bathrooms}</span>
-          </div>
-          <div className="flex items-center">
-            <Square className="h-4 w-4 mr-1" />
-            <span>{property.area} sqft</span>
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-300">{property.title}</h3>
+        <div className="flex items-center text-gray-600 mb-3"><MapPin size={16} className="mr-2" /><span>{property.location}</span></div>
+        <p className="text-gray-600 mb-4 line-clamp-2">{property.description}</p>
+        <div className="flex items-center justify-between text-gray-700 mb-4">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-1"><Bed size={16} /><span>{property.bedrooms}</span></div>
+            <div className="flex items-center space-x-1"><Bath size={16} /><span>{property.bathrooms}</span></div>
+            <div className="flex items-center space-x-1"><Square size={16} /><span>{property.area} sqft</span></div>
           </div>
         </div>
-
-        {/* Stats for Lister View */}
         {showStats && (
-          <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-            <div className="flex items-center">
-              <Eye className="h-4 w-4 mr-1" />
-              <span>{property.views} views</span>
-            </div>
+          <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+            <div className="flex items-center space-x-1"><Eye size={14} /><span>{property.views} views</span></div>
+            <div className="flex items-center space-x-1"><DollarSign size={14} /><span>{property.offers} offers</span></div>
           </div>
         )}
-
-        {/* Lister Info */}
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <span>Listed by</span>
-          <span className="font-medium">{property.listerName}</span>
-        </div>
+        <div className="text-sm text-gray-500"><span className="font-medium">Listed by</span><span className="ml-2 text-primary-600 font-semibold">{property.listerName}</span></div>
       </div>
     </motion.div>
   );

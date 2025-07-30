@@ -343,3 +343,4 @@ export const PropertyDetail: React.FC = () => {
     </motion.div>
   );
 };
+export default PropertyDetail;

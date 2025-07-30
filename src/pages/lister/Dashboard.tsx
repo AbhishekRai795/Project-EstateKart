@@ -9,11 +9,9 @@ import {
   TrendingUp, 
   DollarSign, 
   Eye, 
-  Calendar,
   Building,
   MapPin,
-  ArrowRight,
-  ArrowRight as ArrowRightIcon
+  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProperty } from '../../contexts/PropertyContext';
