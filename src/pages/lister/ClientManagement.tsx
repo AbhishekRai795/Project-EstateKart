@@ -1,574 +1,393 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Users, MessageSquare, Calendar, Search, Filter, Eye, Phone, Mail, Clock, User, MapPin, CheckCircle, XCircle, RotateCcw, X } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useProperty } from '../../contexts/PropertyContext';
-
-interface ClientQuery {
-  id: string;
-  propertyId: string;
-  propertyTitle: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhone?: string;
-  message: string;
-  type: 'inquiry' | 'viewing' | 'offer';
-  status: 'new' | 'responded' | 'closed';
-  createdAt: Date;
-}
-
-interface ScheduledViewing {
-  id: string;
-  propertyId: string;
-  propertyTitle: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhone?: string;
-  date: string;
-  time: string;
-  status: 'scheduled' | 'completed' | 'cancelled';
-  message?: string;
-  createdAt: Date;
-}
+import { 
+  Calendar, 
+  Filter, 
+  Search, 
+  TrendingUp, 
+  Clock, 
+  CheckCircle, 
+  XCircle,
+  Eye
+} from 'lucide-react'; // FIXED: Removed unused imports (MessageSquare, Users, MapPin, User)
+import { useListerViewings, useUpdateViewing } from '../../hooks/useProperties';
+import { ClientList } from '../../components/lister/ClientList';
 
 export const ClientManagement: React.FC = () => {
-  const { user } = useAuth();
-  const { getPropertiesByLister } = useProperty();
-  const [activeTab, setActiveTab] = useState<'queries' | 'viewings'>('queries');
-  const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
+  const { data: scheduledViewings = [], isLoading, error, refetch } = useListerViewings();
+  const updateViewing = useUpdateViewing();
+  
+  const [statusFilter, setStatusFilter] = useState<'all' | 'scheduled' | 'completed' | 'cancelled'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [showContactModal, setShowContactModal] = useState(false);
-  const [selectedContact, setSelectedContact] = useState<any>(null);
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
-  const listerProperties = getPropertiesByLister(user?.id || '');
-
-  // Mock data for client queries
-  const clientQueries: ClientQuery[] = [
-    {
-      id: '1',
-      propertyId: '1',
-      propertyTitle: 'Modern Downtown Apartment',
-      clientName: 'John Smith',
-      clientEmail: 'john@example.com',
-      clientPhone: '+1-555-0123',
-      message: 'I am very interested in this property. Can we schedule a viewing this weekend?',
-      type: 'viewing',
-      status: 'new',
-      createdAt: new Date('2024-01-15T10:30:00')
-    },
-    {
-      id: '2',
-      propertyId: '2',
-      propertyTitle: 'Luxury Family Villa',
-      clientName: 'Sarah Johnson',
-      clientEmail: 'sarah@example.com',
-      message: 'What are the monthly maintenance fees for this property?',
-      type: 'inquiry',
-      status: 'responded',
-      createdAt: new Date('2024-01-14T15:45:00')
-    }
-  ];
-
-  // Mock data for scheduled viewings
-  const scheduledViewings: ScheduledViewing[] = [
-    {
-      id: '1',
-      propertyId: '1',
-      propertyTitle: 'Modern Downtown Apartment',
-      clientName: 'John Smith',
-      clientEmail: 'john@example.com',
-      clientPhone: '+1-555-0123',
-      date: '2024-01-20',
-      time: '14:00',
-      status: 'scheduled',
-      message: 'Looking forward to seeing the property',
-      createdAt: new Date('2024-01-15T10:30:00')
-    },
-    {
-      id: '2',
-      propertyId: '2',
-      propertyTitle: 'Luxury Family Villa',
-      clientName: 'Mike Davis',
-      clientEmail: 'mike@example.com',
-      date: '2024-01-18',
-      time: '10:00',
-      status: 'completed',
-      createdAt: new Date('2024-01-12T09:20:00')
-    }
-  ];
-
-  // Group queries and viewings by property
-  const getPropertyStats = () => {
-    const stats: { [key: string]: { queries: number; viewings: number; property: any } } = {};
-    
-    listerProperties.forEach(property => {
-      stats[property.id] = {
-        queries: clientQueries.filter(q => q.propertyId === property.id).length,
-        viewings: scheduledViewings.filter(v => v.propertyId === property.id).length,
-        property
-      };
+  // Filter and search viewings with time range
+  const filteredViewings = useMemo(() => {
+    return scheduledViewings.filter(viewing => {
+      const status = viewing.status || 'scheduled';
+      const matchesStatus = statusFilter === 'all' || status === statusFilter;
+      const matchesSearch = !searchQuery || 
+        viewing.property?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        viewing.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        viewing.user?.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        viewing.message?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Time range filtering
+      let matchesTimeRange = true;
+      if (selectedTimeRange !== 'all') {
+        const viewingDate = new Date(viewing.scheduledAt);
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
+        switch (selectedTimeRange) {
+          case 'today':
+            const endOfToday = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000);
+            matchesTimeRange = viewingDate >= startOfToday && viewingDate < endOfToday;
+            break;
+          case 'week':
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            matchesTimeRange = viewingDate >= weekAgo;
+            break;
+          case 'month':
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            matchesTimeRange = viewingDate >= monthAgo;
+            break;
+        }
+      }
+      
+      return matchesStatus && matchesSearch && matchesTimeRange;
     });
+  }, [scheduledViewings, statusFilter, searchQuery, selectedTimeRange]);
+
+  // Analytics
+  const analytics = useMemo(() => {
+    const scheduled = scheduledViewings.filter(v => (v.status || 'scheduled') === 'scheduled').length;
+    const completed = scheduledViewings.filter(v => v.status === 'completed').length;
+    const cancelled = scheduledViewings.filter(v => v.status === 'cancelled').length;
+    const total = scheduledViewings.length;
     
-    return stats;
-  };
+    // Upcoming viewings (scheduled for today or future)
+    const now = new Date();
+    const upcoming = scheduledViewings.filter(v => 
+      (v.status || 'scheduled') === 'scheduled' && new Date(v.scheduledAt) > now
+    ).length;
 
-  const propertyStats = getPropertyStats();
+    // Recent activity (last 7 days)
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const recentActivity = scheduledViewings.filter(v => 
+      new Date(v.scheduledAt) >= weekAgo
+    ).length;
+    
+    return {
+      total,
+      scheduled,
+      completed,
+      cancelled,
+      upcoming,
+      recentActivity,
+      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0
+    };
+  }, [scheduledViewings]);
 
-  const handleContactClient = (client: any) => {
-    setSelectedContact(client);
-    setShowContactModal(true);
-  };
-
-  const handleViewingAction = (viewingId: string, action: 'accept' | 'reject' | 'extend') => {
-    console.log(`${action} viewing:`, viewingId);
-    // Here you would update the viewing status
-    alert(`Viewing ${action}ed successfully!`);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'new':
-      case 'scheduled':
-        return 'bg-blue-100 text-blue-800';
-      case 'responded':
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'closed':
-      case 'cancelled':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'inquiry':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'viewing':
-        return 'bg-blue-100 text-blue-800';
-      case 'offer':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const handleUpdateStatus = async (id: string, status: 'completed' | 'cancelled', notes?: string) => {
+    try {
+      await updateViewing.mutateAsync({ id, status, notes });
+      refetch();
+    } catch (error) {
+      console.error('Failed to update viewing status:', error);
     }
   };
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
+    visible: { opacity: 1, transition: { duration: 0.6, staggerChildren: 0.1 } },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-96">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+              <p className="text-slate-600 text-lg font-medium">Loading client management...</p>
+              <p className="text-slate-500 text-sm">Fetching your viewing data</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-96">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <XCircle className="h-8 w-8 text-red-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-slate-900 mb-2">Failed to load client data</h2>
+              <p className="text-slate-600 mb-6">There was an error loading your client information.</p>
+              <button
+                onClick={() => refetch()}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+      className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6"
     >
-      {/* Header */}
-      <motion.div variants={itemVariants} className="mb-8">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-3 rounded-xl">
-            <Users className="h-7 w-7 text-blue-600" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">Client Management</h1>
-            <p className="text-gray-600">Manage client queries and scheduled viewings</p>
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-8 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
-          <div className="flex items-center justify-between">
-            <div className="relative z-10">
-              <h2 className="text-2xl font-bold mb-2">
-                {clientQueries.filter(q => q.status === 'new').length} New Queries
-              </h2>
-              <p className="text-blue-100 text-lg">
-                {scheduledViewings.filter(v => v.status === 'scheduled').length} upcoming viewings scheduled
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Modern Header */}
+        <motion.div variants={itemVariants} className="text-center lg:text-left">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-3">
+                Client Management
+              </h1>
+              <p className="text-xl text-slate-600 max-w-2xl">
+                Streamline your property viewings and client interactions with our comprehensive management system
               </p>
             </div>
-            <Users className="h-16 w-16 text-blue-200" />
+            <div className="mt-6 lg:mt-0 flex items-center space-x-4">
+              <div className="bg-white px-4 py-2 rounded-full shadow-sm border">
+                <span className="text-sm font-medium text-slate-700">
+                  {filteredViewings.length} Active
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
 
-      {/* Tabs */}
-      <motion.div variants={itemVariants} className="mb-8">
-        <div className="flex space-x-2 bg-gray-100 rounded-xl p-2 w-fit">
-          <button
-            onClick={() => setActiveTab('queries')}
-            className={`flex items-center space-x-3 px-6 py-3 rounded-lg text-sm font-bold transition-all duration-300 ${
-              activeTab === 'queries'
-                ? 'bg-white text-blue-600 shadow-lg'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <MessageSquare className="h-5 w-5" />
-            <span>Client Queries</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('viewings')}
-            className={`flex items-center space-x-3 px-6 py-3 rounded-lg text-sm font-bold transition-all duration-300 ${
-              activeTab === 'viewings'
-                ? 'bg-white text-blue-600 shadow-lg'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Calendar className="h-5 w-5" />
-            <span>Scheduled Viewings</span>
-          </button>
-        </div>
-      </motion.div>
+        {/* Modern Analytics Grid */}
+        <motion.div variants={itemVariants}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">Total Viewings</p>
+                  <p className="text-2xl font-bold text-slate-900">{analytics.total}</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-blue-600" />
+                </div>
+              </div>
+            </div>
 
-      {/* Search and Filter */}
-      <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              placeholder={`Search ${activeTab}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-            />
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">Upcoming</p>
+                  <p className="text-2xl font-bold text-amber-600">{analytics.upcoming}</p>
+                </div>
+                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-amber-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">Completed</p>
+                  <p className="text-2xl font-bold text-emerald-600">{analytics.completed}</p>
+                </div>
+                <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="h-6 w-6 text-emerald-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">Cancelled</p>
+                  <p className="text-2xl font-bold text-red-600">{analytics.cancelled}</p>
+                </div>
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                  <XCircle className="h-6 w-6 text-red-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">Success Rate</p>
+                  <p className="text-2xl font-bold text-blue-600">{analytics.completionRate}%</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-blue-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">This Week</p>
+                  <p className="text-2xl font-bold text-purple-600">{analytics.recentActivity}</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <Eye className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <div className="flex items-center space-x-4">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-            >
-              <option value="all">All Status</option>
-              {activeTab === 'queries' ? (
-                <>
-                  <option value="new">New</option>
-                  <option value="responded">Responded</option>
-                  <option value="closed">Closed</option>
-                </>
-              ) : (
-                <>
+        </motion.div>
+
+        {/* Modern Filters */}
+        <motion.div variants={itemVariants}>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-6">
+              {/* Search */}
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+                  <input
+                    type="text"
+                    placeholder="Search by property, client, or message..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-slate-50 focus:bg-white"
+                  />
+                </div>
+              </div>
+              
+              {/* Status Filter */}
+              <div className="flex items-center space-x-2">
+                <Filter className="h-5 w-5 text-slate-400" />
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                  className="px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-slate-50 focus:bg-white"
+                >
+                  <option value="all">All Status</option>
                   <option value="scheduled">Scheduled</option>
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
-                </>
-              )}
-            </select>
-          </div>
-        </div>
-      </motion.div>
+                </select>
+              </div>
 
-      {/* Content */}
-      <motion.div variants={itemVariants}>
-        {!selectedProperty ? (
-          /* Property Overview */
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
-              {activeTab === 'queries' ? 'Properties with Queries' : 'Properties with Scheduled Viewings'}
-            </h3>
-            {Object.entries(propertyStats).map(([propertyId, stats]) => {
-              const count = activeTab === 'queries' ? stats.queries : stats.viewings;
-              if (count === 0) return null;
-              
-              return (
-                <motion.div
-                  key={propertyId}
-                  whileHover={{ y: -3, scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setSelectedProperty(propertyId)}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-8 cursor-pointer border border-gray-100 hover:border-blue-200"
+              {/* Time Range Filter */}
+              <div className="flex items-center space-x-2">
+                <Clock className="h-5 w-5 text-slate-400" />
+                <select
+                  value={selectedTimeRange}
+                  onChange={(e) => setSelectedTimeRange(e.target.value as any)}
+                  className="px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-slate-50 focus:bg-white"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <img
-                        src={stats.property.images[0]}
-                        alt={stats.property.title}
-                        className="w-20 h-20 object-cover rounded-xl"
-                      />
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-1">{stats.property.title}</h3>
-                        <p className="text-gray-600 flex items-center">
-                          <MapPin className="h-4 w-4 mr-1" />
-                          {stats.property.location}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="text-right">
-                      <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-xl font-bold text-lg">
-                        {count} {activeTab === 'queries' ? 'Queries' : 'Viewings'}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+                  <option value="all">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                </select>
+              </div>
+
+              {/* Results Count */}
+              <div className="text-sm text-slate-600 font-medium whitespace-nowrap">
+                {filteredViewings.length} of {scheduledViewings.length} viewings
+              </div>
+            </div>
           </div>
-        ) : (
-          /* Detailed View */
-          <div className="space-y-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">
-                {propertyStats[selectedProperty]?.property.title} - {activeTab === 'queries' ? 'Queries' : 'Viewings'}
-              </h3>
-              <button
-                onClick={() => setSelectedProperty(null)}
-                className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
+        </motion.div>
+
+        {/* Modern Viewings List */}
+        <motion.div variants={itemVariants}>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-200 bg-slate-50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900 flex items-center">
+                    <Calendar className="h-5 w-5 mr-3 text-blue-600" />
+                    Property Viewings
+                  </h2>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Manage all your scheduled property viewings
+                  </p>
+                </div>
+                {scheduledViewings.length > 0 && (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-sm font-medium text-slate-700">Live Updates</span>
+                  </div>
+                )}
+              </div>
             </div>
             
-            {activeTab === 'queries' ? (
-              clientQueries
-                .filter(q => q.propertyId === selectedProperty)
-                .map((query) => (
-                <motion.div
-                  key={query.id}
-                  whileHover={{ y: -2, scale: 1.01 }}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 border border-gray-100"
-                >
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getTypeColor(query.type)}`}>
-                          {query.type.toUpperCase()}
-                        </span>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(query.status)}`}>
-                          {query.status.toUpperCase()}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center space-x-6 text-gray-600 mb-4">
-                        <div className="flex items-center space-x-2">
-                          <User className="h-5 w-5" />
-                          <span className="font-medium">{query.clientName}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Clock className="h-5 w-5" />
-                          <span>{query.createdAt.toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    </div>
+            <div className="p-6">
+              {scheduledViewings.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="h-8 w-8 text-slate-400" />
                   </div>
-
-                  <div className="bg-gray-50 rounded-xl p-6 mb-6">
-                    <p className="text-gray-800 leading-relaxed">{query.message}</p>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">No viewings scheduled</h3>
+                  <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                    Your property viewings will appear here once clients start scheduling appointments
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium">
+                      Share Property Links
+                    </button>
+                    <button className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors font-medium">
+                      View Properties
+                    </button>
                   </div>
-
-                  <div className="flex items-center justify-end space-x-4">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleContactClient(query)}
-                      className="px-6 py-3 text-blue-600 border-2 border-blue-600 rounded-xl hover:bg-blue-50 transition-all duration-300 font-bold"
-                    >
-                      Contact Client
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-bold shadow-lg hover:shadow-blue-500/25"
-                    >
-                      Respond
-                    </motion.button>
-                  </div>
-                </motion.div>
-              ))
-            ) : (
-              scheduledViewings
-                .filter(v => v.propertyId === selectedProperty)
-                .map((viewing) => (
-                <motion.div
-                  key={viewing.id}
-                  whileHover={{ y: -2, scale: 1.01 }}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 border border-gray-100"
-                >
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(viewing.status)}`}>
-                          {viewing.status.toUpperCase()}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center space-x-6 text-gray-600 mb-4">
-                        <div className="flex items-center space-x-2">
-                          <User className="h-5 w-5" />
-                          <span className="font-medium">{viewing.clientName}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Clock className="h-5 w-5" />
-                          <span>{viewing.createdAt.toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-blue-50 rounded-xl p-6 mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <p className="font-bold text-blue-900 text-lg">
-                          {new Date(viewing.date).toLocaleDateString('en-US', { 
-                            weekday: 'long', 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                          })}
-                        </p>
-                        <p className="text-blue-700 text-lg">
-                          {new Date(`2000-01-01T${viewing.time}`).toLocaleTimeString('en-US', { 
-                            hour: 'numeric', 
-                            minute: '2-digit', 
-                            hour12: true 
-                          })}
-                        </p>
-                      </div>
-                      <Calendar className="h-10 w-10 text-blue-600" />
-                    </div>
-                    {viewing.message && (
-                      <div className="pt-4 border-t border-blue-200">
-                        <p className="text-blue-800">{viewing.message}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleContactClient(viewing)}
-                      className="px-6 py-3 text-blue-600 border-2 border-blue-600 rounded-xl hover:bg-blue-50 transition-all duration-300 font-bold"
-                    >
-                      Contact Client
-                    </motion.button>
-                    
-                    {viewing.status === 'scheduled' && (
-                      <div className="flex items-center space-x-3">
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleViewingAction(viewing.id, 'accept')}
-                          className="px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-all duration-300 font-bold flex items-center gap-2"
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                          Accept
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleViewingAction(viewing.id, 'extend')}
-                          className="px-4 py-2 bg-yellow-500 text-white rounded-xl hover:bg-yellow-600 transition-all duration-300 font-bold flex items-center gap-2"
-                        >
-                          <RotateCcw className="h-4 w-4" />
-                          Extend
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleViewingAction(viewing.id, 'reject')}
-                          className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all duration-300 font-bold flex items-center gap-2"
-                        >
-                          <XCircle className="h-4 w-4" />
-                          Reject
-                        </motion.button>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))
-            )}
+                </div>
+              ) : (
+                <ClientList 
+                  viewings={filteredViewings} 
+                  onUpdateStatus={handleUpdateStatus} 
+                />
+              )}
+            </div>
           </div>
-        )}
-      </motion.div>
+        </motion.div>
 
-      {/* Contact Modal */}
-      {showContactModal && selectedContact && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md border border-gray-200"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">Contact Information</h3>
-              <button
-                onClick={() => setShowContactModal(false)}
-                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl">
-                <User className="h-6 w-6 text-blue-600" />
+        {/* Quick Stats Footer */}
+        {scheduledViewings.length > 0 && (
+          <motion.div variants={itemVariants}>
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">{selectedContact.clientName}</p>
-                  <p className="text-sm text-gray-600">Client Name</p>
+                  <h3 className="text-lg font-semibold mb-2">Quick Insights</h3>
+                  <p className="text-blue-100">
+                    You have {analytics.upcoming} upcoming viewings and a {analytics.completionRate}% completion rate
+                  </p>
                 </div>
-              </div>
-
-              <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl">
-                <Mail className="h-6 w-6 text-green-600" />
-                <div>
-                  <p className="font-medium text-gray-900">{selectedContact.clientEmail}</p>
-                  <p className="text-sm text-gray-600">Email Address</p>
-                </div>
-              </div>
-
-              {selectedContact.clientPhone && (
-                <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl">
-                  <Phone className="h-6 w-6 text-purple-600" />
-                  <div>
-                    <p className="font-medium text-gray-900">{selectedContact.clientPhone}</p>
-                    <p className="text-sm text-gray-600">Phone Number</p>
+                <div className="mt-4 lg:mt-0 flex items-center space-x-6 text-sm">
+                  <div className="text-center">
+                    <div className="font-bold text-xl">{analytics.scheduled}</div>
+                    <div className="text-blue-200">Pending</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-xl">{analytics.completed}</div>
+                    <div className="text-blue-200">Completed</div>
                   </div>
                 </div>
-              )}
-            </div>
-
-            <div className="flex space-x-4 mt-8">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => window.open(`mailto:${selectedContact.clientEmail}`)}
-                className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center justify-center gap-2"
-              >
-                <Mail className="h-5 w-5" />
-                Email
-              </motion.button>
-              {selectedContact.clientPhone && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => window.open(`tel:${selectedContact.clientPhone}`)}
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2"
-                >
-                  <Phone className="h-5 w-5" />
-                  Call
-                </motion.button>
-              )}
+              </div>
             </div>
           </motion.div>
-        </div>
-      )}
+        )}
+      </div>
     </motion.div>
   );
 };

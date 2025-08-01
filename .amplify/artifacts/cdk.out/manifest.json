@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/ee83e0fcefcab0361c4de168697d1973dfcf9a823304d564b98909cf222c1347.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f3e2cd4e597bfb937b3de3137c000311459195eed3c2f881116ca43a8e65093d.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -381,6 +381,546 @@
             "data": "amplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResource86290833"
           }
         ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/DynamoDBModelTableReadIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableReadIOPS"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/DynamoDBModelTableWriteIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableWriteIOPS"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/DynamoDBBillingMode": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBBillingMode"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/DynamoDBEnablePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnablePointInTimeRecovery"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/DynamoDBEnableServerSideEncryption": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnableServerSideEncryption"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/HasEnvironmentParameter": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HasEnvironmentParameter"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/ShouldUsePayPerRequestBilling": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePayPerRequestBilling"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/ShouldUsePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePointInTimeRecovery"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/UserTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "User"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/UserTable/Default/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserTable"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "User"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/CustomTableUserTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "User"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/GetAttUserTableStreamArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttUserTableStreamArn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/GetAttUserTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttUserTableName"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/UserIAMRole": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserIAMRole"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/UserIAMRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserIAMRole93CEE926"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserIAMRole"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/UserDataSource": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserTable"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/UserDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDataSource"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserTable"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/QuerygetUserauth0Function/QuerygetUserauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetUserauth0FunctionQuerygetUserauth0FunctionAppSyncFunction9E6250B0"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetUserauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/QuerygetUserpostAuth0Function/QuerygetUserpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetUserpostAuth0FunctionQuerygetUserpostAuth0FunctionAppSyncFunction2792AC60"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetUserpostAuth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/QueryGetUserDataResolverFn/QueryGetUserDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryGetUserDataResolverFnQueryGetUserDataResolverFnAppSyncFunction36A3E4CF"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryGetUserDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/queryGetUserResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetUserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.getUser"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/QuerylistUsersauth0Function/QuerylistUsersauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistUsersauth0FunctionQuerylistUsersauth0FunctionAppSyncFunctionA1FF61AB"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistUsersauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/QuerylistUserspostAuth0Function/QuerylistUserspostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistUserspostAuth0FunctionQuerylistUserspostAuth0FunctionAppSyncFunction37C5583D"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistUserspostAuth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/QueryListUsersDataResolverFn/QueryListUsersDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryListUsersDataResolverFnQueryListUsersDataResolverFnAppSyncFunction83574EBA"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryListUsersDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/queryListUsersResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListUserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.listUsers"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationcreateUserinit0Function/MutationcreateUserinit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateUserinit0FunctionMutationcreateUserinit0FunctionAppSyncFunctionEDF87EC6"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateUserinit0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationcreateUserauth0Function/MutationcreateUserauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateUserauth0FunctionMutationcreateUserauth0FunctionAppSyncFunction30556A6C"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateUserauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationcreateUserpostAuth0Function/MutationcreateUserpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateUserpostAuth0FunctionMutationcreateUserpostAuth0FunctionAppSyncFunction176E20CB"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateUserpostAuth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationCreateUserDataResolverFn/MutationCreateUserDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationCreateUserDataResolverFnMutationCreateUserDataResolverFnAppSyncFunction22E7974E"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationCreateUserDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/mutationCreateUserResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateUserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.createUser"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationupdateUserinit0Function/MutationupdateUserinit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateUserinit0FunctionMutationupdateUserinit0FunctionAppSyncFunctionC2E8A924"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateUserinit0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationupdateUserauth0Function/MutationupdateUserauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateUserauth0FunctionMutationupdateUserauth0FunctionAppSyncFunctionDF95DA65"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateUserauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationupdateUserpostAuth0Function/MutationupdateUserpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateUserpostAuth0FunctionMutationupdateUserpostAuth0FunctionAppSyncFunctionD4B80000"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateUserpostAuth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationUpdateUserDataResolverFn/MutationUpdateUserDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationUpdateUserDataResolverFnMutationUpdateUserDataResolverFnAppSyncFunction6ADF3910"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationUpdateUserDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/mutationUpdateUserResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UpdateUserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.updateUser"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationdeleteUserauth0Function/MutationdeleteUserauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteUserauth0FunctionMutationdeleteUserauth0FunctionAppSyncFunction9B900ACD"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteUserauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationdeleteUserpostAuth0Function/MutationdeleteUserpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteUserpostAuth0FunctionMutationdeleteUserpostAuth0FunctionAppSyncFunction9B804910"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteUserpostAuth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/MutationDeleteUserDataResolverFn/MutationDeleteUserDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationDeleteUserDataResolverFnMutationDeleteUserDataResolverFnAppSyncFunction0B4F366A"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationDeleteUserDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/mutationDeleteUserResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeleteUserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.deleteUser"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/SubscriptiononCreateUserauth0Function/SubscriptiononCreateUserauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateUserauth0FunctionSubscriptiononCreateUserauth0FunctionAppSyncFunctionE9B4721A"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateUserauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/SubscriptiononCreateUserpostAuth0Function/SubscriptiononCreateUserpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateUserpostAuth0FunctionSubscriptiononCreateUserpostAuth0FunctionAppSyncFunction62AE12DA"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateUserpostAuth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/SubscriptionOnCreateUserDataResolverFn/SubscriptionOnCreateUserDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnCreateUserDataResolverFnSubscriptionOnCreateUserDataResolverFnAppSyncFunction23B2F1B9"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnCreateUserDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/subscriptionOnCreateUserResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateUserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onCreateUser"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/SubscriptiononUpdateUserauth0Function/SubscriptiononUpdateUserauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateUserauth0FunctionSubscriptiononUpdateUserauth0FunctionAppSyncFunction78530C9F"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateUserauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/SubscriptiononUpdateUserpostAuth0Function/SubscriptiononUpdateUserpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateUserpostAuth0FunctionSubscriptiononUpdateUserpostAuth0FunctionAppSyncFunctionF3EF85D1"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateUserpostAuth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/SubscriptionOnUpdateUserDataResolverFn/SubscriptionOnUpdateUserDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnUpdateUserDataResolverFnSubscriptionOnUpdateUserDataResolverFnAppSyncFunction93FA5DF6"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnUpdateUserDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/subscriptionOnUpdateUserResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateUserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onUpdateUser"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/SubscriptiononDeleteUserauth0Function/SubscriptiononDeleteUserauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteUserauth0FunctionSubscriptiononDeleteUserauth0FunctionAppSyncFunction0C5B7186"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteUserauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/SubscriptiononDeleteUserpostAuth0Function/SubscriptiononDeleteUserpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteUserpostAuth0FunctionSubscriptiononDeleteUserpostAuth0FunctionAppSyncFunction24A5E815"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteUserpostAuth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/SubscriptionOnDeleteUserDataResolverFn/SubscriptionOnDeleteUserDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnDeleteUserDataResolverFnSubscriptionOnDeleteUserDataResolverFnAppSyncFunction2BEB0972"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnDeleteUserDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/subscriptionOnDeleteUserResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteUserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onDeleteUser"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/UserOwnerDataResolverFn/UserOwnerDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserOwnerDataResolverFnUserOwnerDataResolverFnAppSyncFunction78EE3B72"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserOwnerDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/userOwnerResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserownerResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "User.owner"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceC5B93D1FOutputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventAE5EB657Arn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceC5B93D1FOutputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataaBBD2798C"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthauthenticatedUserRoleE01FD7B7Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthauthenticatedUserRoleE01FD7B7Ref"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthunauthenticatedUserRoleD844DC78Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthunauthenticatedUserRoleD844DC78Ref"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserUserDataSourceF67935A5Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserUserDataSourceF67935A5Name"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User/amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserUserTableC1461300TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserUserTableC1461300TableArn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/User.NestedStack/User.NestedStackResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyDataUserNestedStackUserNestedStackResource9488907F"
+          }
+        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/DynamoDBModelTableReadIOPS": [
           {
             "type": "aws:cdk:logicalId",
@@ -495,16 +1035,6 @@
             "data": "PropertyTable"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerygetPropertypreAuth0Function/QuerygetPropertypreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerygetPropertypreAuth0FunctionQuerygetPropertypreAuth0FunctionAppSyncFunction2F4573D0"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerygetPropertypreAuth0Function"
-          }
-        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerygetPropertyauth0Function/QuerygetPropertyauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -543,16 +1073,6 @@
           {
             "type": "graphqltransformer:resourceName",
             "data": "Query.getProperty"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiespreAuth0Function/QuerylistPropertiespreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiespreAuth0FunctionQuerylistPropertiespreAuth0FunctionAppSyncFunctionEF86E0CE"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertiespreAuth0Function"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesauth0Function/QuerylistPropertiesauth0Function.AppSyncFunction": [
@@ -605,16 +1125,6 @@
             "data": "MutationcreatePropertyinit0Function"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationcreatePropertypreAuth0Function/MutationcreatePropertypreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationcreatePropertypreAuth0FunctionMutationcreatePropertypreAuth0FunctionAppSyncFunction4E4B41CE"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationcreatePropertypreAuth0Function"
-          }
-        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationcreatePropertyauth0Function/MutationcreatePropertyauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -665,16 +1175,6 @@
             "data": "MutationupdatePropertyinit0Function"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationupdatePropertypreAuth0Function/MutationupdatePropertypreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationupdatePropertypreAuth0FunctionMutationupdatePropertypreAuth0FunctionAppSyncFunction18FC12D3"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationupdatePropertypreAuth0Function"
-          }
-        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationupdatePropertyauth0Function/MutationupdatePropertyauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -713,16 +1213,6 @@
           {
             "type": "graphqltransformer:resourceName",
             "data": "Mutation.updateProperty"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationdeletePropertypreAuth0Function/MutationdeletePropertypreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationdeletePropertypreAuth0FunctionMutationdeletePropertypreAuth0FunctionAppSyncFunction7C6CF5FC"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationdeletePropertypreAuth0Function"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationdeletePropertyauth0Function/MutationdeletePropertyauth0Function.AppSyncFunction": [
@@ -885,184 +1375,24 @@
             "data": "Subscription.onDeleteProperty"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByTypeauth0Function/QuerylistPropertiesByTypeauth0Function.AppSyncFunction": [
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/PropertyOwnerIdDataResolverFn/PropertyOwnerIdDataResolverFn.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByTypeauth0FunctionQuerylistPropertiesByTypeauth0FunctionAppSyncFunction27B934F4"
+            "data": "PropertyOwnerIdDataResolverFnPropertyOwnerIdDataResolverFnAppSyncFunction36F6FEE7"
           },
           {
             "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertiesByTypeauth0Function"
+            "data": "PropertyOwnerIdDataResolverFn"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByTypepostAuth0Function/QuerylistPropertiesByTypepostAuth0Function.AppSyncFunction": [
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/propertyOwnerIdResolver": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByTypepostAuth0FunctionQuerylistPropertiesByTypepostAuth0FunctionAppSyncFunction1EFDB4C7"
+            "data": "PropertyownerIdResolver"
           },
           {
             "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertiesByTypepostAuth0Function"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QueryListPropertiesByTypeDataResolverFn/QueryListPropertiesByTypeDataResolverFn.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QueryListPropertiesByTypeDataResolverFnQueryListPropertiesByTypeDataResolverFnAppSyncFunction3AB6DE79"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QueryListPropertiesByTypeDataResolverFn"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/queryListPropertiesByTypeResolver": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByTypeResolver"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "Query.listPropertiesByType"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByStatusauth0Function/QuerylistPropertiesByStatusauth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByStatusauth0FunctionQuerylistPropertiesByStatusauth0FunctionAppSyncFunctionDB9B91EB"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertiesByStatusauth0Function"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByStatuspostAuth0Function/QuerylistPropertiesByStatuspostAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByStatuspostAuth0FunctionQuerylistPropertiesByStatuspostAuth0FunctionAppSyncFunction2C06C0E4"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertiesByStatuspostAuth0Function"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QueryListPropertiesByStatusDataResolverFn/QueryListPropertiesByStatusDataResolverFn.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QueryListPropertiesByStatusDataResolverFnQueryListPropertiesByStatusDataResolverFnAppSyncFunction042D2E5D"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QueryListPropertiesByStatusDataResolverFn"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/queryListPropertiesByStatusResolver": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByStatusResolver"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "Query.listPropertiesByStatus"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByListerauth0Function/QuerylistPropertiesByListerauth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByListerauth0FunctionQuerylistPropertiesByListerauth0FunctionAppSyncFunction5D5ECE7D"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertiesByListerauth0Function"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByListerpostAuth0Function/QuerylistPropertiesByListerpostAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByListerpostAuth0FunctionQuerylistPropertiesByListerpostAuth0FunctionAppSyncFunction5BAFF823"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertiesByListerpostAuth0Function"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QueryListPropertiesByListerDataResolverFn/QueryListPropertiesByListerDataResolverFn.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QueryListPropertiesByListerDataResolverFnQueryListPropertiesByListerDataResolverFnAppSyncFunctionB83C1211"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QueryListPropertiesByListerDataResolverFn"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/queryListPropertiesByListerResolver": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByListerResolver"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "Query.listPropertiesByLister"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByDateauth0Function/QuerylistPropertiesByDateauth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByDateauth0FunctionQuerylistPropertiesByDateauth0FunctionAppSyncFunction6E50E1AA"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertiesByDateauth0Function"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByDatepostAuth0Function/QuerylistPropertiesByDatepostAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByDatepostAuth0FunctionQuerylistPropertiesByDatepostAuth0FunctionAppSyncFunction00AEBBB2"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertiesByDatepostAuth0Function"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QueryListPropertiesByDateDataResolverFn/QueryListPropertiesByDateDataResolverFn.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QueryListPropertiesByDateDataResolverFnQueryListPropertiesByDateDataResolverFnAppSyncFunction8D3233C4"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QueryListPropertiesByDateDataResolverFn"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/queryListPropertiesByDateResolver": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertiesByDateResolver"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "Query.listPropertiesByDate"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/PropertyOwnerDataResolverFn/PropertyOwnerDataResolverFn.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PropertyOwnerDataResolverFnPropertyOwnerDataResolverFnAppSyncFunction1CAB95F5"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "PropertyOwnerDataResolverFn"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/propertyOwnerResolver": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PropertyownerResolver"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "Property.owner"
+            "data": "Property.ownerId"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/CDKMetadata/Default": [
@@ -1111,6 +1441,18 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyPropertyDataSource0CFD1133Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyPropertyDataSource0CFD1133Name"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyPropertyTableCD879777TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyPropertyTableCD879777TableArn"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property.NestedStack/Property.NestedStackResource": [
@@ -1233,16 +1575,6 @@
             "data": "UserPreferenceTable"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/QuerygetUserPreferencepreAuth0Function/QuerygetUserPreferencepreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerygetUserPreferencepreAuth0FunctionQuerygetUserPreferencepreAuth0FunctionAppSyncFunction9BF2F80C"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerygetUserPreferencepreAuth0Function"
-          }
-        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/QuerygetUserPreferenceauth0Function/QuerygetUserPreferenceauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -1281,16 +1613,6 @@
           {
             "type": "graphqltransformer:resourceName",
             "data": "Query.getUserPreference"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/QuerylistUserPreferencespreAuth0Function/QuerylistUserPreferencespreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistUserPreferencespreAuth0FunctionQuerylistUserPreferencespreAuth0FunctionAppSyncFunction9870B84B"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerylistUserPreferencespreAuth0Function"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/QuerylistUserPreferencesauth0Function/QuerylistUserPreferencesauth0Function.AppSyncFunction": [
@@ -1343,16 +1665,6 @@
             "data": "MutationcreateUserPreferenceinit0Function"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/MutationcreateUserPreferencepreAuth0Function/MutationcreateUserPreferencepreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationcreateUserPreferencepreAuth0FunctionMutationcreateUserPreferencepreAuth0FunctionAppSyncFunction2C506A96"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationcreateUserPreferencepreAuth0Function"
-          }
-        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/MutationcreateUserPreferenceauth0Function/MutationcreateUserPreferenceauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -1403,16 +1715,6 @@
             "data": "MutationupdateUserPreferenceinit0Function"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/MutationupdateUserPreferencepreAuth0Function/MutationupdateUserPreferencepreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationupdateUserPreferencepreAuth0FunctionMutationupdateUserPreferencepreAuth0FunctionAppSyncFunction44F459FF"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationupdateUserPreferencepreAuth0Function"
-          }
-        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/MutationupdateUserPreferenceauth0Function/MutationupdateUserPreferenceauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -1451,16 +1753,6 @@
           {
             "type": "graphqltransformer:resourceName",
             "data": "Mutation.updateUserPreference"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/MutationdeleteUserPreferencepreAuth0Function/MutationdeleteUserPreferencepreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationdeleteUserPreferencepreAuth0FunctionMutationdeleteUserPreferencepreAuth0FunctionAppSyncFunction4E500AC2"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationdeleteUserPreferencepreAuth0Function"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/MutationdeleteUserPreferenceauth0Function/MutationdeleteUserPreferenceauth0Function.AppSyncFunction": [
@@ -1623,24 +1915,24 @@
             "data": "Subscription.onDeleteUserPreference"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/UserPreferenceOwnerDataResolverFn/UserPreferenceOwnerDataResolverFn.AppSyncFunction": [
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/UserPreferenceUserIdDataResolverFn/UserPreferenceUserIdDataResolverFn.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "UserPreferenceOwnerDataResolverFnUserPreferenceOwnerDataResolverFnAppSyncFunctionA2DF2254"
+            "data": "UserPreferenceUserIdDataResolverFnUserPreferenceUserIdDataResolverFnAppSyncFunctionFEB58153"
           },
           {
             "type": "graphqltransformer:resourceName",
-            "data": "UserPreferenceOwnerDataResolverFn"
+            "data": "UserPreferenceUserIdDataResolverFn"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/userPreferenceOwnerResolver": [
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/userPreferenceUserIdResolver": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "UserPreferenceownerResolver"
+            "data": "UserPreferenceuserIdResolver"
           },
           {
             "type": "graphqltransformer:resourceName",
-            "data": "UserPreference.owner"
+            "data": "UserPreference.userId"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/CDKMetadata/Default": [
@@ -1689,6 +1981,18 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceUserPreferenceDataSource85D30C12Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceUserPreferenceDataSource85D30C12Name"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference/amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceUserPreferenceTableE77730F2TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceUserPreferenceTableE77730F2TableArn"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/UserPreference.NestedStack/UserPreference.NestedStackResource": [
@@ -1811,16 +2115,6 @@
             "data": "PropertyViewingTable"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/QuerygetPropertyViewingpreAuth0Function/QuerygetPropertyViewingpreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerygetPropertyViewingpreAuth0FunctionQuerygetPropertyViewingpreAuth0FunctionAppSyncFunctionC30C1C0D"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerygetPropertyViewingpreAuth0Function"
-          }
-        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/QuerygetPropertyViewingauth0Function/QuerygetPropertyViewingauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -1859,16 +2153,6 @@
           {
             "type": "graphqltransformer:resourceName",
             "data": "Query.getPropertyViewing"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/QuerylistPropertyViewingspreAuth0Function/QuerylistPropertyViewingspreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "QuerylistPropertyViewingspreAuth0FunctionQuerylistPropertyViewingspreAuth0FunctionAppSyncFunctionF0AFBB71"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "QuerylistPropertyViewingspreAuth0Function"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/QuerylistPropertyViewingsauth0Function/QuerylistPropertyViewingsauth0Function.AppSyncFunction": [
@@ -1921,16 +2205,6 @@
             "data": "MutationcreatePropertyViewinginit0Function"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/MutationcreatePropertyViewingpreAuth0Function/MutationcreatePropertyViewingpreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationcreatePropertyViewingpreAuth0FunctionMutationcreatePropertyViewingpreAuth0FunctionAppSyncFunction9E1BEE83"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationcreatePropertyViewingpreAuth0Function"
-          }
-        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/MutationcreatePropertyViewingauth0Function/MutationcreatePropertyViewingauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -1981,16 +2255,6 @@
             "data": "MutationupdatePropertyViewinginit0Function"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/MutationupdatePropertyViewingpreAuth0Function/MutationupdatePropertyViewingpreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationupdatePropertyViewingpreAuth0FunctionMutationupdatePropertyViewingpreAuth0FunctionAppSyncFunction655C9EB4"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationupdatePropertyViewingpreAuth0Function"
-          }
-        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/MutationupdatePropertyViewingauth0Function/MutationupdatePropertyViewingauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -2029,16 +2293,6 @@
           {
             "type": "graphqltransformer:resourceName",
             "data": "Mutation.updatePropertyViewing"
-          }
-        ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/MutationdeletePropertyViewingpreAuth0Function/MutationdeletePropertyViewingpreAuth0Function.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationdeletePropertyViewingpreAuth0FunctionMutationdeletePropertyViewingpreAuth0FunctionAppSyncFunctionBE0EABA2"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationdeletePropertyViewingpreAuth0Function"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/MutationdeletePropertyViewingauth0Function/MutationdeletePropertyViewingauth0Function.AppSyncFunction": [
@@ -2201,24 +2455,44 @@
             "data": "Subscription.onDeletePropertyViewing"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/PropertyViewingOwnerDataResolverFn/PropertyViewingOwnerDataResolverFn.AppSyncFunction": [
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/PropertyViewingUserIdDataResolverFn/PropertyViewingUserIdDataResolverFn.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "PropertyViewingOwnerDataResolverFnPropertyViewingOwnerDataResolverFnAppSyncFunctionC06B1415"
+            "data": "PropertyViewingUserIdDataResolverFnPropertyViewingUserIdDataResolverFnAppSyncFunction1C452794"
           },
           {
             "type": "graphqltransformer:resourceName",
-            "data": "PropertyViewingOwnerDataResolverFn"
+            "data": "PropertyViewingUserIdDataResolverFn"
           }
         ],
-        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/propertyViewingOwnerResolver": [
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/propertyViewingUserIdResolver": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "PropertyViewingownerResolver"
+            "data": "PropertyViewinguserIdResolver"
           },
           {
             "type": "graphqltransformer:resourceName",
-            "data": "PropertyViewing.owner"
+            "data": "PropertyViewing.userId"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/PropertyViewingPropertyOwnerIdDataResolverFn/PropertyViewingPropertyOwnerIdDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyViewingPropertyOwnerIdDataResolverFnPropertyViewingPropertyOwnerIdDataResolverFnAppSyncFunctionD3E6BF71"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyViewingPropertyOwnerIdDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/propertyViewingPropertyOwnerIdResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyViewingpropertyOwnerIdResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyViewing.propertyOwnerId"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/CDKMetadata/Default": [
@@ -2269,10 +2543,358 @@
             "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef"
           }
         ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingPropertyViewingDataSource3F18A7CDName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingPropertyViewingDataSource3F18A7CDName"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing/amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingPropertyViewingTable83B4683BTableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingPropertyViewingTable83B4683BTableArn"
+          }
+        ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/PropertyViewing.NestedStack/PropertyViewing.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifyDataPropertyViewingNestedStackPropertyViewingNestedStackResource30D89FAE"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/Userpropertiesauth0Function/Userpropertiesauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Userpropertiesauth0FunctionUserpropertiesauth0FunctionAppSyncFunction41BD0EE5"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Userpropertiesauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/UserPropertiesDataResolverFn/UserPropertiesDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPropertiesDataResolverFnUserPropertiesDataResolverFnAppSyncFunctionAC99A0C8"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserPropertiesDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/userPropertiesResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserpropertiesResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "User.properties"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/Userviewingsauth0Function/Userviewingsauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Userviewingsauth0FunctionUserviewingsauth0FunctionAppSyncFunctionEE008B37"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Userviewingsauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/UserViewingsDataResolverFn/UserViewingsDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserViewingsDataResolverFnUserViewingsDataResolverFnAppSyncFunction58730833"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserViewingsDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/userViewingsResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserviewingsResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "User.viewings"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/Userpreferencesauth0Function/Userpreferencesauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Userpreferencesauth0FunctionUserpreferencesauth0FunctionAppSyncFunctionC244AD10"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Userpreferencesauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/UserPreferencesDataResolverFn/UserPreferencesDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesDataResolverFnUserPreferencesDataResolverFnAppSyncFunction96F833C7"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserPreferencesDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/userPreferencesResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserpreferencesResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "User.preferences"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/Propertyviewingsauth0Function/Propertyviewingsauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Propertyviewingsauth0FunctionPropertyviewingsauth0FunctionAppSyncFunction8D5E0374"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Propertyviewingsauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/PropertyViewingsDataResolverFn/PropertyViewingsDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyViewingsDataResolverFnPropertyViewingsDataResolverFnAppSyncFunction0A0B4EEC"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyViewingsDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/propertyViewingsResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyviewingsResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Property.viewings"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/Propertyownerauth0Function/Propertyownerauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Propertyownerauth0FunctionPropertyownerauth0FunctionAppSyncFunction19CF5B0B"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Propertyownerauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/PropertyOwnerDataResolverFn/PropertyOwnerDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyOwnerDataResolverFnPropertyOwnerDataResolverFnAppSyncFunction1CAB95F5"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyOwnerDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/propertyOwnerResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyownerResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Property.owner"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/UserPreferenceuserauth0Function/UserPreferenceuserauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferenceuserauth0FunctionUserPreferenceuserauth0FunctionAppSyncFunction8C123064"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserPreferenceuserauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/UserPreferenceUserDataResolverFn/UserPreferenceUserDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferenceUserDataResolverFnUserPreferenceUserDataResolverFnAppSyncFunction58533EE8"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserPreferenceUserDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/userPreferenceUserResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferenceuserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "UserPreference.user"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/PropertyViewingpropertyauth0Function/PropertyViewingpropertyauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyViewingpropertyauth0FunctionPropertyViewingpropertyauth0FunctionAppSyncFunctionA88C57DE"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyViewingpropertyauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/PropertyViewingPropertyDataResolverFn/PropertyViewingPropertyDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyViewingPropertyDataResolverFnPropertyViewingPropertyDataResolverFnAppSyncFunctionD6D21B40"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyViewingPropertyDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/propertyViewingPropertyResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyViewingpropertyResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyViewing.property"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/PropertyViewinguserauth0Function/PropertyViewinguserauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyViewinguserauth0FunctionPropertyViewinguserauth0FunctionAppSyncFunction16D86C94"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyViewinguserauth0Function"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/PropertyViewingUserDataResolverFn/PropertyViewingUserDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyViewingUserDataResolverFnPropertyViewingUserDataResolverFnAppSyncFunctionA3C1A75C"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyViewingUserDataResolverFn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/propertyViewingUserResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PropertyViewinguserResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "PropertyViewing.user"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyNestedStackPropertyNestedStackResource16C36F63Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyPropertyDataSource0CFD1133Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyNestedStackPropertyNestedStackResource16C36F63Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyProp3C7C122C"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyNestedStackPropertyNestedStackResource16C36F63Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyPropertyTableCD879777TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyNestedStackPropertyNestedStackResource16C36F63Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyProp818459E7"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthauthenticatedUserRoleE01FD7B7Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthauthenticatedUserRoleE01FD7B7Ref"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthunauthenticatedUserRoleD844DC78Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthunauthenticatedUserRoleD844DC78Ref"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingNestedStackPropertyViewingNestedStackResourceC0B14276Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingPropertyViewingDataSource3F18A7CDName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingNestedStackPropertyViewingNestedStackResourceC0B14276Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDaD971F59D"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingNestedStackPropertyViewingNestedStackResourceC0B14276Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingPropertyViewingTable83B4683BTableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyViewingNestedStackPropertyViewingNestedStackResourceC0B14276Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDa2CB90C0D"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceNestedStackUserPreferenceNestedStackResource5A90C33BOutputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceUserPreferenceDataSource85D30C12Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceNestedStackUserPreferenceNestedStackResource5A90C33BOutputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyData0C697C57"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceNestedStackUserPreferenceNestedStackResource5A90C33BOutputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceUserPreferenceTableE77730F2TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserPreferenceNestedStackUserPreferenceNestedStackResource5A90C33BOutputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataDA2847E6"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserNestedStackUserNestedStackResource1FF2CF9DOutputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserUserDataSourceF67935A5Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserNestedStackUserNestedStackResource1FF2CF9DOutputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserUserDataSourceF67935A5Name"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack/reference-to-amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserNestedStackUserNestedStackResource1FF2CF9DOutputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserUserTableC1461300TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserNestedStackUserNestedStackResource1FF2CF9DOutputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataUserUserTableC1461300TableArn"
+          }
+        ],
+        "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/ConnectionStack.NestedStack/ConnectionStack.NestedStackResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyDataConnectionStackNestedStackConnectionStackNestedStackResourceAB0F312B"
           }
         ],
         "/amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/AuthRolePolicy01/Resource": [

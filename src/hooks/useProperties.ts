@@ -1,20 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { propertyService, CreatePropertyInput } from '../services/propertyService';
+import { propertyService, CreatePropertyInput, UpdatePropertyInput } from '../services/propertyService';
 import { getCurrentUser } from 'aws-amplify/auth';
-import { generateClient } from 'aws-amplify/data';
+import { generateClient } from 'aws-amplify/api';
 import type { Schema } from '../../amplify/data/resource';
 
 const client = generateClient<Schema>();
 
 // --- CORE PROPERTY HOOKS ---
+
+// FIXED: Fetches all properties for public display with proper error handling
 export const useProperties = () => {
   return useQuery({
     queryKey: ['properties'],
-    queryFn: propertyService.getAllProperties,
+    queryFn: () => propertyService.getAllProperties(),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2, // FIXED: Added retry logic
+    retryDelay: 1000,
   });
 };
 
+// Fetches a single property by ID
 export const useProperty = (id: string) => {
   return useQuery({
     queryKey: ['property', id],
@@ -23,31 +28,42 @@ export const useProperty = (id: string) => {
   });
 };
 
+// FIXED: Fetches properties for the currently logged-in lister with better error handling
 export const useListerProperties = () => {
   return useQuery({
     queryKey: ['lister-properties'],
     queryFn: async () => {
-      const user = await getCurrentUser();
-      return propertyService.getPropertiesByLister(user.userId);
+      try {
+        const user = await getCurrentUser();
+        return propertyService.getPropertiesByOwner(user.userId);
+      } catch (error) {
+        console.error('Error fetching lister properties:', error);
+        throw error;
+      }
     },
+    retry: 2,
+    retryDelay: 1000,
   });
 };
 
+// Creates a new property
 export const useCreateProperty = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: CreatePropertyInput) => propertyService.createProperty(input),
     onSuccess: () => {
+      // FIXED: Invalidate all relevant queries to ensure data consistency
       queryClient.invalidateQueries({ queryKey: ['properties'] });
       queryClient.invalidateQueries({ queryKey: ['lister-properties'] });
     },
   });
 };
 
+// Updates an existing property
 export const useUpdateProperty = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<CreatePropertyInput> }) =>
+    mutationFn: ({ id, updates }: { id: string; updates: UpdatePropertyInput }) =>
       propertyService.updateProperty(id, updates),
     onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['properties'] });
@@ -57,32 +73,47 @@ export const useUpdateProperty = () => {
   });
 };
 
-// NEW: Mutation hook for deleting a property
+// Deletes a property
 export const useDeleteProperty = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (propertyId: string) => propertyService.deleteProperty(propertyId),
     onSuccess: () => {
-      // Invalidate both general and lister-specific queries to ensure UI consistency
       queryClient.invalidateQueries({ queryKey: ['properties'] });
       queryClient.invalidateQueries({ queryKey: ['lister-properties'] });
     },
     onError: (error) => {
       console.error("Error deleting property:", error);
-      // You could add a user-facing notification here
     }
   });
 };
 
-
+// Schedules a viewing for a property
 export const useScheduleViewing = () => {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: propertyService.scheduleViewing,
+    mutationFn: (viewingData: {
+      propertyId: string;
+      propertyOwnerId: string;
+      message?: string;
+      scheduledAt: string;
+    }) => propertyService.scheduleViewing(viewingData),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['viewings', variables.propertyId] });
+      queryClient.invalidateQueries({ queryKey: ['lister-viewings', variables.propertyOwnerId] });
+    }
   });
 };
 
+// Increments the view count of a property
+export const useIncrementPropertyView = () => {
+  return useMutation({
+    mutationFn: (propertyId: string) => propertyService.incrementViews(propertyId),
+  });
+};
 
 // --- USER PREFERENCE HOOKS ---
+
 export const useUserPreferences = () => {
   return useQuery({
     queryKey: ['user-preferences'],
@@ -102,9 +133,10 @@ export const useUserPreferences = () => {
           catalogueProperties: [],
           favoriteProperties: [],
         });
-        return newPreferences;
 
+        return newPreferences;
       } catch (error) {
+        console.error('Error fetching user preferences:', error);
         return null;
       }
     },
@@ -114,20 +146,20 @@ export const useUserPreferences = () => {
 
 export const useToggleCatalogue = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (propertyId: string) => {
-      const user = await getCurrentUser(); 
+      const user = await getCurrentUser();
       
-      const currentPreferences = await queryClient.fetchQuery<Schema['UserPreference']['type'] | null>({
+      // FIXED: Properly type the preferences data
+      const currentPreferences = await queryClient.fetchQuery({
         queryKey: ['user-preferences'],
-      });
+      }) as Schema['UserPreference']['type'] | null;
 
       const currentCatalogue = (currentPreferences?.catalogueProperties || []).filter((id): id is string => id !== null);
       const newCatalogue = currentCatalogue.includes(propertyId)
         ? currentCatalogue.filter((id: string) => id !== propertyId)
         : [...currentCatalogue, propertyId];
-      
+
       if (currentPreferences?.id) {
         const { data } = await client.models.UserPreference.update({
           id: currentPreferences.id,
@@ -146,22 +178,22 @@ export const useToggleCatalogue = () => {
       queryClient.invalidateQueries({ queryKey: ['user-preferences'] });
     },
     onError: (error) => {
-        console.error("Error toggling catalogue:", error);
+      console.error("Error toggling catalogue:", error);
     }
   });
 };
 
 export const useToggleFavorite = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (propertyId: string) => {
       const user = await getCurrentUser();
       
-      const currentPreferences = await queryClient.fetchQuery<Schema['UserPreference']['type'] | null>({
+      // FIXED: Properly type the preferences data
+      const currentPreferences = await queryClient.fetchQuery({
         queryKey: ['user-preferences'],
-      });
-      
+      }) as Schema['UserPreference']['type'] | null;
+
       const currentFavorites = (currentPreferences?.favoriteProperties || []).filter((id): id is string => id !== null);
       const newFavorites = currentFavorites.includes(propertyId)
         ? currentFavorites.filter((id: string) => id !== propertyId)
@@ -185,7 +217,41 @@ export const useToggleFavorite = () => {
       queryClient.invalidateQueries({ queryKey: ['user-preferences'] });
     },
     onError: (error) => {
-        console.error("Error toggling favorite:", error);
+      console.error("Error toggling favorite:", error);
+    }
+  });
+};
+
+// NEW: Hook to fetch lister's viewings
+export const useListerViewings = () => {
+  return useQuery({
+    queryKey: ['lister-viewings'],
+    queryFn: async () => {
+      try {
+        const user = await getCurrentUser();
+        return propertyService.getListerViewings(user.userId); // Fetch by propertyOwnerId (which is lister's userId)
+      } catch (error) {
+        console.error('Error fetching lister viewings:', error);
+        throw error;
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+    retryDelay: 1000,
+  });
+};
+
+// NEW: Mutation to update viewing status
+export const useUpdateViewing = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status, notes }: { id: string; status: 'scheduled' | 'completed' | 'cancelled'; notes?: string }) =>
+      propertyService.updateViewingStatus(id, status, notes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lister-viewings'] });
+    },
+    onError: (error) => {
+      console.error("Error updating viewing:", error);
     }
   });
 };

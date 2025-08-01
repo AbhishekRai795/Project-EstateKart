@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { DivideIcon as LucideIcon } from 'lucide-react';
 
 interface StatsCardProps {
   title: string;
@@ -9,7 +8,7 @@ interface StatsCardProps {
     value: number;
     type: 'increase' | 'decrease';
   };
-  icon: LucideIcon;
+  icon: React.ReactNode; // FIXED: Change type to React.ReactNode to accept pre-rendered JSX elements
   color?: 'primary' | 'success' | 'warning' | 'error';
   className?: string;
 }
@@ -18,7 +17,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   title,
   value,
   change,
-  icon: Icon,
+  icon, // FIXED: No need to rename/destructure as Icon
   color = 'primary',
   className = ''
 }) => {
@@ -31,29 +30,23 @@ export const StatsCard: React.FC<StatsCardProps> = ({
 
   const changeColor = change?.type === 'increase' ? 'text-green-600' : 'text-red-600';
 
-  return (
+  return ( // FIXED: Removed duplicate return statement
     <motion.div
-      whileHover={{ y: -2, scale: 1.02 }}
-      transition={{ duration: 0.2 }}
-      className={`bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 ${className}`}
+      className={`bg-gradient-to-r ${colorClasses[color]} text-white p-6 rounded-xl shadow-lg ${className}`}
+      whileHover={{ scale: 1.05 }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          {change && (
-            <div className="flex items-center mt-2">
-              <span className={`text-sm font-medium ${changeColor}`}>
-                {change.type === 'increase' ? '+' : '-'}{Math.abs(change.value)}%
-              </span>
-              <span className="text-sm text-gray-500 ml-1">vs last month</span>
-            </div>
-          )}
-        </div>
-        <div className={`bg-gradient-to-r ${colorClasses[color]} p-3 rounded-lg`}>
-          <Icon className="h-6 w-6 text-white" />
-        </div>
+      <div className="flex items-center justify-between mb-4">
+        <div>{icon}</div> {/* FIXED: Render the pre-rendered icon directly */}
       </div>
+      <h3 className="text-lg font-semibold mb-1">{title}</h3>
+      <p className="text-3xl font-bold mb-2">{value}</p>
+      {change && (
+        <p className={`text-sm ${changeColor}`}>
+          {change.type === 'increase' ? '+' : '-'}{Math.abs(change.value)}%
+          <span className="ml-1 opacity-75">vs last month</span>
+        </p>
+      )}
     </motion.div>
   );
 };

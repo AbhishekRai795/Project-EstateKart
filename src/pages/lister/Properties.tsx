@@ -15,23 +15,23 @@ export const ListerProperties: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
 
   const filteredProperties = useMemo(() => {
-    const transformed = listerProperties.map(p => ({
-      ...p,
-      images: p.imageUrls?.filter(Boolean) as string[] || [],
-      createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
-      views: p.views || 0,
-      offers: 0,
-      listerName: p.listerName || 'N/A',
-    })) as Property[];
+  const transformed = listerProperties.map(p => ({
+    ...p,
+    images: p.imageUrls?.filter(Boolean) as string[] || [],
+    createdAt: p.createdAt || new Date().toISOString(), // Keep as string
+    views: p.views || 0,
+    offers: 0,
+    listerName: p.listerName || 'N/A',
+  })) as Property[];
 
-    return transformed.filter(property => {
-      const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           property.location.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || property.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [listerProperties, searchQuery, statusFilter]);
 
+     return transformed.filter(property => {
+    const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         property.location.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || property.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+}, [listerProperties, searchQuery, statusFilter]);
   const handleDeleteProperty = (propertyId: string) => {
     if (window.confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
       deletePropertyMutation.mutate(propertyId);

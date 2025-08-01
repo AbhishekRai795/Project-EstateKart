@@ -1,84 +1,157 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, ShoppingCart, TrendingUp, Home as HomeIcon, Star, Sparkles, Plus, Heart } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { PropertyCard } from '../../components/common/PropertyCard';
-import { SearchBar } from '../../components/common/SearchBar';
-import { StatsCard } from '../../components/analytics/StatsCard';
 import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '../../contexts/AuthContext';
+import { Property } from '../../contexts/PropertyContext';
 import {
   useProperties,
   useUserPreferences,
   useToggleCatalogue,
   useToggleFavorite,
 } from '../../hooks/useProperties';
-import { Property } from '../../contexts/PropertyContext'; // Reusing type
+
+import { PropertyCard } from '../../components/common/PropertyCard';
+import { SearchBar } from '../../components/common/SearchBar';
+import { StatsCard } from '../../components/analytics/StatsCard';
+
+
+// --- Functionality from the newer Dashboard ---
+// This function is crucial for ensuring data from the backend is consistent
+// and doesn't cause runtime errors if fields are missing.
+const transformProperty = (property: any): Property => ({
+  ...property,
+  id: property.id || '',
+  title: property.title || 'Untitled Property',
+  description: property.description || '',
+  price: property.price || 0,
+  location: property.location || 'Not specified',
+  bedrooms: property.bedrooms || 0,
+  bathrooms: property.bathrooms || 0,
+  area: property.area || 0,
+  type: property.type || 'house',
+  status: property.status || 'available',
+  ownerId: property.ownerId || '',
+  listerName: property.listerName || 'N/A',
+  images: property.imageUrls?.filter(Boolean) as string[] || [],
+  createdAt: property.createdAt || new Date().toISOString(),
+  views: property.views || 0,
+  features: property.features || [],
+});
 
 export const UserDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Use backend hooks
-  const { data: properties = [], isLoading: isLoadingProperties, error } = useProperties();
-  const { data: preferences, refetch: refetchPreferences, isLoading: isLoadingPreferences } = useUserPreferences();
+  // --- Robust data fetching hooks connected to your backend services ---
+  const {
+    data: properties = [],
+    isLoading: isLoadingProperties,
+    error: propertiesError,
+    refetch: refetchProperties
+  } = useProperties();
+
+  const {
+    data: preferences,
+    refetch: refetchPreferences,
+    isLoading: isLoadingPreferences
+  } = useUserPreferences();
+
   const toggleCatalogue = useToggleCatalogue();
   const toggleFavorite = useToggleFavorite();
 
   // UI State
-  const [, setSelectedPropertyId] = useState('');
+  const [, setSelectedPropertyId] = useState<string>('');
 
-  // Refetch user preferences when the component mounts or the user changes
+  // --- useEffects for robust data handling and component lifecycle ---
   useEffect(() => {
     if (user) {
       refetchPreferences();
     }
   }, [user, refetchPreferences]);
 
-  // Memoize property lists for performance
-  const transformedProperties = React.useMemo(() => properties
-    .filter(property => property.id && property.title)
-    .map(property => ({
-      ...property,
-      images: property.imageUrls?.filter(Boolean) as string[] || [],
-      createdAt: property.createdAt ? new Date(property.createdAt) : new Date(),
-    })), [properties]);
+  useEffect(() => {
+    if (propertiesError) {
+      console.error('Dashboard: Properties loading error:', propertiesError);
+      // Retry fetching after 5 seconds if an error occurs
+      const retryTimer = setTimeout(() => {
+        refetchProperties();
+      }, 5000);
 
-  const recentProperties = React.useMemo(() => transformedProperties
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 6), [transformedProperties]);
+      return () => clearTimeout(retryTimer);
+    }
+  }, [propertiesError, refetchProperties]);
 
-  const recommendedProperties = React.useMemo(() => transformedProperties
-    .filter(p => (p.views || 0) > 10)
-    .sort((a, b) => (b.views || 0) - (a.views || 0))
-    .slice(0, 3), [transformedProperties]);
+  // --- Memoized property lists for performance, using the safe transform function ---
+  const transformedProperties = React.useMemo(() => {
+    if (!properties || properties.length === 0) return [];
+    return properties
+      .filter(property => property?.id && property?.title)
+      .map(transformProperty);
+  }, [properties]);
 
-  const featuredProperties = React.useMemo(() => transformedProperties
-    .filter(p => (p.price || 0) > 500000)
-    .sort((a, b) => (b.price || 0) - (a.price || 0))
-    .slice(0, 3), [transformedProperties]);
+  const recentProperties = React.useMemo(() =>
+    [...transformedProperties]
+      .sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+      })
+      .slice(0, 6),
+    [transformedProperties]
+  );
 
-  // Real-time stats from preferences
+  const recommendedProperties = React.useMemo(() =>
+    [...transformedProperties]
+      .filter(p => (p.views || 0) > 10)
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
+      .slice(0, 3),
+    [transformedProperties]
+  );
+
+  const featuredProperties = React.useMemo(() =>
+    [...transformedProperties]
+      .filter(p => (p.price || 0) > 500000)
+      .sort((a, b) => (b.price || 0) - (a.price || 0))
+      .slice(0, 3),
+    [transformedProperties]
+  );
+
+  // --- Calculate stats from the processed data ---
   const totalProperties = transformedProperties.length;
   const catalogueCount = preferences?.catalogueProperties?.length || 0;
   const favoriteCount = preferences?.favoriteProperties?.length || 0;
 
+  // --- Event Handlers with error handling ---
   const handleSearch = (query: string, filters: any) => {
     const searchParams = new URLSearchParams({ q: query, ...filters });
     navigate(`/user/properties?${searchParams.toString()}`);
   };
 
   const handleCatalogueToggle = async (propertyId: string) => {
-    await toggleCatalogue.mutateAsync(propertyId);
+    try {
+      await toggleCatalogue.mutateAsync(propertyId);
+    } catch (error) {
+      console.error('Dashboard: Error toggling catalogue:', error);
+    }
   };
 
   const handleFavoriteToggle = async (propertyId: string) => {
-    await toggleFavorite.mutateAsync(propertyId);
+    try {
+      await toggleFavorite.mutateAsync(propertyId);
+    } catch (error) {
+      console.error('Dashboard: Error toggling favorite:', error);
+    }
   };
 
   const handleScheduleViewing = (propertyId: string) => {
     setSelectedPropertyId(propertyId);
+    // Navigate to a detailed view or open a modal
+    navigate(`/property/${propertyId}`);
   };
 
+  // --- UI Design from Dashboard (1).tsx ---
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.6, staggerChildren: 0.1 } },
@@ -92,12 +165,20 @@ export const UserDashboard: React.FC = () => {
   const PropertySkeleton = () => (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
       <div className="h-64 bg-gray-200"></div>
-      <div className="p-5"><div className="h-6 bg-gray-200 rounded mb-2"></div><div className="h-4 bg-gray-200 rounded mb-3 w-3/4"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>
+      <div className="p-5">
+        <div className="h-6 bg-gray-200 rounded mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded mb-3 w-3/4"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+      </div>
     </div>
   );
 
-  if (error) return <div>Error loading dashboard. Please refresh.</div>;
   const isLoading = isLoadingProperties || isLoadingPreferences;
+  const displayName = user?.name?.split(' ')[0] || 'User';
+
+  if (propertiesError && !isLoading) {
+      return <div className="flex items-center justify-center h-screen text-red-500">Error loading dashboard data. We are trying to reconnect...</div>;
+  }
 
   return (
     <motion.div
@@ -107,15 +188,14 @@ export const UserDashboard: React.FC = () => {
       className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 md:p-8"
     >
       <div className="max-w-7xl mx-auto">
+        {/* Header section from Dashboard (1).tsx */}
         <motion.div variants={itemVariants} className="mb-12">
           <div className="bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden">
-            {/* Animated background blobs */}
             <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 translate-x-40 animate-blob"></div>
             <div className="absolute bottom-0 left-0 w-60 h-60 bg-white/5 rounded-full translate-y-30 -translate-x-30 animate-blob animation-delay-2000"></div>
-            
             <div className="relative z-10">
               <h1 className="text-4xl font-black mb-4">
-                Welcome back, {user?.name?.split(' ')[0] || 'User'}! 👋
+                Welcome back, {displayName}! 👋
               </h1>
               <p className="text-primary-100 text-xl font-light max-w-2xl mb-6">
                 Discover your perfect property from {totalProperties} amazing listings
@@ -132,13 +212,15 @@ export const UserDashboard: React.FC = () => {
         <motion.div variants={itemVariants} className="mb-12">
           <SearchBar onSearch={handleSearch} loading={isLoading} />
         </motion.div>
-
+        
+        {/* FIX: Reverted to 3-column grid and restored original card colors */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <StatsCard title="Available Properties" value={totalProperties.toString()} icon={TrendingUp} color="primary" />
-          <StatsCard title="Your Catalogue" value={catalogueCount.toString()} icon={ShoppingCart} color="success" />
-          <StatsCard title="Your Favorites" value={favoriteCount.toString()} icon={Star} color="warning" />
+          <StatsCard title="Available Properties" value={totalProperties.toString()} icon={<TrendingUp />} color="primary" />
+          <StatsCard title="Your Catalogue" value={catalogueCount.toString()} icon={<ShoppingCart />} color="success" />
+          <StatsCard title="Your Favorites" value={favoriteCount.toString()} icon={<Star />} color="warning" />
         </motion.div>
 
+        {/* Featured Properties Section */}
         {featuredProperties.length > 0 && (
           <motion.div variants={itemVariants} className="mb-12">
             <div className="flex items-center justify-between mb-8">
@@ -148,18 +230,19 @@ export const UserDashboard: React.FC = () => {
               </div>
               <button onClick={() => navigate('/user/properties?featured=true')} className="text-primary-600 hover:text-primary-700 font-medium transition-colors">View all featured →</button>
             </div>
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{[...Array(3)].map((_, i) => <PropertySkeleton key={i} />)}</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {featuredProperties.map(p => (
-                  <PropertyCard key={p.id} property={p as unknown as Property} onCatalogueToggle={handleCatalogueToggle} isInCatalogue={preferences?.catalogueProperties?.includes(p.id)} onFavoriteToggle={handleFavoriteToggle} isFavorite={preferences?.favoriteProperties?.includes(p.id)} onScheduleViewing={handleScheduleViewing} />
-                ))}
-              </div>
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {isLoading ? (
+                [...Array(3)].map((_, i) => <PropertySkeleton key={i} />)
+              ) : (
+                featuredProperties.map(p => (
+                  <PropertyCard key={p.id} property={p} onCatalogueToggle={() => handleCatalogueToggle(p.id)} isInCatalogue={preferences?.catalogueProperties?.includes(p.id)} onFavoriteToggle={() => handleFavoriteToggle(p.id)} isFavorite={preferences?.favoriteProperties?.includes(p.id)} onScheduleViewing={() => handleScheduleViewing(p.id)} />
+                ))
+              )}
+            </div>
           </motion.div>
         )}
 
+        {/* Recommended Properties Section */}
         {recommendedProperties.length > 0 && (
           <motion.div variants={itemVariants} className="mb-12">
             <div className="flex items-center justify-between mb-8">
@@ -169,18 +252,19 @@ export const UserDashboard: React.FC = () => {
               </div>
               <button onClick={() => navigate('/user/recommendations')} className="text-primary-600 hover:text-primary-700 font-medium transition-colors">View all recommendations →</button>
             </div>
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{[...Array(3)].map((_, i) => <PropertySkeleton key={i} />)}</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recommendedProperties.map(p => (
-                  <PropertyCard key={p.id} property={p as unknown as Property} onCatalogueToggle={handleCatalogueToggle} isInCatalogue={preferences?.catalogueProperties?.includes(p.id)} onFavoriteToggle={handleFavoriteToggle} isFavorite={preferences?.favoriteProperties?.includes(p.id)} onScheduleViewing={handleScheduleViewing} />
-                ))}
-              </div>
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {isLoading ? (
+                [...Array(3)].map((_, i) => <PropertySkeleton key={i} />)
+              ) : (
+                recommendedProperties.map(p => (
+                  <PropertyCard key={p.id} property={p} onCatalogueToggle={() => handleCatalogueToggle(p.id)} isInCatalogue={preferences?.catalogueProperties?.includes(p.id)} onFavoriteToggle={() => handleFavoriteToggle(p.id)} isFavorite={preferences?.favoriteProperties?.includes(p.id)} onScheduleViewing={() => handleScheduleViewing(p.id)} />
+                ))
+              )}
+            </div>
           </motion.div>
         )}
 
+        {/* Recently Added Section */}
         <motion.div variants={itemVariants} className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -189,15 +273,15 @@ export const UserDashboard: React.FC = () => {
             </div>
             <button onClick={() => navigate('/user/properties')} className="text-primary-600 hover:text-primary-700 font-medium transition-colors">View all properties →</button>
           </div>
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{[...Array(6)].map((_, i) => <PropertySkeleton key={i} />)}</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recentProperties.map(p => (
-                <PropertyCard key={p.id} property={p as unknown as Property} onCatalogueToggle={handleCatalogueToggle} isInCatalogue={preferences?.catalogueProperties?.includes(p.id)} onFavoriteToggle={handleFavoriteToggle} isFavorite={preferences?.favoriteProperties?.includes(p.id)} onScheduleViewing={handleScheduleViewing} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {isLoading && recentProperties.length === 0 ? (
+              [...Array(6)].map((_, i) => <PropertySkeleton key={i} />)
+            ) : (
+              recentProperties.map(p => (
+                <PropertyCard key={p.id} property={p} onCatalogueToggle={() => handleCatalogueToggle(p.id)} isInCatalogue={preferences?.catalogueProperties?.includes(p.id)} onFavoriteToggle={() => handleFavoriteToggle(p.id)} isFavorite={preferences?.favoriteProperties?.includes(p.id)} onScheduleViewing={() => handleScheduleViewing(p.id)} />
+              ))
+            )}
+          </div>
         </motion.div>
 
         {/* Quick Actions Section */}

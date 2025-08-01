@@ -11,7 +11,34 @@ import {
   useToggleFavorite,
   useUserPreferences,
 } from '../../hooks/useProperties';
-import { Property } from '../../contexts/PropertyContext'; // Reusing type
+import type { Schema } from '../../../amplify/data/resource';
+import { Property } from '../../contexts/PropertyContext'; // Import the frontend Property type
+
+// --- FIX FOR MISSING IMAGES ---
+// This function acts as a translator. It takes the raw data from your backend
+// and ensures it matches the 'Property' interface your frontend components expect.
+// Most importantly, it maps the `imageUrls` array from the backend to the `images`
+// array that the PropertyCard component needs.
+const transformProperty = (property: Schema['Property']['type'] & { imageUrls?: string[] }): Property => ({
+  id: property.id,
+  title: property.title || 'Untitled Property',
+  description: property.description || '',
+  price: property.price || 0,
+  location: property.location || 'N/A',
+  bedrooms: property.bedrooms || 0,
+  bathrooms: property.bathrooms || 0,
+  area: property.area || 0,
+  type: property.type || 'house',
+  status: property.status || 'available',
+  ownerId: property.ownerId,
+  listerName: property.listerName || 'N/A',
+  // This is the key mapping:
+  images: property.imageUrls?.filter(Boolean) as string[] || [],
+  createdAt: property.createdAt || new Date().toISOString(),
+  views: property.views || 0,
+  features: property.features || [],
+});
+
 
 export const UserProperties: React.FC = () => {
   const { user } = useAuth();
@@ -21,11 +48,14 @@ export const UserProperties: React.FC = () => {
   const toggleCatalogue = useToggleCatalogue();
   const toggleFavorite = useToggleFavorite();
 
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
+  const [viewMode] = useState<'grid' | 'list'>('grid');
+  // This state now holds the correctly shaped 'Property' type
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [selectedPropertyId, setSelectedPropertyId] = useState('');
+  // This state also holds the correctly shaped 'Property' type
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  
   const [scheduleForm, setScheduleForm] = useState({
     date: '',
     time: '',
@@ -35,58 +65,50 @@ export const UserProperties: React.FC = () => {
     phone: ''
   });
 
+  // This useEffect now transforms the data as soon as it arrives from the backend.
   useEffect(() => {
     if (properties) {
-      const transformedProperties = properties
-        .filter(property => property.id && property.title)
-        .map(property => ({
-          ...property,
-          images: property.imageUrls?.filter(Boolean) || [],
-          createdAt: property.createdAt ? new Date(property.createdAt) : new Date(),
-        }));
-      setFilteredProperties(transformedProperties);
+      const transformed = properties.map(transformProperty);
+      setFilteredProperties(transformed);
     }
   }, [properties]);
 
-  const handleSearch = (query: string, filters: any) => {
+  const handleSearch = (query: string) => {
     setIsSearching(true);
-    let masterList = properties.map(p => ({ ...p, images: p.imageUrls?.filter(Boolean) || [] }));
+    // Ensure we start with the full, transformed list of properties
+    const masterList = (properties || []).map(transformProperty);
     
     let localFiltered = masterList;
 
     if (query) {
       localFiltered = localFiltered.filter(property =>
-        property.title?.toLowerCase().includes(query.toLowerCase()) ||
-        property.description?.toLowerCase().includes(query.toLowerCase()) ||
-        property.location?.toLowerCase().includes(query.toLowerCase())
+        property.title.toLowerCase().includes(query.toLowerCase()) ||
+        property.description.toLowerCase().includes(query.toLowerCase()) ||
+        property.location.toLowerCase().includes(query.toLowerCase())
       );
     }
-    // Implement other filters as needed
     setFilteredProperties(localFiltered);
     setIsSearching(false);
   };
 
-  // FIX: Added the missing handler function for scheduling a viewing
   const handleScheduleViewing = (propertyId: string) => {
-    setSelectedPropertyId(propertyId);
-    setShowScheduleModal(true);
+    const propertyToSchedule = filteredProperties.find(p => p.id === propertyId);
+    if(propertyToSchedule) {
+        setSelectedProperty(propertyToSchedule);
+        setShowScheduleModal(true);
+    }
   };
 
   const handleScheduleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const property = filteredProperties.find(p => p.id === selectedPropertyId);
-    if (!property) return;
+    if (!selectedProperty) return;
     
     try {
       await scheduleViewing.mutateAsync({
-        propertyId: selectedPropertyId,
-        clientName: scheduleForm.name,
-        clientEmail: scheduleForm.email,
-        clientPhone: scheduleForm.phone,
-        date: scheduleForm.date,
-        time: scheduleForm.time,
+        propertyId: selectedProperty.id,
+        propertyOwnerId: selectedProperty.ownerId,
+        scheduledAt: new Date(`${scheduleForm.date}T${scheduleForm.time}`).toISOString(),
         message: scheduleForm.message,
-        listerId: property.listerId,
       });
       alert('Viewing scheduled successfully!');
       setShowScheduleModal(false);
@@ -136,7 +158,6 @@ export const UserProperties: React.FC = () => {
               )}
             </span>
           </div>
-          {/* Sorting and View Mode controls... */}
         </motion.div>
 
         <motion.div variants={itemVariants}>
@@ -147,20 +168,18 @@ export const UserProperties: React.FC = () => {
               {filteredProperties.map((property) => (
                 <PropertyCard
                   key={property.id}
-                  property={property as unknown as Property}
-                  viewMode={viewMode}
-                  onCatalogueToggle={toggleCatalogue.mutate}
+                  property={property} // No more 'as any' needed!
+                  onCatalogueToggle={() => toggleCatalogue.mutate(property.id)}
                   isInCatalogue={preferences?.catalogueProperties?.includes(property.id)}
-                  onFavoriteToggle={toggleFavorite.mutate}
+                  onFavoriteToggle={() => toggleFavorite.mutate(property.id)}
                   isFavorite={preferences?.favoriteProperties?.includes(property.id)}
-                  onScheduleViewing={handleScheduleViewing} // FIX: Passing the correct handler function
+                  onScheduleViewing={handleScheduleViewing}
                 />
               ))}
             </div>
           )}
         </motion.div>
 
-        {/* Schedule Viewing Modal */}
         {showScheduleModal && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <motion.div

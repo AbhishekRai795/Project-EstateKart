@@ -373,19 +373,7 @@
       "attributeType": "S"
      },
      {
-      "attributeName": "type",
-      "attributeType": "S"
-     },
-     {
-      "attributeName": "status",
-      "attributeType": "S"
-     },
-     {
-      "attributeName": "listerId",
-      "attributeType": "S"
-     },
-     {
-      "attributeName": "createdAt",
+      "attributeName": "ownerId",
       "attributeType": "S"
      }
     ],
@@ -397,94 +385,10 @@
     ],
     "globalSecondaryIndexes": [
      {
-      "indexName": "propertiesByType",
+      "indexName": "gsi-User.properties",
       "keySchema": [
        {
-        "attributeName": "type",
-        "keyType": "HASH"
-       }
-      ],
-      "projection": {
-       "projectionType": "ALL"
-      },
-      "provisionedThroughput": {
-       "Fn::If": [
-        "ShouldUsePayPerRequestBilling",
-        {
-         "Ref": "AWS::NoValue"
-        },
-        {
-         "ReadCapacityUnits": {
-          "Ref": "DynamoDBModelTableReadIOPS"
-         },
-         "WriteCapacityUnits": {
-          "Ref": "DynamoDBModelTableWriteIOPS"
-         }
-        }
-       ]
-      }
-     },
-     {
-      "indexName": "propertiesByStatus",
-      "keySchema": [
-       {
-        "attributeName": "status",
-        "keyType": "HASH"
-       }
-      ],
-      "projection": {
-       "projectionType": "ALL"
-      },
-      "provisionedThroughput": {
-       "Fn::If": [
-        "ShouldUsePayPerRequestBilling",
-        {
-         "Ref": "AWS::NoValue"
-        },
-        {
-         "ReadCapacityUnits": {
-          "Ref": "DynamoDBModelTableReadIOPS"
-         },
-         "WriteCapacityUnits": {
-          "Ref": "DynamoDBModelTableWriteIOPS"
-         }
-        }
-       ]
-      }
-     },
-     {
-      "indexName": "propertiesByListerId",
-      "keySchema": [
-       {
-        "attributeName": "listerId",
-        "keyType": "HASH"
-       }
-      ],
-      "projection": {
-       "projectionType": "ALL"
-      },
-      "provisionedThroughput": {
-       "Fn::If": [
-        "ShouldUsePayPerRequestBilling",
-        {
-         "Ref": "AWS::NoValue"
-        },
-        {
-         "ReadCapacityUnits": {
-          "Ref": "DynamoDBModelTableReadIOPS"
-         },
-         "WriteCapacityUnits": {
-          "Ref": "DynamoDBModelTableWriteIOPS"
-         }
-        }
-       ]
-      }
-     },
-     {
-      "indexName": "propertiesByCreatedAt",
-      "keySchema": [
-       {
-        "attributeName": "createdAt",
+        "attributeName": "ownerId",
         "keyType": "HASH"
        }
       ],
@@ -731,28 +635,6 @@
     "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/PropertyDataSource/Resource"
    }
   },
-  "QuerygetPropertypreAuth0FunctionQuerygetPropertypreAuth0FunctionAppSyncFunction2F4573D0": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QuerygetPropertypreAuth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/ffc597e18023b530e6afcbe02cee647d49550fa9e77bd06f1dee09d8b1be8de3.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerygetPropertypreAuth0Function/QuerygetPropertypreAuth0Function.AppSyncFunction"
-   }
-  },
   "QuerygetPropertyauth0FunctionQuerygetPropertyauth0FunctionAppSyncFunctionE86BEB0B": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
@@ -765,7 +647,7 @@
     "FunctionVersion": "2018-05-29",
     "Name": "QuerygetPropertyauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/62baca1d1fe8e93eb394d958513556ffc536c35fde7d8fba84f4af8dd76705da.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/52811fcf3d424ade016c7931a047790834026a2ed2418ada96c1656dad27d8b1.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
@@ -837,12 +719,6 @@
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
-      {
-       "Fn::GetAtt": [
-        "QuerygetPropertypreAuth0FunctionQuerygetPropertypreAuth0FunctionAppSyncFunction2F4573D0",
-        "FunctionId"
-       ]
-      },
       {
        "Fn::GetAtt": [
         "QuerygetPropertyauth0FunctionQuerygetPropertyauth0FunctionAppSyncFunctionE86BEB0B",
@@ -939,28 +815,6 @@
     "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/queryGetPropertyResolver"
    }
   },
-  "QuerylistPropertiespreAuth0FunctionQuerylistPropertiespreAuth0FunctionAppSyncFunctionEF86E0CE": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistPropertiespreAuth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/3e81312d4c75951808eda9fcd5f854c1925c0b819de0939f09c4fe2eebb190b8.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiespreAuth0Function/QuerylistPropertiespreAuth0Function.AppSyncFunction"
-   }
-  },
   "QuerylistPropertiesauth0FunctionQuerylistPropertiesauth0FunctionAppSyncFunctionFB70E442": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
@@ -973,7 +827,7 @@
     "FunctionVersion": "2018-05-29",
     "Name": "QuerylistPropertiesauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/62baca1d1fe8e93eb394d958513556ffc536c35fde7d8fba84f4af8dd76705da.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/52811fcf3d424ade016c7931a047790834026a2ed2418ada96c1656dad27d8b1.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
@@ -1045,12 +899,6 @@
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
-      {
-       "Fn::GetAtt": [
-        "QuerylistPropertiespreAuth0FunctionQuerylistPropertiespreAuth0FunctionAppSyncFunctionEF86E0CE",
-        "FunctionId"
-       ]
-      },
       {
        "Fn::GetAtt": [
         "QuerylistPropertiesauth0FunctionQuerylistPropertiesauth0FunctionAppSyncFunctionFB70E442",
@@ -1169,28 +1017,6 @@
     "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationcreatePropertyinit0Function/MutationcreatePropertyinit0Function.AppSyncFunction"
    }
   },
-  "MutationcreatePropertypreAuth0FunctionMutationcreatePropertypreAuth0FunctionAppSyncFunction4E4B41CE": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreatePropertypreAuth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/39fb35c6f8e8573ffe3a63ba867cf543b05af129a104b387a44f03c3d85da0c3.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationcreatePropertypreAuth0Function/MutationcreatePropertypreAuth0Function.AppSyncFunction"
-   }
-  },
   "MutationcreatePropertyauth0FunctionMutationcreatePropertyauth0FunctionAppSyncFunction429EB534": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
@@ -1203,7 +1029,7 @@
     "FunctionVersion": "2018-05-29",
     "Name": "MutationcreatePropertyauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e29c08fe4aa10018d9af219da17407c3ac5b0eba794284dd1410c56366cc06f1.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6348d22271c9d0bcf519b0878f0e0ececd202ee9b61589330f1d081cdf070e5b.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
@@ -1250,7 +1076,7 @@
     "FunctionVersion": "2018-05-29",
     "Name": "MutationCreatePropertyDataResolverFn",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/5e89b72258fd23d8b99f9767ee5905c18343adf6146c3add69204ef98761fce3.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/793c0a7c3b3605f1ffd704fb8cfb59cfdb320efe2ec1c07c4f1e4a6b56cb7ce1.vtl"
     },
     "ResponseMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f4a52b72209a9dfa197b5e7367a5c378c5bb86de6e29ddd9e48b49a3fe54b249.vtl"
@@ -1278,12 +1104,6 @@
       {
        "Fn::GetAtt": [
         "MutationcreatePropertyinit0FunctionMutationcreatePropertyinit0FunctionAppSyncFunctionB31B9C4B",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "MutationcreatePropertypreAuth0FunctionMutationcreatePropertypreAuth0FunctionAppSyncFunction4E4B41CE",
         "FunctionId"
        ]
       },
@@ -1405,28 +1225,6 @@
     "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationupdatePropertyinit0Function/MutationupdatePropertyinit0Function.AppSyncFunction"
    }
   },
-  "MutationupdatePropertypreAuth0FunctionMutationupdatePropertypreAuth0FunctionAppSyncFunction18FC12D3": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdatePropertypreAuth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/39fb35c6f8e8573ffe3a63ba867cf543b05af129a104b387a44f03c3d85da0c3.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationupdatePropertypreAuth0Function/MutationupdatePropertypreAuth0Function.AppSyncFunction"
-   }
-  },
   "MutationupdatePropertyauth0FunctionMutationupdatePropertyauth0FunctionAppSyncFunction0145B39F": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
@@ -1445,7 +1243,7 @@
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
     },
     "ResponseMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/7bb75f16550188a95899fa3f6f76a999bdb4aaf1705ebe92471ff61c6ed476bd.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/45c7114e5818ab775d0f3eb9ef0dbfd25d4429af53fb352cd97d33df96edbc22.vtl"
     }
    },
    "DependsOn": [
@@ -1522,12 +1320,6 @@
       {
        "Fn::GetAtt": [
         "MutationupdatePropertyinit0FunctionMutationupdatePropertyinit0FunctionAppSyncFunctionBCE5C953",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "MutationupdatePropertypreAuth0FunctionMutationupdatePropertypreAuth0FunctionAppSyncFunction18FC12D3",
         "FunctionId"
        ]
       },
@@ -1627,28 +1419,6 @@
     "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/mutationUpdatePropertyResolver"
    }
   },
-  "MutationdeletePropertypreAuth0FunctionMutationdeletePropertypreAuth0FunctionAppSyncFunction7C6CF5FC": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "MutationdeletePropertypreAuth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a2c0f8a4d76f659d130c8a445801845ae9d33e5cc2c5ecd610edc272d4bd46e3.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/MutationdeletePropertypreAuth0Function/MutationdeletePropertypreAuth0Function.AppSyncFunction"
-   }
-  },
   "MutationdeletePropertyauth0FunctionMutationdeletePropertyauth0FunctionAppSyncFunctionE47E0E54": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
@@ -1667,7 +1437,7 @@
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
     },
     "ResponseMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6257bfd1ef2992bd01df135516c0df15c5ff692f426e0c71c93960be8f8c81df.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/d66c8a8d9695828e21f84b49ab5d6f109c98954e2a0b61cd07bb4eeb35d2821e.vtl"
     }
    },
    "DependsOn": [
@@ -1741,12 +1511,6 @@
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
-      {
-       "Fn::GetAtt": [
-        "MutationdeletePropertypreAuth0FunctionMutationdeletePropertypreAuth0FunctionAppSyncFunction7C6CF5FC",
-        "FunctionId"
-       ]
-      },
       {
        "Fn::GetAtt": [
         "MutationdeletePropertyauth0FunctionMutationdeletePropertyauth0FunctionAppSyncFunctionE47E0E54",
@@ -1855,7 +1619,7 @@
     "FunctionVersion": "2018-05-29",
     "Name": "SubscriptiononCreatePropertyauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/616d9084d37a5192e6c798ff5243c52f88c11adb3c7a2424c4a4948cbfa78618.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/595c761acee27d00db8ec5beafee2b49c5a815e75a06e26ba5f2e1ce7e36dfb1.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
@@ -2002,7 +1766,7 @@
     "FunctionVersion": "2018-05-29",
     "Name": "SubscriptiononUpdatePropertyauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/616d9084d37a5192e6c798ff5243c52f88c11adb3c7a2424c4a4948cbfa78618.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/595c761acee27d00db8ec5beafee2b49c5a815e75a06e26ba5f2e1ce7e36dfb1.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
@@ -2149,7 +1913,7 @@
     "FunctionVersion": "2018-05-29",
     "Name": "SubscriptiononDeletePropertyauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/616d9084d37a5192e6c798ff5243c52f88c11adb3c7a2424c4a4948cbfa78618.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/595c761acee27d00db8ec5beafee2b49c5a815e75a06e26ba5f2e1ce7e36dfb1.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
@@ -2284,7 +2048,7 @@
     "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/subscriptionOnDeletePropertyResolver"
    }
   },
-  "QuerylistPropertiesByTypeauth0FunctionQuerylistPropertiesByTypeauth0FunctionAppSyncFunction27B934F4": {
+  "PropertyOwnerIdDataResolverFnPropertyOwnerIdDataResolverFnAppSyncFunction36F6FEE7": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -2294,753 +2058,33 @@
      "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistPropertiesByTypeauth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/62baca1d1fe8e93eb394d958513556ffc536c35fde7d8fba84f4af8dd76705da.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByTypeauth0Function/QuerylistPropertiesByTypeauth0Function.AppSyncFunction"
-   }
-  },
-  "QuerylistPropertiesByTypepostAuth0FunctionQuerylistPropertiesByTypepostAuth0FunctionAppSyncFunction1EFDB4C7": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistPropertiesByTypepostAuth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByTypepostAuth0Function/QuerylistPropertiesByTypepostAuth0Function.AppSyncFunction"
-   }
-  },
-  "QueryListPropertiesByTypeDataResolverFnQueryListPropertiesByTypeDataResolverFnAppSyncFunction3AB6DE79": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Fn::GetAtt": [
-      "PropertyDataSource",
-      "Name"
-     ]
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QueryListPropertiesByTypeDataResolverFn",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe9ecfc8bea84a4c393869abf103927041f92ef3d83abd9757558bebd7e3627f.vtl"
-    },
-    "ResponseMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/098c998f215c333f57348ca8912f66057ae6b574fe34013033dc54362ee2372c.vtl"
-    }
-   },
-   "DependsOn": [
-    "PropertyDataSource"
-   ],
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QueryListPropertiesByTypeDataResolverFn/QueryListPropertiesByTypeDataResolverFn.AppSyncFunction"
-   }
-  },
-  "QuerylistPropertiesByTypeResolver": {
-   "Type": "AWS::AppSync::Resolver",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "FieldName": "listPropertiesByType",
-    "Kind": "PIPELINE",
-    "PipelineConfig": {
-     "Functions": [
-      {
-       "Fn::GetAtt": [
-        "QuerylistPropertiesByTypeauth0FunctionQuerylistPropertiesByTypeauth0FunctionAppSyncFunction27B934F4",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "QuerylistPropertiesByTypepostAuth0FunctionQuerylistPropertiesByTypepostAuth0FunctionAppSyncFunction1EFDB4C7",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "QueryListPropertiesByTypeDataResolverFnQueryListPropertiesByTypeDataResolverFnAppSyncFunction3AB6DE79",
-        "FunctionId"
-       ]
-      }
-     ]
-    },
-    "RequestMappingTemplate": {
-     "Fn::Join": [
-      "",
-      [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listPropertiesByType\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
-       {
-        "Fn::Select": [
-         1,
-         {
-          "Fn::Split": [
-           "/",
-           {
-            "Fn::Select": [
-             5,
-             {
-              "Fn::Split": [
-               ":",
-               {
-                "Fn::GetAtt": [
-                 "PropertyTable",
-                 "TableArn"
-                ]
-               }
-              ]
-             }
-            ]
-           }
-          ]
-         }
-        ]
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":sts::",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":assumed-role/",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthauthenticatedUserRoleE01FD7B7Ref"
-       },
-       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":sts::",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":assumed-role/",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthunauthenticatedUserRoleD844DC78Ref"
-       },
-       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef"
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
-      ]
-     ]
-    },
-    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
-    "TypeName": "Query"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/queryListPropertiesByTypeResolver"
-   }
-  },
-  "QuerylistPropertiesByStatusauth0FunctionQuerylistPropertiesByStatusauth0FunctionAppSyncFunctionDB9B91EB": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistPropertiesByStatusauth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/62baca1d1fe8e93eb394d958513556ffc536c35fde7d8fba84f4af8dd76705da.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByStatusauth0Function/QuerylistPropertiesByStatusauth0Function.AppSyncFunction"
-   }
-  },
-  "QuerylistPropertiesByStatuspostAuth0FunctionQuerylistPropertiesByStatuspostAuth0FunctionAppSyncFunction2C06C0E4": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistPropertiesByStatuspostAuth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByStatuspostAuth0Function/QuerylistPropertiesByStatuspostAuth0Function.AppSyncFunction"
-   }
-  },
-  "QueryListPropertiesByStatusDataResolverFnQueryListPropertiesByStatusDataResolverFnAppSyncFunction042D2E5D": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Fn::GetAtt": [
-      "PropertyDataSource",
-      "Name"
-     ]
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QueryListPropertiesByStatusDataResolverFn",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e6aec8d04ef2f7531c814a2e5d8592b5d5d2e0f81cd4c4ce83de06ad81d5e189.vtl"
-    },
-    "ResponseMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/098c998f215c333f57348ca8912f66057ae6b574fe34013033dc54362ee2372c.vtl"
-    }
-   },
-   "DependsOn": [
-    "PropertyDataSource"
-   ],
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QueryListPropertiesByStatusDataResolverFn/QueryListPropertiesByStatusDataResolverFn.AppSyncFunction"
-   }
-  },
-  "QuerylistPropertiesByStatusResolver": {
-   "Type": "AWS::AppSync::Resolver",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "FieldName": "listPropertiesByStatus",
-    "Kind": "PIPELINE",
-    "PipelineConfig": {
-     "Functions": [
-      {
-       "Fn::GetAtt": [
-        "QuerylistPropertiesByStatusauth0FunctionQuerylistPropertiesByStatusauth0FunctionAppSyncFunctionDB9B91EB",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "QuerylistPropertiesByStatuspostAuth0FunctionQuerylistPropertiesByStatuspostAuth0FunctionAppSyncFunction2C06C0E4",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "QueryListPropertiesByStatusDataResolverFnQueryListPropertiesByStatusDataResolverFnAppSyncFunction042D2E5D",
-        "FunctionId"
-       ]
-      }
-     ]
-    },
-    "RequestMappingTemplate": {
-     "Fn::Join": [
-      "",
-      [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listPropertiesByStatus\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
-       {
-        "Fn::Select": [
-         1,
-         {
-          "Fn::Split": [
-           "/",
-           {
-            "Fn::Select": [
-             5,
-             {
-              "Fn::Split": [
-               ":",
-               {
-                "Fn::GetAtt": [
-                 "PropertyTable",
-                 "TableArn"
-                ]
-               }
-              ]
-             }
-            ]
-           }
-          ]
-         }
-        ]
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":sts::",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":assumed-role/",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthauthenticatedUserRoleE01FD7B7Ref"
-       },
-       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":sts::",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":assumed-role/",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthunauthenticatedUserRoleD844DC78Ref"
-       },
-       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef"
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
-      ]
-     ]
-    },
-    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
-    "TypeName": "Query"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/queryListPropertiesByStatusResolver"
-   }
-  },
-  "QuerylistPropertiesByListerauth0FunctionQuerylistPropertiesByListerauth0FunctionAppSyncFunction5D5ECE7D": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistPropertiesByListerauth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/62baca1d1fe8e93eb394d958513556ffc536c35fde7d8fba84f4af8dd76705da.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByListerauth0Function/QuerylistPropertiesByListerauth0Function.AppSyncFunction"
-   }
-  },
-  "QuerylistPropertiesByListerpostAuth0FunctionQuerylistPropertiesByListerpostAuth0FunctionAppSyncFunction5BAFF823": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistPropertiesByListerpostAuth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByListerpostAuth0Function/QuerylistPropertiesByListerpostAuth0Function.AppSyncFunction"
-   }
-  },
-  "QueryListPropertiesByListerDataResolverFnQueryListPropertiesByListerDataResolverFnAppSyncFunctionB83C1211": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Fn::GetAtt": [
-      "PropertyDataSource",
-      "Name"
-     ]
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QueryListPropertiesByListerDataResolverFn",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/511dd2729abb03b96ddd91b7d12b26c81b6908e649c907dfeea9e83f0faf1685.vtl"
-    },
-    "ResponseMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/098c998f215c333f57348ca8912f66057ae6b574fe34013033dc54362ee2372c.vtl"
-    }
-   },
-   "DependsOn": [
-    "PropertyDataSource"
-   ],
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QueryListPropertiesByListerDataResolverFn/QueryListPropertiesByListerDataResolverFn.AppSyncFunction"
-   }
-  },
-  "QuerylistPropertiesByListerResolver": {
-   "Type": "AWS::AppSync::Resolver",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "FieldName": "listPropertiesByLister",
-    "Kind": "PIPELINE",
-    "PipelineConfig": {
-     "Functions": [
-      {
-       "Fn::GetAtt": [
-        "QuerylistPropertiesByListerauth0FunctionQuerylistPropertiesByListerauth0FunctionAppSyncFunction5D5ECE7D",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "QuerylistPropertiesByListerpostAuth0FunctionQuerylistPropertiesByListerpostAuth0FunctionAppSyncFunction5BAFF823",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "QueryListPropertiesByListerDataResolverFnQueryListPropertiesByListerDataResolverFnAppSyncFunctionB83C1211",
-        "FunctionId"
-       ]
-      }
-     ]
-    },
-    "RequestMappingTemplate": {
-     "Fn::Join": [
-      "",
-      [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listPropertiesByLister\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
-       {
-        "Fn::Select": [
-         1,
-         {
-          "Fn::Split": [
-           "/",
-           {
-            "Fn::Select": [
-             5,
-             {
-              "Fn::Split": [
-               ":",
-               {
-                "Fn::GetAtt": [
-                 "PropertyTable",
-                 "TableArn"
-                ]
-               }
-              ]
-             }
-            ]
-           }
-          ]
-         }
-        ]
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":sts::",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":assumed-role/",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthauthenticatedUserRoleE01FD7B7Ref"
-       },
-       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":sts::",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":assumed-role/",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthunauthenticatedUserRoleD844DC78Ref"
-       },
-       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef"
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
-      ]
-     ]
-    },
-    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
-    "TypeName": "Query"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/queryListPropertiesByListerResolver"
-   }
-  },
-  "QuerylistPropertiesByDateauth0FunctionQuerylistPropertiesByDateauth0FunctionAppSyncFunction6E50E1AA": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistPropertiesByDateauth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/62baca1d1fe8e93eb394d958513556ffc536c35fde7d8fba84f4af8dd76705da.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByDateauth0Function/QuerylistPropertiesByDateauth0Function.AppSyncFunction"
-   }
-  },
-  "QuerylistPropertiesByDatepostAuth0FunctionQuerylistPropertiesByDatepostAuth0FunctionAppSyncFunction00AEBBB2": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistPropertiesByDatepostAuth0Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QuerylistPropertiesByDatepostAuth0Function/QuerylistPropertiesByDatepostAuth0Function.AppSyncFunction"
-   }
-  },
-  "QueryListPropertiesByDateDataResolverFnQueryListPropertiesByDateDataResolverFnAppSyncFunction8D3233C4": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Fn::GetAtt": [
-      "PropertyDataSource",
-      "Name"
-     ]
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "QueryListPropertiesByDateDataResolverFn",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/24ef7f462b16cf3bf930c08037ee39a0752625feb83d4abc2cd55fd04b0ead76.vtl"
-    },
-    "ResponseMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/098c998f215c333f57348ca8912f66057ae6b574fe34013033dc54362ee2372c.vtl"
-    }
-   },
-   "DependsOn": [
-    "PropertyDataSource"
-   ],
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/QueryListPropertiesByDateDataResolverFn/QueryListPropertiesByDateDataResolverFn.AppSyncFunction"
-   }
-  },
-  "QuerylistPropertiesByDateResolver": {
-   "Type": "AWS::AppSync::Resolver",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "FieldName": "listPropertiesByDate",
-    "Kind": "PIPELINE",
-    "PipelineConfig": {
-     "Functions": [
-      {
-       "Fn::GetAtt": [
-        "QuerylistPropertiesByDateauth0FunctionQuerylistPropertiesByDateauth0FunctionAppSyncFunction6E50E1AA",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "QuerylistPropertiesByDatepostAuth0FunctionQuerylistPropertiesByDatepostAuth0FunctionAppSyncFunction00AEBBB2",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "QueryListPropertiesByDateDataResolverFnQueryListPropertiesByDateDataResolverFnAppSyncFunction8D3233C4",
-        "FunctionId"
-       ]
-      }
-     ]
-    },
-    "RequestMappingTemplate": {
-     "Fn::Join": [
-      "",
-      [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listPropertiesByDate\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
-       {
-        "Fn::Select": [
-         1,
-         {
-          "Fn::Split": [
-           "/",
-           {
-            "Fn::Select": [
-             5,
-             {
-              "Fn::Split": [
-               ":",
-               {
-                "Fn::GetAtt": [
-                 "PropertyTable",
-                 "TableArn"
-                ]
-               }
-              ]
-             }
-            ]
-           }
-          ]
-         }
-        ]
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":sts::",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":assumed-role/",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthauthenticatedUserRoleE01FD7B7Ref"
-       },
-       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":sts::",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":assumed-role/",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthunauthenticatedUserRoleD844DC78Ref"
-       },
-       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
-       {
-        "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authNestedStackauthNestedStackResource2CEA4725Outputsamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthIdentityPoolD2F1536ERef"
-       },
-       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
-      ]
-     ]
-    },
-    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
-    "TypeName": "Query"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/queryListPropertiesByDateResolver"
-   }
-  },
-  "PropertyOwnerDataResolverFnPropertyOwnerDataResolverFnAppSyncFunction1CAB95F5": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPINONEDSE91EB9CDName"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "PropertyOwnerDataResolverFn",
+    "Name": "PropertyOwnerIdDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/041534e5fd916595f752318f161512d7c7f83b9f2cf32d0f0be381c12253ff68.vtl"
     },
     "ResponseMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/064303962e481067b44300212516363b99aaee539b6bafaf756fdd83ff0b60f0.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/cbc59e0f0f8a827a85bed0784fac3750e9690c8fea35769220123cae818bfb6c.vtl"
     }
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/PropertyOwnerDataResolverFn/PropertyOwnerDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/PropertyOwnerIdDataResolverFn/PropertyOwnerIdDataResolverFn.AppSyncFunction"
    }
   },
-  "PropertyownerResolver": {
+  "PropertyownerIdResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
     },
-    "FieldName": "owner",
+    "FieldName": "ownerId",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "PropertyOwnerDataResolverFnPropertyOwnerDataResolverFnAppSyncFunction1CAB95F5",
+        "PropertyOwnerIdDataResolverFnPropertyOwnerIdDataResolverFnAppSyncFunction36F6FEE7",
         "FunctionId"
        ]
       }
@@ -3050,7 +2094,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Property\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"owner\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Property\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"ownerId\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataGraphQLAPI9EC0B84AApiId"
        },
@@ -3092,7 +2136,7 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/propertyOwnerResolver"
+    "aws:cdk:path": "amplify-realestatemanagementplatform-abhishekrai-sandbox-1ffda5cc38/data/amplifyData/Property/propertyOwnerIdResolver"
    }
   },
   "CDKMetadata": {
@@ -3155,6 +2199,22 @@
       ]
      ]
     }
+   }
+  },
+  "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyPropertyDataSource0CFD1133Name": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PropertyDataSource",
+     "Name"
+    ]
+   }
+  },
+  "amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38dataamplifyDataPropertyPropertyTableCD879777TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PropertyTable",
+     "TableArn"
+    ]
    }
   }
  }

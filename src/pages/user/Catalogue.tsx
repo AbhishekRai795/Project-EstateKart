@@ -10,14 +10,49 @@ import {
   useToggleCatalogue,
   useToggleFavorite,
 } from '../../hooks/useProperties';
-import { Property } from '../../contexts/PropertyContext'; // Reusing type
+import { Property } from '../../contexts/PropertyContext';
+
+// --- Kept from functional Catalogue.tsx ---
+// This transformation function is critical for data stability. It ensures that
+// even if the backend API returns an incomplete object, our frontend component
+// will have default values and won't crash.
+const transformProperty = (property: any): Property => ({
+  ...property,
+  id: property.id || '',
+  title: property.title || 'Untitled',
+  description: property.description || '',
+  price: property.price || 0,
+  location: property.location || 'N/A',
+  bedrooms: property.bedrooms || 0,
+  bathrooms: property.bathrooms || 0,
+  area: property.area || 0,
+  type: property.type || 'house',
+  status: property.status || 'available',
+  ownerId: property.ownerId || '',
+  listerName: property.listerName || 'N/A',
+  images: property.imageUrls?.filter(Boolean) as string[] || [],
+  createdAt: property.createdAt || new Date().toISOString(),
+  views: property.views || 0,
+  features: property.features || [],
+});
 
 export const UserCatalogue: React.FC = () => {
   const navigate = useNavigate();
 
-  // Backend hooks
-  const { data: allProperties = [], isLoading: isLoadingProperties } = useProperties();
-  const { data: preferences, isLoading: isLoadingPreferences } = useUserPreferences();
+  // --- Kept from functional Catalogue.tsx ---
+  // Robust hooks that handle the entire data lifecycle (loading, error, success).
+  const {
+    data: allProperties = [],
+    isLoading: isLoadingProperties,
+    error: propertiesError
+  } = useProperties();
+
+  const {
+    data: preferences,
+    isLoading: isLoadingPreferences,
+    error: preferencesError
+  } = useUserPreferences();
+
   const toggleCatalogue = useToggleCatalogue();
   const toggleFavorite = useToggleFavorite();
 
@@ -27,84 +62,64 @@ export const UserCatalogue: React.FC = () => {
   const [sortBy, setSortBy] = useState('recent');
   const [isSearching, setIsSearching] = useState(false);
 
-  const catalogueIds = useMemo(() => new Set(preferences?.catalogueProperties || []), [preferences]);
+  const catalogueIds = useMemo(() =>
+    new Set(preferences?.catalogueProperties || []),
+    [preferences]
+  );
 
-  // FIX: This useEffect now correctly filters AND transforms the property data
-  // to match the 'Property' type interface, preventing TypeScript errors.
+  // --- Kept from functional Catalogue.tsx ---
+  // This useEffect correctly filters AND transforms the property data.
   useEffect(() => {
+    if (propertiesError || preferencesError) {
+      console.error('Catalogue: Error loading data:', { propertiesError, preferencesError });
+      setFilteredProperties([]);
+      return;
+    }
+
     if (catalogueIds.size === 0 || !allProperties.length) {
       setFilteredProperties([]);
       return;
     }
-    
-    const list = allProperties
-      .filter(p => p.id && catalogueIds.has(p.id))
-      .map(property => ({
-        // Spread all properties from the backend object
-        ...property,
-        // Ensure required fields from the frontend 'Property' type are present
-        id: property.id || '',
-        title: property.title || 'Untitled',
-        description: property.description || '',
-        price: property.price || 0,
-        location: property.location || 'N/A',
-        bedrooms: property.bedrooms || 0,
-        bathrooms: property.bathrooms || 0,
-        area: property.area || 0,
-        type: property.type || 'house',
-        status: property.status || 'available',
-        listerId: property.listerId || '',
-        listerName: property.listerName || 'N/A',
-        images: property.imageUrls?.filter(Boolean) as string[] || [], 
-        createdAt: property.createdAt ? new Date(property.createdAt) : new Date(),
-        views: property.views || 0,
-        offers: 0, // Default 'offers' to 0 as it's not in the backend schema
-      }));
 
-    setFilteredProperties(list);
-  }, [catalogueIds, allProperties]);
+    try {
+      const list = allProperties
+        .filter(p => p?.id && catalogueIds.has(p.id))
+        .map(transformProperty);
 
-
-  const handleSearch = async (query: string) => {
-    setIsSearching(true);
-    let masterList = allProperties
-      .filter(p => p.id && catalogueIds.has(p.id))
-      .map(property => ({
-        ...property,
-        id: property.id || '',
-        title: property.title || 'Untitled',
-        description: property.description || '',
-        price: property.price || 0,
-        location: property.location || 'N/A',
-        bedrooms: property.bedrooms || 0,
-        bathrooms: property.bathrooms || 0,
-        area: property.area || 0,
-        type: property.type || 'house',
-        status: property.status || 'available',
-        listerId: property.listerId || '',
-        listerName: property.listerName || 'N/A',
-        images: property.imageUrls?.filter(Boolean) as string[] || [],
-        createdAt: property.createdAt ? new Date(property.createdAt) : new Date(),
-        views: property.views || 0,
-        offers: 0,
-      }));
-    
-    let localFiltered = masterList;
-
-    if (query) {
-      localFiltered = localFiltered.filter(property =>
-        property.title.toLowerCase().includes(query.toLowerCase()) ||
-        property.description.toLowerCase().includes(query.toLowerCase()) ||
-        property.location.toLowerCase().includes(query.toLowerCase())
-      );
+      setFilteredProperties(list);
+    } catch (error) {
+      console.error('Catalogue: Error transforming properties:', error);
+      setFilteredProperties([]);
     }
-    setFilteredProperties(localFiltered);
-    setIsSearching(false);
+  }, [catalogueIds, allProperties, propertiesError, preferencesError]);
+
+  const handleSearch = (query: string) => {
+    setIsSearching(true);
+    try {
+      const masterList = allProperties
+        .filter(p => p?.id && catalogueIds.has(p.id))
+        .map(transformProperty);
+
+      let localFiltered = masterList;
+      if (query) {
+        localFiltered = localFiltered.filter(property =>
+          property.title.toLowerCase().includes(query.toLowerCase()) ||
+          property.description.toLowerCase().includes(query.toLowerCase()) ||
+          property.location.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+      setFilteredProperties(localFiltered);
+    } catch (error) {
+      console.error('Catalogue: Error during search:', error);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleSort = (sortType: string) => {
     setSortBy(sortType);
     let sorted = [...filteredProperties];
+
     switch (sortType) {
       case 'price-low':
         sorted.sort((a, b) => a.price - b.price);
@@ -113,7 +128,11 @@ export const UserCatalogue: React.FC = () => {
         sorted.sort((a, b) => b.price - a.price);
         break;
       case 'recent':
-        sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        sorted.sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
         break;
       case 'alphabetical':
         sorted.sort((a, b) => a.title.localeCompare(b.title));
@@ -122,19 +141,31 @@ export const UserCatalogue: React.FC = () => {
     setFilteredProperties(sorted);
   };
 
-  const handleRemoveFromCatalogue = (propertyId: string) => {
-    toggleCatalogue.mutate(propertyId);
-  };
-
-  const clearCatalogue = async () => {
-    if (window.confirm('Are you sure you want to clear your entire catalogue?')) {
-      const removalPromises = filteredProperties.map(p => toggleCatalogue.mutateAsync(p.id));
-      await Promise.all(removalPromises);
+  const handleRemoveFromCatalogue = async (propertyId: string) => {
+    try {
+      await toggleCatalogue.mutateAsync(propertyId);
+    } catch (error) {
+      console.error('Catalogue: Error removing from catalogue:', error);
     }
   };
   
-  const handleFavoriteToggle = (propertyId: string) => {
-    toggleFavorite.mutate(propertyId);
+  // REMOVED: `window.confirm` to prevent app from freezing in certain environments.
+  // A custom modal would be a good future addition here.
+  const clearCatalogue = async () => {
+    try {
+      const removalPromises = filteredProperties.map(p => toggleCatalogue.mutateAsync(p.id));
+      await Promise.all(removalPromises);
+    } catch (error) {
+      console.error('Catalogue: Error clearing catalogue:', error);
+    }
+  };
+
+  const handleFavoriteToggle = async (propertyId: string) => {
+    try {
+      await toggleFavorite.mutateAsync(propertyId);
+    } catch (error) {
+      console.error('Catalogue: Error toggling favorite:', error);
+    }
   };
 
   const containerVariants = {
@@ -146,7 +177,9 @@ export const UserCatalogue: React.FC = () => {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
-
+  
+  // --- Adopted from Catalogue.tsx ---
+  // Superior loading and error states for a better user experience.
   if (isLoadingProperties || isLoadingPreferences) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
@@ -158,9 +191,31 @@ export const UserCatalogue: React.FC = () => {
     );
   }
   
+  if (propertiesError || preferencesError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-red-500 mb-4">
+              <ShoppingCart className="h-12 w-12 mx-auto mb-4" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Failed to Load Catalogue</h2>
+            <p className="text-gray-600 mb-4">There was an error loading your saved properties.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+      </div>
+    );
+  }
+
   const isCatalogueEmpty = catalogueIds.size === 0;
 
   return (
+    // --- Adopted from Catalogue (1).tsx ---
+    // The overall layout, header, and control panel design.
     <motion.div
       variants={containerVariants}
       initial="hidden"
@@ -198,41 +253,40 @@ export const UserCatalogue: React.FC = () => {
         </motion.div>
 
         {!isCatalogueEmpty && (
-          <motion.div variants={itemVariants} className="mb-8">
-            <SearchBar onSearch={handleSearch} loading={isSearching} />
-          </motion.div>
-        )}
-
-        {!isCatalogueEmpty && (
-          <motion.div variants={itemVariants} className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="mb-4 lg:mb-0">
-              <span className="text-lg font-semibold text-gray-900">
-                {`${filteredProperties.length} properties found`}
-              </span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <select
-                value={sortBy}
-                onChange={(e) => handleSort(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none text-sm"
-              >
-                <option value="recent">Recently Added</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="alphabetical">Alphabetical</option>
-              </select>
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
-                ><Grid className="h-5 w-5" /></button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
-                ><List className="h-5 w-5" /></button>
+          <>
+            <motion.div variants={itemVariants} className="mb-8">
+              <SearchBar onSearch={handleSearch} loading={isSearching} />
+            </motion.div>
+            <motion.div variants={itemVariants} className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="mb-4 lg:mb-0">
+                <span className="text-lg font-semibold text-gray-900">
+                  {`${filteredProperties.length} properties found`}
+                </span>
               </div>
-            </div>
-          </motion.div>
+              <div className="flex items-center space-x-4">
+                <select
+                  value={sortBy}
+                  onChange={(e) => handleSort(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none text-sm"
+                >
+                  <option value="recent">Recently Added</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="alphabetical">Alphabetical</option>
+                </select>
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                  ><Grid className="h-5 w-5" /></button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                  ><List className="h-5 w-5" /></button>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
 
         <motion.div variants={itemVariants}>
@@ -243,10 +297,9 @@ export const UserCatalogue: React.FC = () => {
                   <div key={property.id} className="relative group">
                     <PropertyCard
                       property={property}
-                      viewMode={viewMode}
-                      onCatalogueToggle={handleRemoveFromCatalogue}
+                      onCatalogueToggle={() => handleRemoveFromCatalogue(property.id)}
                       isInCatalogue={true}
-                      onFavoriteToggle={handleFavoriteToggle}
+                      onFavoriteToggle={() => handleFavoriteToggle(property.id)}
                       isFavorite={preferences?.favoriteProperties?.includes(property.id)}
                     />
                     <button
@@ -258,36 +311,25 @@ export const UserCatalogue: React.FC = () => {
                 ))}
               </div>
             ) : (
+              // Adopted from Catalogue (1).tsx - "No Results" state
               <div className="text-center py-20">
                 <div className="text-gray-400 text-6xl mb-4">🔍</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">No matching properties found</h3>
-                <p className="text-gray-600 mb-6">Try adjusting your search criteria or filters</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">No Matching Properties Found</h3>
+                <p className="text-gray-600 mb-6">Try adjusting your search criteria or filters.</p>
                 <button
-                  onClick={() => {
-                    const catalogueSet = new Set(catalogueIds);
-                    const originalList = allProperties
-                      .filter(p => p.id && catalogueSet.has(p.id))
-                      .map(p => ({
-                          ...p,
-                          images: p.imageUrls?.filter(Boolean) as string[] || [],
-                          createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
-                          views: p.views || 0,
-                          offers: 0,
-                          listerName: p.listerName || 'N/A'
-                      })) as Property[];
-                    setFilteredProperties(originalList);
-                  }}
+                  onClick={() => handleSearch('')}
                   className="text-primary-600 hover:text-primary-700 font-medium"
                 >
-                  Clear search and show all
+                  Clear Search
                 </button>
               </div>
             )
           ) : (
+            // Adopted from Catalogue (1).tsx - "Empty" state
             <div className="text-center py-20">
               <div className="text-gray-400 text-6xl mb-6">🛒</div>
               <h3 className="text-3xl font-bold text-gray-900 mb-4">Your catalogue is empty</h3>
-              <p className="text-gray-600 mb-8 max-w-md mx-auto">Browse properties and save your favorites to see them here.</p>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">Browse properties and save them to your catalogue to see them here.</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={() => navigate('/user/properties')}
