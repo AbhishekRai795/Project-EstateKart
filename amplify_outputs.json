@@ -29,11 +29,11 @@
       ],
       "redirect_sign_in_uri": [
         "http://localhost:5173/",
-        "https://main.d38vjxpnaksvjk.amplifyapp.com"
+        "https://main.d6e9m6h929ezj.amplifyapp.com/"
       ],
       "redirect_sign_out_uri": [
         "http://localhost:5173/auth/",
-        "https://main.d38vjxpnaksvjk.amplifyapp.com"
+        "https://main.d6e9m6h929ezj.amplifyapp.com/"
       ],
       "response_type": "code",
       "scopes": [
