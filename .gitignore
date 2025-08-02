@@ -6,7 +6,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# AWS/Amplify Local Files (Do not commit these)
+# AWS/Amplify Generated Files (Do not commit these)
 .aws/
 amplify/#current-cloud-backend/
 amplify/.amplify-sandbox/
@@ -15,11 +15,11 @@ amplify/mock-data/
 amplify/artifacts/
 amplify/amplify-meta.json
 amplify/.config/local-*
+amplify/team-provider-info.json
 
-# CRITICAL: Ignore the outputs directory, but explicitly UN-ignore the outputs file
-# This allows the frontend to connect to the backend resources.
-amplify/outputs/
-!amplify/outputs/amplify_outputs.json
+# Amplify Outputs (Let Amplify generate these during build)
+amplify_outputs.json
+amplifyconfiguration.json
 
 # Node modules & builds
 node_modules/
