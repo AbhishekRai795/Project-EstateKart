@@ -143,10 +143,10 @@
    "Value": "[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"]"
   },
   "oauthRedirectSignIn": {
-   "Value": "http://localhost:5173/"
+   "Value": "http://localhost:5173/,https://main.d38vjxpnaksvjk.amplifyapp.com"
   },
   "oauthRedirectSignOut": {
-   "Value": "http://localhost:5173/auth/"
+   "Value": "http://localhost:5173/auth/,https://main.d38vjxpnaksvjk.amplifyapp.com"
   },
   "oauthResponseType": {
    "Value": "code"
@@ -299,7 +299,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/3e455298cbac8912a320e626f346661ebeacaed4c5f7eaf4daaef347c1c327b1.json"
+       "/18de1b402a3b988fb1735d94bb8f520d8a396ebba2a84e024e2032367d58dca4.json"
       ]
      ]
     }
@@ -367,7 +367,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/55984597adf74802471f349d38e8950aa45c9d50daf1fb2b7446b37e2dd894ac.json"
+       "/e4b98fd576a683635f625c3726d3f525cb6b18d718d9f58852f646dc61be311c.json"
       ]
      ]
     }

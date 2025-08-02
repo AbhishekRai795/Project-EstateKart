@@ -452,7 +452,8 @@
      "aws.cognito.signin.user.admin"
     ],
     "CallbackURLs": [
-     "http://localhost:5173/"
+     "http://localhost:5173/",
+     "https://main.d38vjxpnaksvjk.amplifyapp.com"
     ],
     "ExplicitAuthFlows": [
      "ALLOW_CUSTOM_AUTH",
@@ -460,7 +461,8 @@
      "ALLOW_REFRESH_TOKEN_AUTH"
     ],
     "LogoutURLs": [
-     "http://localhost:5173/auth/"
+     "http://localhost:5173/auth/",
+     "https://main.d38vjxpnaksvjk.amplifyapp.com"
     ],
     "PreventUserExistenceErrors": "ENABLED",
     "SupportedIdentityProviders": [

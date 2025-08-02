@@ -7,12 +7,12 @@ export const auth = defineAuth({
       // These URLs must match what you configured in the Cognito Hosted UI
       callbackUrls: [
         'http://localhost:5173/',
-        // Add your deployed app's URL here in the future
+        'https://main.d38vjxpnaksvjk.amplifyapp.com',
+        
       ],
       logoutUrls: [
         'http://localhost:5173/auth/',
-        // Add your deployed app's URL here in the future
-      ],
+        'https://main.d38vjxpnaksvjk.amplifyapp.com',      ],
       google: {
         // Use secrets for your client ID and secret
         clientId: secret('GOOGLE_CLIENT_ID'),
