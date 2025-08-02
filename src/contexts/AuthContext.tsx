@@ -9,13 +9,19 @@ import {
   resendSignUpCode,
   resetPassword,
   confirmResetPassword,
+  signInWithRedirect,
 } from 'aws-amplify/auth';
 import type { SignUpOutput } from 'aws-amplify/auth';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '../../amplify/data/resource';
+
+const client = generateClient<Schema>();
 
 interface User {
   id: string;
   email: string;
   name: string;
+  phone?: string;
   avatar?: string;
   userType?: 'user' | 'lister';
   emailVerified?: boolean;
@@ -24,9 +30,10 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   logout: () => void;
   register: (email: string, password: string, name: string) => Promise<SignUpOutput>;
-  loading: boolean; // This is now ONLY for the initial app load
+  loading: boolean;
   confirmSignUp: (email: string, code: string) => Promise<void>;
   resendSignUpCode: (email: string) => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
@@ -51,21 +58,89 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuthState = useCallback(async (): Promise<User | null> => {
     try {
-      const currentUser = await getCurrentUser();
+      const cognitoUser = await getCurrentUser();
       const attributes = await fetchUserAttributes();
       
+      const { data: existingUser } = await client.models.User.get({ id: cognitoUser.userId });
+
+      let userProfile: Schema['User']['type'];
+      
+      const nameFromProvider = attributes.name || 
+                               [attributes.given_name, attributes.family_name].filter(Boolean).join(' ') || 
+                               'New User';
+      const pictureFromProvider = attributes.picture;
+
+      if (!existingUser) {
+        console.log("User profile not found in DB. Attempting to create...");
+        const newUserInput = {
+          id: cognitoUser.userId,
+          username: attributes.email || 'default_username',
+          name: nameFromProvider,
+          email: attributes.email || '',
+          phone: attributes.phone_number || '',
+          avatarUrl: pictureFromProvider || '',
+        };
+        
+        try {
+          const { data: newProfile, errors } = await client.models.User.create(newUserInput);
+          if (errors || !newProfile) {
+            throw new Error(errors?.[0].message || "Could not create user profile in the database.");
+          }
+          userProfile = newProfile;
+          console.log("Successfully created new user profile in DB.");
+        } catch (creationError) {
+          // --- FIX: Handle race condition caused by React Strict Mode ---
+          console.warn("Creation failed, possibly due to a race condition. Re-fetching profile...");
+          const { data: refetchedUser } = await client.models.User.get({ id: cognitoUser.userId });
+          if (refetchedUser) {
+            console.log("Successfully fetched profile on second attempt.");
+            userProfile = refetchedUser;
+          } else {
+            // If it still doesn't exist, then it's a genuine error.
+            throw new Error("Could not create or find user profile after creation attempt.");
+          }
+        }
+      } else {
+        console.log("User profile found in DB. Checking for updates...");
+        userProfile = existingUser;
+        
+        const updates: { name?: string; avatarUrl?: string } = {};
+        
+        if (nameFromProvider && nameFromProvider !== 'New User' && nameFromProvider !== userProfile.name) {
+          updates.name = nameFromProvider;
+        }
+        if (pictureFromProvider && pictureFromProvider !== userProfile.avatarUrl) {
+          updates.avatarUrl = pictureFromProvider;
+        }
+
+        if (Object.keys(updates).length > 0) {
+          console.log(`Updating user profile with:`, updates);
+          const { data: updatedProfile } = await client.models.User.update({
+            id: userProfile.id,
+            ...updates,
+          });
+          if (updatedProfile) {
+            userProfile = updatedProfile;
+          }
+        }
+      }
+
       const userData: User = {
-        id: currentUser.userId,
-        email: attributes.email || '',
-        name: attributes.name || attributes.given_name || attributes.email?.split('@')[0] || 'User',
-        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${attributes.name || attributes.email}`,
+        id: userProfile.id,
+        email: userProfile.email || '',
+        name: userProfile.name || 'User',
+        phone: userProfile.phone || '',
+        avatar: userProfile.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${userProfile.name || userProfile.email}`,
         userType: 'user',
-        emailVerified: attributes.email_verified === 'true'
+        emailVerified: attributes.email_verified === 'true',
       };
 
       setUser(userData);
       return userData;
     } catch (error) {
+      if ((error as Error).name !== 'UserUnAuthenticatedException') {
+          console.error("Auth state check/profile sync failed:", error);
+      }
       setUser(null);
       return null;
     }
@@ -74,14 +149,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       await checkAuthState();
-      setLoading(false); // This global loading is ONLY for the initial app load.
+      setLoading(false);
     };
     initializeAuth();
   }, [checkAuthState]);
   
-  // FIX: Removed the global setLoading calls from this function.
-  // The local 'isProcessing' state in Auth.tsx will now correctly handle the button's loading state
-  // without triggering the full-page loader.
   const login = async (email: string, password: string): Promise<void> => {
     try {
       await signIn({ username: email, password });
@@ -91,8 +163,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error.name === 'UserNotConfirmedException') {
         throw new Error('Please verify your email before signing in.');
       }
-      // This error will be caught and displayed on the Auth page.
       throw new Error('Incorrect username or password.'); 
+    }
+  };
+
+  const signInWithGoogle = async (): Promise<void> => {
+    try {
+      await signOut();
+    } catch (signOutError) {
+      console.log("No active user to sign out, proceeding with Google sign-in.");
+    }
+    try {
+      await signInWithRedirect({ provider: 'Google' });
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+      throw error;
     }
   };
 
@@ -102,7 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const result = await signUp({
             username: email,
             password,
-            options: { userAttributes: { email, name } },
+            options: { userAttributes: { email, name, phone_number: '' } },
         });
         return result;
     } finally {
@@ -137,6 +222,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         login,
+        signInWithGoogle,
         logout,
         register,
         loading,

@@ -14,10 +14,17 @@ import {
   useUserPreferences,
   useToggleCatalogue,
   useToggleFavorite,
-  useIncrementPropertyView // Your hook for view incrementing
+  useIncrementPropertyView
 } from '../hooks/useProperties';
+import ContactListerModal from '../components/ContactListerModal';
+// --- CHANGE: Import Amplify client and types ---
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '../../amplify/data/resource';
 
-// Your original Modal Component is preserved
+// --- CHANGE: Initialize the Amplify Data client ---
+const client = generateClient<Schema>();
+
+
 const Modal: React.FC<{ title: string, onClose: () => void, children: React.ReactNode }> = ({ title, onClose, children }) => (
   <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
     <motion.div 
@@ -45,17 +52,19 @@ export const PropertyDetail: React.FC = () => {
   const { user } = useAuth();
 
   const { data: property, isLoading, error } = useProperty(id!);
+  // --- CHANGE: State to hold the fetched lister profile ---
+  const [listerProfile, setListerProfile] = useState<Schema['User']['type'] | null>(null);
+  
   const { data: preferences, refetch: refetchPreferences } = useUserPreferences();
   const catalogueProperties = preferences?.catalogueProperties || [];
   const favoriteProperties = preferences?.favoriteProperties || [];
   const toggleCatalogue = useToggleCatalogue();
   const toggleFavorite = useToggleFavorite();
   const scheduleViewing = useScheduleViewing();
-  const incrementView = useIncrementPropertyView(); // Using your hook
+  const incrementView = useIncrementPropertyView();
 
-  // All your original state is preserved
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showContactForm, setShowContactForm] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
 
@@ -68,19 +77,6 @@ export const PropertyDetail: React.FC = () => {
     message: ''
   });
 
-  const [contactForm, setContactForm] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: '',
-    message: ''
-  });
-
-  // --- FIX FOR VIEW COUNT ---
-  // This is the only part of the logic that has been changed.
-  // Think of `sessionStorage` as a short-term memory for a browser tab.
-  // We check this memory first. If we haven't seen this property ID before in this
-  // session, we increment the view count in the database and then add the ID to our
-  // memory. If we *have* seen it, we do nothing.
   useEffect(() => {
     if (id) {
       const viewedProperties = JSON.parse(sessionStorage.getItem('viewedProperties') || '[]');
@@ -92,13 +88,31 @@ export const PropertyDetail: React.FC = () => {
     }
   }, [id, incrementView]);
 
+  // --- CHANGE: Fetch lister profile when property data is available ---
+  useEffect(() => {
+    const fetchListerProfile = async () => {
+      if (property?.ownerId) {
+        try {
+          const { data: listerData, errors } = await client.models.User.get({ id: property.ownerId });
+          if (errors) throw errors;
+          setListerProfile(listerData);
+        } catch (err) {
+          console.error("Failed to fetch lister profile:", err);
+          setListerProfile(null); // Handle case where lister might not be found
+        }
+      }
+    };
+
+    fetchListerProfile();
+  }, [property]);
+
+
   useEffect(() => {
     if (user) {
       refetchPreferences();
     }
   }, [user, refetchPreferences]);
 
-  // Your original transformation logic is preserved
   const transformedProperty = property ? {
     ...property,
     id: property.id || '',
@@ -113,9 +127,10 @@ export const PropertyDetail: React.FC = () => {
     status: property.status || 'available' as 'available' | 'pending' | 'sold',
     imageUrls: property.imageUrls?.filter((url): url is string => !!url) || [],
     ownerId: property.ownerId || '',
-    listerName: property.listerName || 'Anonymous',
-    listerEmail: property.listerEmail || '',
-    listerPhone: property.listerPhone || '',
+    // --- CHANGE: These are now fallbacks; primary data comes from listerProfile ---
+    listerName: listerProfile?.name || property.listerName || 'Anonymous',
+    listerEmail: listerProfile?.email || property.listerEmail || '',
+    listerPhone: listerProfile?.phone || property.listerPhone || '',
     createdAt: property.createdAt || new Date().toISOString(),
     views: property.views || 0,
     features: property.features?.filter((feature): feature is string => !!feature) || [],
@@ -124,7 +139,6 @@ export const PropertyDetail: React.FC = () => {
   const isInCatalogue = catalogueProperties.includes(transformedProperty?.id || '');
   const isFavorite = favoriteProperties.includes(transformedProperty?.id || '');
 
-  // All your handler functions are preserved
   const handleToggleAction = async (action: 'catalogue' | 'favorite') => {
     if (!transformedProperty) return;
     const mutation = action === 'catalogue' ? toggleCatalogue : toggleFavorite;
@@ -157,19 +171,6 @@ export const PropertyDetail: React.FC = () => {
     }
   };
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!transformedProperty) return;
-    try {
-      console.log('Contact form submitted:', contactForm);
-      alert('Message sent successfully!');
-      setShowContactForm(false);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      alert('Failed to send message.');
-    }
-  };
-
   const nextImage = () => {
     if (transformedProperty?.imageUrls.length) {
       setCurrentImageIndex(p => (p + 1) % transformedProperty.imageUrls.length);
@@ -182,7 +183,6 @@ export const PropertyDetail: React.FC = () => {
     }
   };
 
-  // All your helper functions and JSX are preserved exactly as they were.
   const formatPrice = (price: number) => new Intl.NumberFormat('en-US', {
     style: 'currency', currency: 'USD', maximumFractionDigits: 0,
   }).format(price);
@@ -281,7 +281,7 @@ export const PropertyDetail: React.FC = () => {
               <h3 className="text-lg font-bold mb-3">Actions</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {user && <button onClick={() => setShowScheduleModal(true)} className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-semibold text-sm"> <Calendar size={16} /> Schedule Viewing</button>}
-                <button onClick={() => setShowContactForm(true)} className="w-full flex items-center justify-center gap-2 py-2.5 px-4 border-2 border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 font-semibold text-sm"><Mail size={16} /> Contact Lister</button>
+                <button onClick={() => setIsContactModalOpen(true)} className="w-full flex items-center justify-center gap-2 py-2.5 px-4 border-2 border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 font-semibold text-sm"><Mail size={16} /> Contact Lister</button>
               </div>
             </motion.div>
 
@@ -290,8 +290,9 @@ export const PropertyDetail: React.FC = () => {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center"><User className="text-primary-600" /></div>
                 <div>
-                  <p className="font-semibold text-gray-800 text-sm">{transformedProperty.listerName}</p>
-                  <p className="text-xs text-gray-500">{transformedProperty.listerEmail}</p>
+                  {/* --- CHANGE: Display dynamic lister info --- */}
+                  <p className="font-semibold text-gray-800 text-sm">{listerProfile ? listerProfile.name : 'Loading...'}</p>
+                  <p className="text-xs text-gray-500">{listerProfile ? listerProfile.email : '...'}</p>
                 </div>
               </div>
             </motion.div>
@@ -312,7 +313,12 @@ export const PropertyDetail: React.FC = () => {
         </div>
       </main>
 
-      {/* Your original modals are preserved */}
+      <ContactListerModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        property={transformedProperty}
+      />
+
       {showScheduleModal && (
         <Modal title="Schedule Viewing" onClose={() => setShowScheduleModal(false)}>
           <form onSubmit={handleScheduleSubmit} className="space-y-3 text-sm">
@@ -327,17 +333,6 @@ export const PropertyDetail: React.FC = () => {
             <button type="submit" disabled={scheduleViewing.isPending} className="w-full py-2 bg-primary-600 text-white rounded-md font-semibold hover:bg-primary-700 disabled:opacity-50">
               {scheduleViewing.isPending ? 'Scheduling...' : 'Confirm'}
             </button>
-          </form>
-        </Modal>
-      )}
-       {showContactForm && (
-        <Modal title="Contact Lister" onClose={() => setShowContactForm(false)}>
-          <form onSubmit={handleContactSubmit} className="space-y-3 text-sm">
-            <input type="text" placeholder="Name" value={contactForm.name} onChange={e => setContactForm({...contactForm, name: e.target.value})} className="w-full p-2 border rounded-md" required />
-            <input type="email" placeholder="Email" value={contactForm.email} onChange={e => setContactForm({...contactForm, email: e.target.value})} className="w-full p-2 border rounded-md" required />
-            <input type="tel" placeholder="Phone (Optional)" value={contactForm.phone} onChange={e => setContactForm({...contactForm, phone: e.target.value})} className="w-full p-2 border rounded-md" />
-            <textarea placeholder="Your message..." value={contactForm.message} onChange={e => setContactForm({...contactForm, message: e.target.value})} className="w-full p-2 border rounded-md h-28"></textarea>
-            <button type="submit" className="w-full py-2 bg-primary-600 text-white rounded-md font-semibold hover:bg-primary-700">Send</button>
           </form>
         </Modal>
       )}

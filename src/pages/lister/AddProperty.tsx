@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCreateProperty } from '../../hooks/useProperties';
-import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 
 export const AddProperty: React.FC = () => {
   const navigate = useNavigate();
@@ -39,9 +38,6 @@ export const AddProperty: React.FC = () => {
     status: 'available' as 'available' | 'pending' | 'sold',
     yearBuilt: '',
     parkingSpaces: '',
-    contactName: '',
-    contactEmail: '',
-    contactPhone: ''
   });
 
   const [images, setImages] = useState<File[]>([]);
@@ -51,7 +47,6 @@ export const AddProperty: React.FC = () => {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [imageUploadMethod, setImageUploadMethod] = useState<'file' | 'url'>('file');
 
-  // FIXED: The amenitiesList is defined here to be in scope for the JSX.
   const amenitiesList = [
     'Swimming Pool', 'Gym', 'Parking', 'Balcony', 'Garden', 'Security',
     'Elevator', 'Air Conditioning', 'Heating', 'Internet', 'Furnished',
@@ -107,16 +102,17 @@ export const AddProperty: React.FC = () => {
     );
   };
 
+  // --- CHANGE: handleSubmit now uses the authenticated user's info ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+        alert("You must be logged in to list a property.");
+        return;
+    }
 
     setUploadingImages(true);
 
     try {
-      const currentUser = await getCurrentUser();
-      const attrs = await fetchUserAttributes();
-
       const imagesToUpload = images.length > 0 ? images : [];
 
       const propertyData = {
@@ -130,9 +126,10 @@ export const AddProperty: React.FC = () => {
         area: parseInt(formData.area),
         features: selectedAmenities,
         images: imagesToUpload,
-        listerName: formData.contactName || attrs.given_name || attrs.name || currentUser.userId,
-        listerEmail: formData.contactEmail || attrs.email || currentUser.userId,
-        listerPhone: formData.contactPhone || attrs.phone_number,
+        // Automatically use the logged-in user's details
+        listerName: user.name,
+        listerEmail: user.email,
+        listerPhone: user.phone || '', // Use phone from user profile if available
       };
 
       await createProperty.mutateAsync(propertyData);
@@ -165,13 +162,7 @@ export const AddProperty: React.FC = () => {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
+    visible: { opacity: 1, transition: { duration: 0.6, staggerChildren: 0.1 } }
   };
 
   const itemVariants = {
@@ -328,7 +319,6 @@ export const AddProperty: React.FC = () => {
               <h2 className="text-xl font-semibold text-gray-900 ml-3">Amenities</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {/* FIXED: Added explicit 'string' type to the amenity parameter */}
               {amenitiesList.map((amenity: string) => (
                 <label key={amenity} className="relative flex items-center cursor-pointer">
                   <input type="checkbox" checked={selectedAmenities.includes(amenity)} onChange={() => toggleAmenity(amenity)} className="sr-only" />
@@ -338,28 +328,6 @@ export const AddProperty: React.FC = () => {
                   </div>
                 </label>
               ))}
-            </div>
-          </motion.div>
-
-          {/* Contact Information */}
-          <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center mb-6">
-              <div className="p-2 bg-primary-100 rounded-lg"><Home className="h-5 w-5 text-primary-600" /></div>
-              <h2 className="text-xl font-semibold text-gray-900 ml-3">Contact Information</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Contact Name *</label>
-                <input type="text" value={formData.contactName} onChange={(e) => handleInputChange('contactName', e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="John Smith" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Contact Email *</label>
-                <input type="email" value={formData.contactEmail} onChange={(e) => handleInputChange('contactEmail', e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="john@example.com" required />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Contact Phone *</label>
-                <input type="tel" value={formData.contactPhone} onChange={(e) => handleInputChange('contactPhone', e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="+1 (555) 123-4567" required />
-              </div>
             </div>
           </motion.div>
 
@@ -375,3 +343,4 @@ export const AddProperty: React.FC = () => {
     </motion.div>
   );
 };
+

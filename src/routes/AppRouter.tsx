@@ -14,7 +14,7 @@ import { AddProperty } from '../pages/lister/AddProperty';
 import { ListerAnalytics } from '../pages/lister/Analytics';
 import { ListerQueries } from '../pages/lister/Queries';
 import { UserDashboard } from '../pages/user/Dashboard';
-import { ClientManagement } from '../pages/lister/ClientManagement';
+import {ClientManagement}   from '../pages/lister/ClientManagement';
 import { Profile } from '../pages/user/Profile';
 import { Loader2 } from 'lucide-react';
 

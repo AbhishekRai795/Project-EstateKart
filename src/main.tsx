@@ -8,7 +8,29 @@ import { Amplify } from 'aws-amplify';
 import outputs from '../amplify_outputs.json';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-Amplify.configure(outputs);
+// --- FIX: Manually added the OAuth configuration for Google Sign-In ---
+// This is necessary because the backend was configured via the AWS Console,
+// so the amplify_outputs.json file is missing this information.
+Amplify.configure({
+    ...outputs,
+    auth: {
+        ...outputs.auth,
+        loginWith: {
+            oauth: {
+                domain: 'estatekart-auth.auth.ap-south-1.amazoncognito.com',
+                scopes: [
+                    'email',
+                    'profile',
+                    'openid',
+                    'aws.cognito.signin.user.admin'
+                ],
+                redirectSignIn: ['http://localhost:5173/'],
+                redirectSignOut: ['http://localhost:5173/auth/'],
+                responseType: 'code'
+            }
+        }
+    }
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -59,7 +59,8 @@ export const Header: React.FC = () => {
       items: [
         { path: '/lister/dashboard', label: 'Lister Dashboard', icon: Building },
         { path: '/lister/properties', label: 'My Properties', icon: Building },
-        { path: '/add-property', label: 'Add Property', icon: Plus },
+        // --- FIX: Corrected the path for the Add Property link ---
+        { path: '/lister/add-property', label: 'Add Property', icon: Plus },
         { path: '/lister/clients', label: 'Client Management', icon: Users },
         { path: '/lister/analytics', label: 'Analytics', icon: TrendingUp },
       ]

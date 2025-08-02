@@ -1,5 +1,4 @@
 # Logs
-logs
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -9,19 +8,18 @@ lerna-debug.log*
 
 # AWS/Amplify Local Files (Do not commit these)
 .aws/
-.amplify/
 amplify/#current-cloud-backend/
 amplify/.amplify-sandbox/
 amplify/backend.out/
-amplify/outputs/
 amplify/mock-data/
 amplify/artifacts/
 amplify/amplify-meta.json
-amplify/team-provider-info.json
 amplify/.config/local-*
 
-# Optional: Ignore generated GraphQL files if regenerated locally
-amplify/generated/
+# CRITICAL: Ignore the outputs directory, but explicitly UN-ignore the outputs file
+# This allows the frontend to connect to the backend resources.
+amplify/outputs/
+!amplify/outputs/amplify_outputs.json
 
 # Node modules & builds
 node_modules/
@@ -47,7 +45,3 @@ build/
 *.njsproj
 *.sln
 *.sw?
-
-# Optional: Package manager lockfiles if you prefer
-# package-lock.json
-# yarn.lock

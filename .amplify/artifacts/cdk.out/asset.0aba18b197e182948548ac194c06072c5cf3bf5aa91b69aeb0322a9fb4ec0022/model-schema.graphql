@@ -1,0 +1,124 @@
+type User @model @auth(rules: [{allow: owner, operations: [create, read, update, delete], ownerField: "owner"},
+  {allow: private, operations: [read]}])
+{
+  owner: String
+  username: String
+  name: String
+  email: String
+  phone: String
+  location: String
+  bio: String
+  properties: [Property] @hasMany(references: ["ownerId"])
+  viewings: [PropertyViewing] @hasMany(references: ["userId"])
+  preferences: [UserPreference] @hasMany(references: ["userId"])
+  sentQueries: [ClientQuery] @hasMany(references: ["userId"])
+  receivedQueries: [ClientQuery] @hasMany(references: ["propertyOwnerId"])
+}
+
+type Property @model @auth(rules: [{allow: owner, operations: [create, read, update, delete], ownerField: "ownerId"},
+  {allow: public, provider: iam, operations: [read]},
+  {allow: private, operations: [read]}])
+{
+  ownerId: ID!
+  owner: User @belongsTo(references: ["ownerId"])
+  title: String!
+  description: String!
+  price: Int!
+  location: String!
+  type: PropertyType
+  bedrooms: Int!
+  bathrooms: Int!
+  area: Int!
+  status: PropertyStatus
+  images: [String]
+  features: [String]
+  views: Int
+  listerName: String
+  listerEmail: String
+  listerPhone: String
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  viewings: [PropertyViewing] @hasMany(references: ["propertyId"])
+  queries: [ClientQuery] @hasMany(references: ["propertyId"])
+}
+
+type ClientQuery @model @auth(rules: [{allow: owner, operations: [create, read, update, delete], ownerField: "userId"},
+  {allow: owner, operations: [read, update], ownerField: "propertyOwnerId"}])
+{
+  propertyId: ID!
+  property: Property @belongsTo(references: ["propertyId"])
+  userId: ID!
+  user: User @belongsTo(references: ["userId"])
+  propertyOwnerId: ID!
+  propertyOwner: User @belongsTo(references: ["propertyOwnerId"])
+  clientName: String!
+  clientEmail: String!
+  clientPhone: String
+  subject: String!
+  message: String!
+  status: ClientQueryStatus
+  priority: ClientQueryPriority
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type UserPreference @model @auth(rules: [{allow: owner, operations: [create, read, update, delete], ownerField: "userId"}])
+{
+  userId: ID!
+  user: User @belongsTo(references: ["userId"])
+  catalogueProperties: [String]
+  favoriteProperties: [String]
+  searchHistory: [String]
+  priceRange: AWSJSON
+  preferredLocations: [String]
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type PropertyViewing @model @auth(rules: [{allow: owner, operations: [create, read, update, delete], ownerField: "userId"},
+  {allow: owner, operations: [read, update], ownerField: "propertyOwnerId"}])
+{
+  propertyId: ID!
+  property: Property @belongsTo(references: ["propertyId"])
+  userId: ID!
+  user: User @belongsTo(references: ["userId"])
+  propertyOwnerId: ID!
+  message: String
+  scheduledAt: AWSDateTime!
+  status: PropertyViewingStatus
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+enum PropertyType {
+  house
+  apartment
+  condo
+  villa
+}
+
+enum PropertyStatus {
+  available
+  pending
+  sold
+}
+
+enum ClientQueryStatus {
+  unread
+  read
+  replied
+}
+
+enum ClientQueryPriority {
+  low
+  medium
+  high
+}
+
+enum PropertyViewingStatus {
+  scheduled
+  completed
+  cancelled
+  accepted
+  rejected
+}

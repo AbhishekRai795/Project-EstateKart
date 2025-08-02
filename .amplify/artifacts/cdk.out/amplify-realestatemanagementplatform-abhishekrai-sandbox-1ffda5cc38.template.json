@@ -117,19 +117,36 @@
    "Value": "[]"
   },
   "socialProviders": {
-   "Value": ""
+   "Value": "[\"GOOGLE\"]"
   },
   "oauthCognitoDomain": {
-   "Value": ""
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      {
+       "Fn::GetAtt": [
+        "auth179371D7",
+        "Outputs.amplifyrealestatemanagementplatformabhishekraisandbox1ffda5cc38authamplifyAuthUserPoolUserPoolDomainAD1E01B8Ref"
+       ]
+      },
+      ".auth.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".amazoncognito.com"
+     ]
+    ]
+   }
   },
   "oauthScope": {
-   "Value": "[\"profile\",\"phone\",\"email\",\"openid\",\"aws.cognito.signin.user.admin\"]"
+   "Value": "[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"]"
   },
   "oauthRedirectSignIn": {
-   "Value": "https://example.com"
+   "Value": "http://localhost:5173/"
   },
   "oauthRedirectSignOut": {
-   "Value": ""
+   "Value": "http://localhost:5173/auth/"
   },
   "oauthResponseType": {
    "Value": "code"
@@ -282,7 +299,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/7c461a273b2b4f509f5ea928a50ffdefe7e3b55b1b1bd90aae7e4e6f37567a1f.json"
+       "/3e455298cbac8912a320e626f346661ebeacaed4c5f7eaf4daaef347c1c327b1.json"
       ]
      ]
     }
@@ -350,7 +367,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/56d1a17a08a8b08eafd4c18f7c6ff0ef9599c8e6fd5520af4b634d183fbb5a91.json"
+       "/55984597adf74802471f349d38e8950aa45c9d50daf1fb2b7446b37e2dd894ac.json"
       ]
      ]
     }

@@ -1,9 +1,9 @@
 {
   "auth": {
-    "user_pool_id": "ap-south-1_RP0pY5viP",
+    "user_pool_id": "ap-south-1_qEFxAEkPe",
     "aws_region": "ap-south-1",
-    "user_pool_client_id": "2eb87i1loe5p5teonq0tqb6cvg",
-    "identity_pool_id": "ap-south-1:5fdee77c-b19c-4f61-b297-1ff4ef786eb1",
+    "user_pool_client_id": "65t729q9vimruei3aqts7n57n1",
+    "identity_pool_id": "ap-south-1:46947dc9-e75e-4ec3-a3b1-cfb929008537",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -23,12 +23,32 @@
       "require_symbols": true,
       "require_uppercase": true
     },
+    "oauth": {
+      "identity_providers": [
+        "GOOGLE"
+      ],
+      "redirect_sign_in_uri": [
+        "http://localhost:5173/"
+      ],
+      "redirect_sign_out_uri": [
+        "http://localhost:5173/auth/"
+      ],
+      "response_type": "code",
+      "scopes": [
+        "phone",
+        "email",
+        "openid",
+        "profile",
+        "aws.cognito.signin.user.admin"
+      ],
+      "domain": "fe377d0dd52ced209cd0.auth.ap-south-1.amazoncognito.com"
+    },
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://nao7cedeefhbxbrdyp6ezed4hu.appsync-api.ap-south-1.amazonaws.com/graphql",
+    "url": "https://hvevyfc44jgldpl6nwprp2q4wi.appsync-api.ap-south-1.amazonaws.com/graphql",
     "aws_region": "ap-south-1",
-    "api_key": "da2-uxa3pcruxff7dhtrxpp4twwmfe",
+    "api_key": "da2-rajrn3odljey3gzqjpulxgljdq",
     "default_authorization_type": "AMAZON_COGNITO_USER_POOLS",
     "authorization_types": [
       "API_KEY",
@@ -43,12 +63,61 @@
             "id": {
               "name": "id",
               "isArray": false,
-              "type": "ID",
+              "type": "String",
               "isRequired": true,
+              "attributes": []
+            },
+            "owner": {
+              "name": "owner",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
               "attributes": []
             },
             "username": {
               "name": "username",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "name": {
+              "name": "name",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "email": {
+              "name": "email",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "phone": {
+              "name": "phone",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "location": {
+              "name": "location",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "bio": {
+              "name": "bio",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "avatarUrl": {
+              "name": "avatarUrl",
               "isArray": false,
               "type": "String",
               "isRequired": false,
@@ -102,6 +171,38 @@
                 ]
               }
             },
+            "sentQueries": {
+              "name": "sentQueries",
+              "isArray": true,
+              "type": {
+                "model": "ClientQuery"
+              },
+              "isRequired": false,
+              "attributes": [],
+              "isArrayNullable": true,
+              "association": {
+                "connectionType": "HAS_MANY",
+                "associatedWith": [
+                  "userId"
+                ]
+              }
+            },
+            "receivedQueries": {
+              "name": "receivedQueries",
+              "isArray": true,
+              "type": {
+                "model": "ClientQuery"
+              },
+              "isRequired": false,
+              "attributes": [],
+              "isArrayNullable": true,
+              "association": {
+                "connectionType": "HAS_MANY",
+                "associatedWith": [
+                  "propertyOwnerId"
+                ]
+              }
+            },
             "createdAt": {
               "name": "createdAt",
               "isArray": false,
@@ -127,15 +228,29 @@
               "properties": {}
             },
             {
+              "type": "key",
+              "properties": {
+                "fields": [
+                  "id"
+                ]
+              }
+            },
+            {
               "type": "auth",
               "properties": {
                 "rules": [
                   {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "read"
+                    ]
+                  },
+                  {
                     "provider": "userPools",
-                    "ownerField": "owner",
+                    "ownerField": "id",
                     "allow": "owner",
                     "operations": [
-                      "read",
                       "update",
                       "delete"
                     ],
@@ -323,6 +438,22 @@
                   "propertyId"
                 ]
               }
+            },
+            "queries": {
+              "name": "queries",
+              "isArray": true,
+              "type": {
+                "model": "ClientQuery"
+              },
+              "isRequired": false,
+              "attributes": [],
+              "isArrayNullable": true,
+              "association": {
+                "connectionType": "HAS_MANY",
+                "associatedWith": [
+                  "propertyId"
+                ]
+              }
             }
           },
           "syncable": true,
@@ -360,6 +491,193 @@
                     "operations": [
                       "read"
                     ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "ClientQuery": {
+          "name": "ClientQuery",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "propertyId": {
+              "name": "propertyId",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "property": {
+              "name": "property",
+              "isArray": false,
+              "type": {
+                "model": "Property"
+              },
+              "isRequired": false,
+              "attributes": [],
+              "association": {
+                "connectionType": "BELONGS_TO",
+                "targetNames": [
+                  "propertyId"
+                ]
+              }
+            },
+            "userId": {
+              "name": "userId",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "user": {
+              "name": "user",
+              "isArray": false,
+              "type": {
+                "model": "User"
+              },
+              "isRequired": false,
+              "attributes": [],
+              "association": {
+                "connectionType": "BELONGS_TO",
+                "targetNames": [
+                  "userId"
+                ]
+              }
+            },
+            "propertyOwnerId": {
+              "name": "propertyOwnerId",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "propertyOwner": {
+              "name": "propertyOwner",
+              "isArray": false,
+              "type": {
+                "model": "User"
+              },
+              "isRequired": false,
+              "attributes": [],
+              "association": {
+                "connectionType": "BELONGS_TO",
+                "targetNames": [
+                  "propertyOwnerId"
+                ]
+              }
+            },
+            "clientName": {
+              "name": "clientName",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "clientEmail": {
+              "name": "clientEmail",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "clientPhone": {
+              "name": "clientPhone",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "subject": {
+              "name": "subject",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "message": {
+              "name": "message",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "status": {
+              "name": "status",
+              "isArray": false,
+              "type": {
+                "enum": "ClientQueryStatus"
+              },
+              "isRequired": false,
+              "attributes": []
+            },
+            "priority": {
+              "name": "priority",
+              "isArray": false,
+              "type": {
+                "enum": "ClientQueryPriority"
+              },
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            }
+          },
+          "syncable": true,
+          "pluralName": "ClientQueries",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "provider": "userPools",
+                    "ownerField": "userId",
+                    "allow": "owner",
+                    "operations": [
+                      "create",
+                      "read",
+                      "update",
+                      "delete"
+                    ],
+                    "identityClaim": "cognito:username"
+                  },
+                  {
+                    "provider": "userPools",
+                    "ownerField": "propertyOwnerId",
+                    "allow": "owner",
+                    "operations": [
+                      "read",
+                      "update"
+                    ],
+                    "identityClaim": "cognito:username"
                   }
                 ]
               }
@@ -651,12 +969,30 @@
             "sold"
           ]
         },
+        "ClientQueryStatus": {
+          "name": "ClientQueryStatus",
+          "values": [
+            "unread",
+            "read",
+            "replied"
+          ]
+        },
+        "ClientQueryPriority": {
+          "name": "ClientQueryPriority",
+          "values": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
         "PropertyViewingStatus": {
           "name": "PropertyViewingStatus",
           "values": [
             "scheduled",
             "completed",
-            "cancelled"
+            "cancelled",
+            "accepted",
+            "rejected"
           ]
         }
       },
@@ -665,11 +1001,11 @@
   },
   "storage": {
     "aws_region": "ap-south-1",
-    "bucket_name": "amplify-realestatemanagem-propertyimagesbucket584c-68nc70lfbdkg",
+    "bucket_name": "amplify-realestatemanagem-propertyimagesbucket584c-anu8n91htzfv",
     "buckets": [
       {
         "name": "propertyImages",
-        "bucket_name": "amplify-realestatemanagem-propertyimagesbucket584c-68nc70lfbdkg",
+        "bucket_name": "amplify-realestatemanagem-propertyimagesbucket584c-anu8n91htzfv",
         "aws_region": "ap-south-1",
         "paths": {
           "public/properties/*": {
