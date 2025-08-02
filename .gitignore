@@ -18,7 +18,6 @@ amplify/.config/local-*
 amplify/team-provider-info.json
 
 # Amplify Outputs (Let Amplify generate these during build)
-amplify_outputs.json
 amplifyconfiguration.json
 
 # Node modules & builds
